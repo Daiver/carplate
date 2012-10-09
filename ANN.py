@@ -1,33 +1,19 @@
 
-from time import time
-
-import os
-
-import pybrain
-from pybrain.datasets            import ClassificationDataSet
-from pybrain.utilities           import percentError
-from pybrain.tools.shortcuts     import buildNetwork
-from pybrain.supervised.trainers import BackpropTrainer, RPropMinusTrainer
-from pybrain.structure.modules   import SoftmaxLayer
-
-import pickle
+import numpy as np
 
 class ANN:
     def __init__(self, indim, hiddendim, nb_classes):
-        #net = buildNetwork(size[0] * size[1], 96, ds.outdim, outclass=SoftmaxLayer)
-        self.ds = ClassificationDataSet(indim, nb_classes=nb_classes)
-        self.net = buildNetwork(indim, hiddendim, nb_classes, outclass=SoftmaxLayer)#
-        
+        self.indim = indim
+        self.hiddendim = hiddendim
+        self.nb_classes = nb_classes
+
+        self.theta = np.zeros((indim * hiddendim + hiddendim * nb_classes))
+        self.activate_func = np.tanh
+
     def activate(self, features):
-        return self.net.activate(features)
+        theta1 = self.theta[0:indim * hiddendim]
+        theta2 = self.theta[indim * hiddendim:]
+        a1 = np.array(features)
+        #z1 = 
 
-    def addSamples(self, ds):
-        for x in ds:
-            self.ds.addSample(x[0], [x[1]])
-
-    def train(self, epoch):
-        self.ds._convertToOneOfMany( )
-        trainer = RPropMinusTrainer(self.net, dataset=self.ds, momentum=0.1, verbose=True, weightdecay=0.01)
-        trainer.trainEpochs( epoch )
-
-    
+net = ANN(2, 1, 1)

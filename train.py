@@ -5,7 +5,7 @@ import numpy as np
 
 from time import time
 
-from ANN import ANN
+from PyBrainANN import ANN
 
 from letterselect import CutLetters
 
@@ -22,7 +22,7 @@ net = ANN(size[0] * size[1], 10, 10)
 image = np.zeros((1000, 5000, 1))
 image[:] = 255
 
-cv2.putText(image, '123456789', (0, 300), cv2.cv.CV_FONT_HERSHEY_PLAIN, 25., (0), 20)
+cv2.putText(image, '0123456789', (0, 300), cv2.cv.CV_FONT_HERSHEY_PLAIN, 25., (0), 20)
 
 st = time()
 letters = CutLetters(image)

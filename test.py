@@ -24,7 +24,7 @@ ds = []
 for i, x in enumerate(letters):
     x = cv2.resize(x, size, interpolation=cv2.cv.CV_INTER_NN)    
     #cv2.imshow(str(i), x)
-    print net.activate(FeaturesFromImage(x)).argmax() + 1
+    print net.activate(FeaturesFromImage(x)).argmax()
 
 
 cv2.imshow('', image)
