@@ -3,6 +3,9 @@ import numpy as np
 
 from random import random
 
+def sigmoid(z):
+     return 1.0 / (1.0 + np.exp(-z));
+
 class ANN:
     def __init__(self, indim, hiddendim, nb_classes):
         self.indim = indim
@@ -11,7 +14,7 @@ class ANN:
         theta_size = indim * hiddendim + hiddendim * nb_classes
         self.theta = np.array([random() for i in xrange(theta_size) ])
         
-        self.activate_func = np.tanh
+        self.activate_func = sigmoid#np.tanh
         self.X = []
         self.Y = []
 
@@ -21,8 +24,19 @@ class ANN:
         #cst = ( -n_y * np.log(h)) - (1 - n_y) * np.log(1 - h);
         #print cst
         #return sum(cst);
-        return sum(1.0 / 2 * (h - Y)**2)
-        #return sum(( -Y * np.log(h)) - (1 - Y) * np.log(1 - h)) 
+        #return sum(1.0 / 2 * (h - Y)**2)
+        #print 'h', h
+        #err = sum(( Y * np.log(h)) + (1 - Y) * np.log(1 - h))
+        if min(h) <= 0:# or max(h) > 1:
+            print 'h <= 0'
+            exit()
+        if max(h) > 1:
+            print 'h > 0'
+            exit()
+        err = abs(sum( (Y[i] * np.log(h[i]) + (1 - Y[i]) * np.log(1 - h[i]) for i in xrange(len(Y))) ))
+        err /= len(Y)
+        #print 'err:', err
+        return err 
         
 
     def activate(self, features):
@@ -51,8 +65,11 @@ class ANN:
 
     def addSamples(self, ds):
         for x in ds:
-            self.X.append(x[0])
-            self.Y.append(x[1])
+            X = [y for y in x[0]]
+            self.X.append(X)
+            Y = np.zeros(self.nb_classes)
+            Y[x[1]] = 1
+            self.Y.append(Y)
 
 
     def train(self, epoch):
@@ -61,8 +78,8 @@ class ANN:
         Q = sum((self.singleerror(X[i], Y[i]) for i in xrange(len(Y)))) / len(Y)
                  #error(thetas, model, X, Y)
         lambd = 1.0 / len(Y)
-        nu = 0.01
-        while Q > 0.01:
+        nu = 0.05
+        while Q > 0.4:
             i = int(random() * len(Y))
             e = self.singleerror(X[i], Y[i])
             dW = self.puregrad(X[i], Y[i])

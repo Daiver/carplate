@@ -42,6 +42,8 @@ for x in cols:
 #f = FeaturesFromImage(im)
 net.addSamples(ds)
 net.train(100)
+print 'End learning!'
+print sum((net.singleerror(net.X[i], net.Y[i]) for i in xrange(len(net.Y)))) / len(net.Y)
 f = open('learned3', 'w')
 pickle.dump(net, f)
 f.close()
