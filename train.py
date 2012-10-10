@@ -5,13 +5,14 @@ import numpy as np
 
 from time import time
 
-from PyBrainANN import ANN
+#from PyBrainANN import ANN
+from ANN import ANN
 
 from letterselect import CutLetters
 
 import pickle
 
-size = (40, 70)
+size = (30, 30)
 
 def FeaturesFromImage(image):
     tmp = image[:].reshape((size[0] * size[1]))
