@@ -1,4 +1,6 @@
 
+from timr import time
+
 import numpy as np
 
 from random import random
@@ -6,43 +8,34 @@ from random import random
 def sigmoid(z):
      return 1.0 / (1.0 + np.exp(-z));
 
+def ExecTime(f, *arg, **karg):
+     st = time()
+     f(*arg, **karg)
+     print 'time', f, time() - st
+
 class ANN:
     def __init__(self, indim, hiddendim, nb_classes):
         self.indim = indim
         self.hiddendim = hiddendim
         self.nb_classes = nb_classes
         theta_size = indim * hiddendim + hiddendim * nb_classes
-        self.theta = np.array([random() for i in xrange(theta_size) ])
+        self.theta = np.array([random() for i in xrange(theta_size)])
         
         self.activate_func = sigmoid#np.tanh
         self.X = []
         self.Y = []
 
     def singleerror(self, X, Y):
-        h = self.activate(X)
-        #n_y = np.eye(self.nb_classes)
-        #cst = ( -n_y * np.log(h)) - (1 - n_y) * np.log(1 - h);
-        #print cst
-        #return sum(cst);
-        #return sum(1.0 / 2 * (h - Y)**2)
-        #print 'h', h
-        #err = sum(( Y * np.log(h)) + (1 - Y) * np.log(1 - h))
-        if min(h) <= 0:# or max(h) > 1:
-            print 'h <= 0'
-            exit()
-        if max(h) > 1:
-            print 'h > 0'
-            exit()
+        h = self.activate(X)        
         err = abs(sum( (Y[i] * np.log(h[i]) + (1 - Y[i]) * np.log(1 - h[i]) for i in xrange(len(Y))) ))
         err /= len(Y)
-        #print 'err:', err
         return err 
         
 
     def activate(self, features):
         middle = self.indim * self.hiddendim
         theta1 = self.theta[0:middle].reshape((self.hiddendim, self.indim))
-        theta2 = self.theta[middle:].reshape((self.nb_classes, self.hiddendim))
+        theta2 = self.theta[middle:].reshape((self.nb_classes, self.hiddendim))        
         a1 = np.dot(np.array(features), theta1.T)
         z1 = self.activate_func(a1)
         a2 = np.dot(z1, theta2.T)
@@ -65,7 +58,8 @@ class ANN:
 
     def addSamples(self, ds):
         for x in ds:
-            X = [y for y in x[0]]
+            sm = sum(x[0])
+            X = np.array([y/sm for y in x[0]])
             self.X.append(X)
             Y = np.zeros(self.nb_classes)
             Y[x[1]] = 1
@@ -78,17 +72,43 @@ class ANN:
         Q = sum((self.singleerror(X[i], Y[i]) for i in xrange(len(Y)))) / len(Y)
                  #error(thetas, model, X, Y)
         lambd = 1.0 / len(Y)
-        nu = 0.05
-        while Q > 0.4:
+        nu = 0.1
+        while Q > 0.01:
             i = int(random() * len(Y))
             e = self.singleerror(X[i], Y[i])
             dW = self.puregrad(X[i], Y[i])
+            self.gradientBP(X[i], Y[i])
             self.theta -= nu*dW
-            #Q = error(thetas, model, X, Y)
             print Q
             Q = (1 - lambd)*Q + lambd*e
         return self.theta
 
+#net = ANN(5, 3, 2)
+
+    def gradientBP(self, X, Y):
+        middle = self.indim * self.hiddendim
+        theta1 = self.theta[0:middle].reshape((self.hiddendim, self.indim))
+        theta2 = self.theta[middle:].reshape((self.nb_classes, self.hiddendim))
+
+        A1 = X
+        Z1 = np.dot(A1, theta1.T)
+        A2 = self.activate_func(Z1)
+        Z2 = np.dot(A2, theta2.T)
+	A3 = self.activate_func(Z2)
+	#y_k = np.zeros((self.nb_classes, 1))
+	#y_k[Y.argmax()] = 1
+
+	delta3 = A3 - Y
+	#Delta3 = np.dot(delta3, theta2)
+	#print Delta3
+	#Delta2 = np.dot(Delta3, A2.T)
+	delta2 = np.dot(theta2.T, delta3)
+	#print self.activate_func(Z1)#(1.0 - self.activate_func(Z1)) *
+	# * sigmoidGradient(Z1)
+	print Z1#delta2
+	#Delta1 = np.dot(delta2, A1)
+
+	
 '''
 samples = [
         [[1, 1], 1],

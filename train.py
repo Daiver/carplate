@@ -12,13 +12,17 @@ from letterselect import CutLetters
 
 import pickle
 
-size = (30, 30)
+size = (30, 40)
 
 def FeaturesFromImage(image):
-    tmp = image[:].reshape((size[0] * size[1]))
-    return tmp.tolist()
+    #tmp = image[:].reshape((size[0] * size[1]))
+    res = []
+    for i in xrange(image.shape[1]):
+        for j in xrange(image.shape[0]):
+            res.append(0. if image[j, i] < 230 else 1.)
+    return res#tmp.tolist()
 
-net = ANN(size[0] * size[1], 10, 10)
+net = ANN(size[0] * size[1], 20, 10)
 
 image = np.zeros((1000, 5000, 1))
 image[:] = 255
@@ -43,7 +47,7 @@ for x in cols:
 net.addSamples(ds)
 net.train(100)
 print 'End learning!'
-print sum((net.singleerror(net.X[i], net.Y[i]) for i in xrange(len(net.Y)))) / len(net.Y)
+#print sum((net.singleerror(net.X[i], net.Y[i]) for i in xrange(len(net.Y)))) / len(net.Y)
 f = open('learned3', 'w')
 pickle.dump(net, f)
 f.close()
