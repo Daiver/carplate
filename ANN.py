@@ -1,5 +1,5 @@
 
-from timr import time
+from time import time
 
 import numpy as np
 
@@ -19,7 +19,7 @@ class ANN:
         self.hiddendim = hiddendim
         self.nb_classes = nb_classes
         theta_size = indim * hiddendim + hiddendim * nb_classes
-        self.theta = np.array([random() for i in xrange(theta_size)])
+        self.theta = np.array([random() * 0.2 for i in xrange(theta_size)])
         
         self.activate_func = sigmoid#np.tanh
         self.X = []
@@ -44,7 +44,7 @@ class ANN:
 
 
     def puregrad(self, x, y):
-        eps = 0.0001
+        eps = 0.001
         res = []
         theta = self.theta
         for i in xrange(len(theta)):
@@ -69,15 +69,18 @@ class ANN:
     def train(self, epoch):
         X = self.X
         Y = self.Y
+
         Q = sum((self.singleerror(X[i], Y[i]) for i in xrange(len(Y)))) / len(Y)
                  #error(thetas, model, X, Y)
         lambd = 1.0 / len(Y)
-        nu = 0.1
+        nu = 0.001
         while Q > 0.01:
             i = int(random() * len(Y))
             e = self.singleerror(X[i], Y[i])
-            dW = self.puregrad(X[i], Y[i])
-            self.gradientBP(X[i], Y[i])
+            dW = self.gradientBP(X[i], Y[i])#self.puregrad(X[i], Y[i])
+            #print self.gradientBP(X[i], Y[i]) - dW[-200:]
+            #print 'norm=', np.linalg.norm(self.gradientBP(X[i], Y[i])- dW)/np.linalg.norm(self.gradientBP(X[i], Y[i])+ dW)
+            dW = dW / np.linalg.norm(dW)
             self.theta -= nu*dW
             print Q
             Q = (1 - lambd)*Q + lambd*e
@@ -97,65 +100,24 @@ class ANN:
 	A3 = self.activate_func(Z2)
 	#y_k = np.zeros((self.nb_classes, 1))
 	#y_k[Y.argmax()] = 1
-
+	
 	delta3 = A3 - Y
 	#Delta3 = np.dot(delta3, theta2)
 	#print Delta3
-	#Delta2 = np.dot(Delta3, A2.T)
-	delta2 = np.dot(theta2.T, delta3)
-	#print self.activate_func(Z1)#(1.0 - self.activate_func(Z1)) *
-	# * sigmoidGradient(Z1)
-	print Z1#delta2
-	#Delta1 = np.dot(delta2, A1)
+	#print delta3.shape, A2.shape
+	dtheta2 = np.zeros(theta2.shape)
+	divZ2 = self.activate_func(Z2) * (1 - self.activate_func(Z2))
+	for j in xrange(self.hiddendim):
+             for i in xrange(self.nb_classes):
+                  dtheta2[i, j] = delta3[i] * A2[j] #* divZ2[i]
+	#return dtheta2.reshape((-1))
+        delta2 = np.dot(theta2.T, delta3)# * sigmoidGradient(Z1)
 
-	
-'''
-samples = [
-        [[1, 1], 1],
-        [[1, 0], 0],
-        [[0, 1], 0],
-        [[0, 0], 0],
-    ]
-
-net = ANN(2, 3, 1)
-net.addSamples(samples)
-net.train()
-print 'act:', net.activate([1, 1])
-'''
-#print net.singleerror([4, 3],  1)
-#print net.puregrad([4, 3],  1)
-'''#SGradient =)
-def train(thetas, model, X, Y):
-    Q = error(thetas, model, X, Y)
-    lambd = 1.0 / len(Y)
-    nu = 0.01
-    while Q > 0.01:
-        i = int(random() * len(Y))
-        e = singleerror(thetas, model, X[i], Y[i])
-        dW = puregrad(thetas, X[i], Y[i])
-        thetas = thetas - nu*dW
-        #Q = error(thetas, model, X, Y)
-        #print Q#, thetas
-        Q = (1 - lambd)*Q + lambd*e
-    return thetas
-
-
-    def gradientBP(self, X, Y):
-        middle = self.indim * self.hiddendim
-        theta1 = self.theta[0:middle].reshape((self.hiddendim, self.indim))
-        theta2 = self.theta[middle:].reshape((self.nb_classes, self.hiddendim))
-        a1 = np.dot(np.array(features), theta1.T)
-        z1 = self.activate_func(a1)
-        a2 = np.dot(z1, theta2.T)
-        z2 = self.activate_func(a2)
-
-        Delta1 = 0
-        Delta2 = 0
-
-        delta3 = z2 - y
-        Delta2 = Delta2 + np.dot(delta3, Z1.T)
-
-	#layer 2
-        delta2 = np.dot(theta2.T, delta3) * sigmoidGradient(a1)
-        Delta1 = Delta1 + np.dot(delta2, X.T)
-'''
+        dtheta1 = np.zeros(theta1.shape)
+	divZ1 = self.activate_func(Z1) * (1 - self.activate_func(Z1))
+	for j in xrange(self.indim):
+             for i in xrange(self.hiddendim):
+                  dtheta1[i, j] = delta2[i] * A1[j] #* divZ1[i]
+        return np.array(dtheta1.reshape((-1)).tolist() + dtheta2.reshape((-1)).tolist())
+	#print Z1#delta2
+	#Delta1 = np.dot(delta2, A1.T)
