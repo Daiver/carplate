@@ -25,6 +25,19 @@ class ANN:
         self.X = []
         self.Y = []
 
+
+    def normalize(self, features):
+         MAX_IN = 255.
+         MIN_IN = 0.
+         MAX_OUT = 1.
+         MIN_OUT = 0.
+
+         res =(((features - MIN_IN) 
+				/ (MAX_IN - MIN_IN))
+				* (MAX_OUT - MIN_OUT) + MIN_OUT)
+         print 'normalized = ', res
+         return res
+         
     def singleerror(self, X, Y):
         h = self.activate(X)        
         err = abs(sum( (Y[i] * np.log(h[i]) + (1 - Y[i]) * np.log(1 - h[i]) for i in xrange(len(Y))) ))
@@ -33,6 +46,7 @@ class ANN:
         
 
     def activate(self, features):
+        #features = self.normalize(features)
         middle = self.indim * self.hiddendim
         theta1 = self.theta[0:middle].reshape((self.hiddendim, self.indim))
         theta2 = self.theta[middle:].reshape((self.nb_classes, self.hiddendim))        
@@ -58,8 +72,9 @@ class ANN:
 
     def addSamples(self, ds):
         for x in ds:
-            sm = sum(x[0])
-            X = np.array([y/sm for y in x[0]])
+            #sm = sum(x[0])
+            #X = np.array([y/sm for y in x[0]])
+            X = self.normalize(np.array(x[0]))
             self.X.append(X)
             Y = np.zeros(self.nb_classes)
             Y[x[1]] = 1
@@ -78,9 +93,9 @@ class ANN:
             i = int(random() * len(Y))
             e = self.singleerror(X[i], Y[i])
             dW = self.gradientBP(X[i], Y[i])
-            print dW[100:200]
-            dW = self.puregrad(X[i], Y[i])
-            print dW[100:200]
+            #print dW[100:200]
+            #dW = self.puregrad(X[i], Y[i])
+            #print dW[100:200]
             #print self.gradientBP(X[i], Y[i]) - dW[-200:]
             #print 'norm=', np.linalg.norm(self.gradientBP(X[i], Y[i])- dW)/np.linalg.norm(self.gradientBP(X[i], Y[i])+ dW)
             dW = dW / np.linalg.norm(dW)
