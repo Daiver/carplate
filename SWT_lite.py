@@ -52,8 +52,7 @@ stat = {}
 for i in xrange(1, gray.shape[1] - 1):
     for j in xrange(1, gray.shape[0] - 1):
         res = dirselect(gradient(gray, (j, i)))
-        stat[res] = 1
-print stat        
+        print res
 #gray = cv2.Sobel(gray, 5, 1, 1)
 
 cv2.imshow('', gray)
