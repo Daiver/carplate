@@ -73,11 +73,14 @@ class ANN:
         Q = sum((self.singleerror(X[i], Y[i]) for i in xrange(len(Y)))) / len(Y)
                  #error(thetas, model, X, Y)
         lambd = 1.0 / len(Y)
-        nu = 0.001
+        nu = 0.01
         while Q > 0.01:
             i = int(random() * len(Y))
             e = self.singleerror(X[i], Y[i])
-            dW = self.gradientBP(X[i], Y[i])#self.puregrad(X[i], Y[i])
+            dW = self.gradientBP(X[i], Y[i])
+            print dW[100:200]
+            dW = self.puregrad(X[i], Y[i])
+            print dW[100:200]
             #print self.gradientBP(X[i], Y[i]) - dW[-200:]
             #print 'norm=', np.linalg.norm(self.gradientBP(X[i], Y[i])- dW)/np.linalg.norm(self.gradientBP(X[i], Y[i])+ dW)
             dW = dW / np.linalg.norm(dW)
@@ -85,8 +88,6 @@ class ANN:
             print Q
             Q = (1 - lambd)*Q + lambd*e
         return self.theta
-
-#net = ANN(5, 3, 2)
 
     def gradientBP(self, X, Y):
         middle = self.indim * self.hiddendim
@@ -98,26 +99,21 @@ class ANN:
         A2 = self.activate_func(Z1)
         Z2 = np.dot(A2, theta2.T)
 	A3 = self.activate_func(Z2)
-	#y_k = np.zeros((self.nb_classes, 1))
-	#y_k[Y.argmax()] = 1
 	
 	delta3 = A3 - Y
-	#Delta3 = np.dot(delta3, theta2)
-	#print Delta3
-	#print delta3.shape, A2.shape
+
 	dtheta2 = np.zeros(theta2.shape)
-	divZ2 = self.activate_func(Z2) * (1 - self.activate_func(Z2))
+	#divZ2 = self.activate_func(Z2) * (1 - self.activate_func(Z2))
 	for j in xrange(self.hiddendim):
              for i in xrange(self.nb_classes):
                   dtheta2[i, j] = delta3[i] * A2[j] #* divZ2[i]
-	#return dtheta2.reshape((-1))
+	
         delta2 = np.dot(theta2.T, delta3)# * sigmoidGradient(Z1)
 
         dtheta1 = np.zeros(theta1.shape)
 	divZ1 = self.activate_func(Z1) * (1 - self.activate_func(Z1))
 	for j in xrange(self.indim):
              for i in xrange(self.hiddendim):
-                  dtheta1[i, j] = delta2[i] * A1[j] #* divZ1[i]
+                  dtheta1[i, j] = delta2[i] * A1[j] * divZ1[i]
         return np.array(dtheta1.reshape((-1)).tolist() + dtheta2.reshape((-1)).tolist())
-	#print Z1#delta2
-	#Delta1 = np.dot(delta2, A1.T)
+
