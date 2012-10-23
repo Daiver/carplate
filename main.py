@@ -5,32 +5,8 @@ import sys
 import ctypes
 from PyQt4 import QtGui, QtCore
 import sip
-import pickle
-import cv2
-import numpy as np
-from letterselect import CutLetters
-from time import time
 
-def processimage(imgname):
-    size = (30, 40)
-    def FeaturesFromImage(image):
-        res = []
-        for i in xrange(image.shape[1]):
-            for j in xrange(image.shape[0]):
-                res.append(0. if image[j, i] < 230 else 1.)
-        return res
-    f = open('learned3', 'r')
-    net = pickle.load(f)
-    f.close()
-
-    image = cv2.imread(imgname)
-    gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
-    letters = CutLetters(gray)
-
-    for i, x in enumerate(letters):
-        x = cv2.resize(x, size, interpolation=cv2.cv.CV_INTER_NN)    
-        print net.activate(FeaturesFromImage(x)).argmax()
-
+from test import processimage
 
  
 class Window(QtGui.QWidget):
