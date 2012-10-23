@@ -35,8 +35,8 @@ class ANN:
          res =(((features - MIN_IN) 
 				/ (MAX_IN - MIN_IN))
 				* (MAX_OUT - MIN_OUT) + MIN_OUT)
-         print 'normalized = ', res
-         return res
+         #print 'normalized = ', res
+         return features
          
     def singleerror(self, X, Y):
         h = self.activate(X)        
