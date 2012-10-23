@@ -32,26 +32,28 @@ def gradient(image, anchor):
     #dy = dy /g
     #return np.arctan(dy / dx)
 
+
 def dirselect(angle):
-    if not angle: return None
-    delta = np.pi / 16
-    turns = []
+    if angle == None: return None
+    delta = np.pi / 4
+    turns = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
+    direct = (angle / delta)
+    return turns[int(np.round(direct)) % 8]
 
-    return angle // delta
 
-img = cv2.imread('img/cars/1.jpg')
+img = cv2.imread('img/numbers/1.jpg')
 
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 #print gradient(gray, (1, 1))
 
-stat = {}
 gray = cv2.Canny(gray, 10, 230)
+stat = {}
 for i in xrange(1, gray.shape[1] - 1):
     for j in xrange(1, gray.shape[0] - 1):
         res = dirselect(gradient(gray, (j, i)))
         stat[res] = 1
-print stat
+print stat        
 #gray = cv2.Sobel(gray, 5, 1, 1)
 
 cv2.imshow('', gray)
