@@ -5,16 +5,39 @@ import sys
 import ctypes
 from PyQt4 import QtGui, QtCore
 import sip
- 
-'''
-2009-2010 dbzhang800@gmail.com
-''' 
+import pickle
+import cv2
+import numpy as np
+from letterselect import CutLetters
+from time import time
+
+def processimage(imgname):
+    size = (30, 40)
+    def FeaturesFromImage(image):
+        res = []
+        for i in xrange(image.shape[1]):
+            for j in xrange(image.shape[0]):
+                res.append(0. if image[j, i] < 230 else 1.)
+        return res
+    f = open('learned3', 'r')
+    net = pickle.load(f)
+    f.close()
+
+    image = cv2.imread(imgname)
+    gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+    letters = CutLetters(gray)
+
+    for i, x in enumerate(letters):
+        x = cv2.resize(x, size, interpolation=cv2.cv.CV_INTER_NN)    
+        print net.activate(FeaturesFromImage(x)).argmax()
+
+
  
 class Window(QtGui.QWidget):
     def __init__(self, parent=None):
         super(Window, self).__init__(parent)
         self.label = QtGui.QLabel(self)
-        self.label.setMinimumSize(512, 512)
+        self.label.setMinimumSize(300, 200)
         #self.comboBox = QtGui.QComboBox(self)
         #self.comboBox.addItems(["Image.0"])
         vbox = QtGui.QVBoxLayout(self)
@@ -23,11 +46,16 @@ class Window(QtGui.QWidget):
         self.initImages()
         #self.comboBox.currentIndexChanged.connect(self.onCurrentIndexChanged)
         btnQuit = QtGui.QPushButton(u"Btn", self)
-        btnQuit.setGeometry(550, 75, 100, 50)        
+        btnQuit.setGeometry(550, 75, 100, 30)        
         self.connect(btnQuit, QtCore.SIGNAL('clicked()'), self.OnBtnPush)
 
+        self.textedit = QtGui.QTextEdit(self)
+        self.textedit.setGeometry(100, 100, 100, 100)
+        vbox.addWidget(self.textedit)
+
     def OnBtnPush(self):
-        print 'button has pushed'
+        #print 'button has pushed'
+        processimage(str(self.textedit.toPlainText()))
  
     def onCurrentIndexChanged(self, index):
         self.label.setPixmap(QtGui.QPixmap.fromImage(self.images[index]))
