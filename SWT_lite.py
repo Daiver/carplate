@@ -44,25 +44,14 @@ def anglediff(f, s):
     return tmpangle
 
 
-def Stroke(img, mask, point):
-    makestep = lambda point, step: (point[0] + step[0], point[1] + step[1])
-    checkbound = lambda point, image: (
-            (point[0] + 1 < image.shape[0]) and (point[1] + 1 < image.shape[1]) and
-            (point [0] - 1 > 0) and (point [1] - 1 > 0))
-    stroke = []
-    if not checkbound(point, image): return []
-    oldangle = gradient(image, point)
-    angle = oldangle
-    if (oldangle == None) or (np.isnan(oldangle)): return []
-    
-
-img = cv2.imread('img/numbers/1.jpg')
+img = cv2.imread('img/numbers/5.jpg')
 cv2.imshow('orig', img)
 
+
+edges = []
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 gray = cv2.Canny(gray, 10, 230)
 
-edges = []
 
 extracted = np.zeros(gray.shape)
 extracted[:] = float('nan')
@@ -73,8 +62,43 @@ for i in xrange(1, gray.shape[0]-1):
         extracted[i, j] = gradient(gray, (i, j))
 
 stepmap = [ [dirselect(-x) for x in vect] for vect in extracted]
-for p in edges:
-    print extracted[p[0], p[1]]
+
+
+def Stroke(image, point):
+    makestep = lambda point, step: (point[0] + step[0], point[1] + step[1])
+    checkbound = lambda point, image: (
+            (point[0] + 1 < image.shape[0]) and (point[1] + 1 < image.shape[1]) and
+            (point [0] - 1 > 0) and (point [1] - 1 > 0))
+    stroke = []
+    if not checkbound(point, image): return []
+    oldangle = extracted[point[0], point[1]]
+    angle = oldangle
+    if (oldangle == None) or (np.isnan(oldangle)): return []
+    step = stepmap[point[0]][point[1]]
+    diff = anglediff(oldangle, angle)
+    while diff < np.pi:
+        stroke.append(point)
+        point = makestep(point, step)
+        if not checkbound(point, image):
+            break
+        angle = extracted[point[0], point[1]]
+        diff = anglediff(oldangle, angle)
+    return stroke
+    
+
+
+for i in xrange(1, gray.shape[1] - 1):
+    for j in xrange(1, gray.shape[0] - 1):
+        res = Stroke(gray, (i, j))
+        if len(res) > 0:
+            tmp = gray.copy()
+            for p in res:tmp[p[0], p[1]] = 255
+            cv2.imshow('77', tmp)
+            cv2.waitKey(1000)
+            print len(res)
+
+#for p in edges:
+#    print extracted[p[0], p[1]]
 
 #print extracted
 #print stepmap
