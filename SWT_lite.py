@@ -41,6 +41,7 @@ def dirselect(angle):
     return turns[int(np.round(direct)) % 8]
 
 def anglediff(f, s):
+    if (s == None)or (np.isnan(s)):return 0.
     tmpangle = min([abs(f - s),
         abs(np.pi*2 + f - s),
         abs(np.pi*2 - f + s)])
@@ -52,10 +53,10 @@ A = np.array([
         [ 255, 0, 0],
         [ 255, 0, 0],
     ])
-print A
-print convolution(A, Gx)
-print convolution(A, Gy)
-print dirselect(gradient(A, (1, 1)))
+#print A
+#print convolution(A, Gx)
+#print convolution(A, Gy)
+#print dirselect(gradient(A, (1, 1)))
 #exit()
 
 img = cv2.imread('img/numbers/5.jpg')
@@ -108,12 +109,14 @@ def Stroke(image, point):
 for i in xrange(1, gray.shape[1] - 1):
     for j in xrange(1, gray.shape[0] - 1):
         res = Stroke(gray, (i, j))
+        print res
         if len(res) > 0:
             tmp = gray.copy()
             for p in res:tmp[p[0], p[1]] = 255
             cv2.imshow('77', tmp)
             cv2.waitKey(1000)
             print len(res)
+        #exit()
 
 #for p in edges:
 #    print extracted[p[0], p[1]]
