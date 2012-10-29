@@ -1,4 +1,3 @@
-
 import cv2
 
 import numpy as np
@@ -17,11 +16,15 @@ Gx = np.array([
         ]
     )
 
+def SquareSelect(image, center):
+    return image[center[0] - 1:center[0] + 2, center[1] - 1:center[1] + 2]
+    
+
 def convolution(A, kernel):
     return sum(sum(kernel * A))/6#6 - coff norm
 
 def gradient(image, anchor):
-    A = image[anchor[0] - 1:anchor[0] + 2, anchor[1] - 1:anchor[1] + 2]
+    A = SquareSelect(image, anchor)
     dx = convolution(A, Gx)
     dy = convolution(A, Gy)
     g = float(np.sqrt(dx**2 + dy**2))
@@ -44,6 +47,17 @@ def anglediff(f, s):
     return tmpangle
 
 
+A = np.array([
+        [ 255, 0, 0],
+        [ 255, 0, 0],
+        [ 255, 0, 0],
+    ])
+print A
+print convolution(A, Gx)
+print convolution(A, Gy)
+print dirselect(gradient(A, (1, 1)))
+#exit()
+
 img = cv2.imread('img/numbers/5.jpg')
 cv2.imshow('orig', img)
 
@@ -51,7 +65,6 @@ cv2.imshow('orig', img)
 edges = []
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 gray = cv2.Canny(gray, 10, 230)
-
 
 extracted = np.zeros(gray.shape)
 extracted[:] = float('nan')
@@ -61,8 +74,12 @@ for i in xrange(1, gray.shape[0]-1):
             edges.append((i, j))
         extracted[i, j] = gradient(gray, (i, j))
 
-stepmap = [ [dirselect(-x) for x in vect] for vect in extracted]
+stepmap = [ [dirselect(x) for x in vect] for vect in extracted]
 
+#print gray[10:20, 10:15]
+#print extracted[15:20, 11:14]
+#print stepmap[ 15][11:14]
+#exit()
 
 def Stroke(image, point):
     makestep = lambda point, step: (point[0] + step[0], point[1] + step[1])
@@ -74,7 +91,8 @@ def Stroke(image, point):
     oldangle = extracted[point[0], point[1]]
     angle = oldangle
     if (oldangle == None) or (np.isnan(oldangle)): return []
-    step = stepmap[point[0]][point[1]]
+    step = stepmap[point[1]][point[0]]
+    if not step:return []
     diff = anglediff(oldangle, angle)
     while diff < np.pi:
         stroke.append(point)
@@ -116,14 +134,6 @@ for i in xrange(1, gray.shape[1] - 1):
 
 '''
 '''
-A = np.array([
-        [ 255, 0, 0],
-        [ 255, 0, 0],
-        [ 255, 0, 0],
-    ])
 
-print convolution(A, Gx)
-print convolution(A, Gy)
-print dirselect(gradient(A, (1, 1)))
 
 '''
