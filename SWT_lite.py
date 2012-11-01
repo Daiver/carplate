@@ -36,7 +36,8 @@ def dirselect(angle):
     if (angle == None) or (np.isnan(angle)): return None    
     delta = np.pi / 4
     #turns = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
-    turns = [(1, 0), (1, -1), (0, -1), (-1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1)]
+    #turns = [(1, 0), (1, -1), (0, -1), (-1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1)]
+    turns = [(-1, 0), (-1, -1), (0, -1), (1, -1), (1, 0), (1, 1), (0, 1), (-1, 1)]
     direct = (angle / delta)
     return turns[int(np.round(direct)) % 8]
 
@@ -75,8 +76,8 @@ for i in xrange(1, gray.shape[0]-1):
             edges.append((i, j))
         extracted[i, j] = gradient(gray, (i, j))
 
-stepmap = [ [dirselect(x) for x in vect] for vect in extracted]
-
+#stepmap = [ [dirselect(x) for x in vect] for vect in extracted]
+mask = np.zeros(gray.shape)
 #print gray[10:20, 10:15]
 #print extracted[15:20, 11:14]
 #print stepmap[ 15][11:14]
@@ -92,14 +93,17 @@ def Stroke(image, point):
     oldangle = extracted[point[0], point[1]]
     angle = oldangle
     if (oldangle == None) or (np.isnan(oldangle)): return []
-    step = stepmap[point[1]][point[0]]
+    step = dirselect(extracted[point[0], point[1]])#stepmap[point[0]][point[1]]
+    step = (step[1], step[0])
+    print 'step:', step, 'point', point, 'angle', oldangle
     if not step:return []
     diff = anglediff(oldangle, angle)
     while diff < np.pi:
-        stroke.append(point)
+        stroke.append(point)        
         point = makestep(point, step)
-        if not checkbound(point, image):
+        if not checkbound(point, image):# or mask[point[0], point[1]] == 255:
             break
+        mask[point[0], point[1]] = 255
         angle = extracted[point[0], point[1]]
         diff = anglediff(oldangle, angle)
     return stroke
@@ -108,14 +112,16 @@ def Stroke(image, point):
 
 for i in xrange(1, gray.shape[1] - 1):
     for j in xrange(1, gray.shape[0] - 1):
-        res = Stroke(gray, (i, j))
-        print res
-        if len(res) > 0:
-            tmp = gray.copy()
-            for p in res:tmp[p[0], p[1]] = 255
-            cv2.imshow('77', tmp)
-            cv2.waitKey(1000)
-            print len(res)
+        if mask[j, i] != 255:
+            res = Stroke(gray, (j, i))
+            print res
+            if len(res) > 0:
+                tmp = gray.copy()
+                for p in res:tmp[p[0], p[1]] = 255
+                cv2.imshow('77', tmp)
+                cv2.imshow('7', mask)
+                cv2.waitKey(10000)
+                print len(res)
         #exit()
 
 #for p in edges:
