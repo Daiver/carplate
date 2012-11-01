@@ -2,47 +2,12 @@ import cv2
 
 import numpy as np
 
-class DSelecter:
-    def __init__(self, point, angle):
-        X = point[0]
-        Y = point[1]
-        dx = 10 * np.cos(angle)
-        dy = 10 * np.cos(angle)
-        incx = np.sign(dx)
-        incy = np.sign(dy);
-        dx = abs(dx)
-        dy = abs(dy) 
-        if (dx > dy):
-            pdx = incx
-            pdy = 0
-            es = dy
-            self.el = dx
-        else:
-            pdx = 0
-            pdy = incy
-            es = dx
-            self.el = dy
-        self.x = X
-        self.y = Y
-        self.err = self.el/2
-        self.t = 0
-        self.incx = incx
-        self.incy = incy
-        self.pdx = pdx
-        self.pdy = pdy
-        self.es = es
-        
-    def GetNext(self):        
-        self.err -= self.es;
-        if (self.err < 0) :       
-            self.err += self.el;
-            self.x += self.incx
-            self.y += self.incy
-        else:
-            self.x += self.pdx
-            self.y += self.pdy
-        self.t += 1
-        return (self.x, self.y)
+def DSelecter:
+    def __init__(self, X, Y, angle):
+        self.tX = int(X + 100*np.cos(angle))
+        self.tY = int(Y + 100*np.sin(angle))
+        self.dX = abs(tX - X)
+        self.dY = abs(tY - Y)
 
 Gy = np.array([
             [-1, -2, -1],
@@ -112,8 +77,8 @@ gray = cv2.Canny(gray, 10, 230)
 
 extracted = np.zeros(gray.shape)
 extracted[:] = float('nan')
-for j in xrange(1, gray.shape[1]-1):
-    for i in xrange(1, gray.shape[0]-1):    
+for i in xrange(1, gray.shape[0]-1):
+    for j in xrange(1, gray.shape[1]-1):
         if gray[i, j] == 255:
             edges.append((i, j))
         extracted[i, j] = gradient(gray, (i, j))
@@ -135,21 +100,19 @@ def Stroke(image, point):
     oldangle = extracted[point[0], point[1]]
     angle = oldangle
     if (oldangle == None) or (np.isnan(oldangle)): return []
-    #ds = DSelecter(point, angle):todo implement dselecter
     step = dirselect(extracted[point[0], point[1]])#stepmap[point[0]][point[1]]
     step = (step[1], step[0])
-    
+    print 'step:', step, 'point', point, 'angle', oldangle
     if not step:return []
     diff = anglediff(oldangle, angle)
     while abs(diff) < (np.pi / 3):
         stroke.append(point)        
         point = makestep(point, step)
         if not checkbound(point, image):# or mask[point[0], point[1]] == 255:
-            return []
-        #mask[point[0], point[1]] = 255
+            break
+        mask[point[0], point[1]] = 255
         angle = extracted[point[0], point[1]]
         diff = anglediff(oldangle, angle)
-    print 'step:', step, 'point', point, 'angle', oldangle
     return stroke
     
 pointtowalk = []
@@ -165,17 +128,15 @@ for point in pointtowalk:
     i = point[1]
     if (point[0] + 1 < gray.shape[0]) and (point[1] + 1 < gray.shape[1]) and (point [0] - 1 > 0) and (point [1] - 1 > 0):
         if mask[j, i] != 255:
-            res = Stroke(gray, (j, i))            
+            res = Stroke(gray, (j, i))
+            print res
             if len(res) > 0:
-                print res
                 tmp = gray.copy()
-                for p in res:
-                    tmp[p[0], p[1]] = 255
-                    mask[p[0], p[1]] = 255
+                for p in res:tmp[p[0], p[1]] = 255
                 cv2.imshow('77', tmp)
                 cv2.imshow('7', mask)
-                cv2.waitKey(10000)
-                #print len(res)
+                cv2.waitKey(1)
+                print len(res)
         #exit()
 
 #for p in edges:
