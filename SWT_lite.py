@@ -60,7 +60,7 @@ A = np.array([
 #print dirselect(gradient(A, (1, 1)))
 #exit()
 
-img = cv2.imread('img/numbers/7.jpg')
+img = cv2.imread('img/numbers/1.jpg')
 cv2.imshow('orig', img)
 
 
@@ -98,7 +98,7 @@ def Stroke(image, point):
     print 'step:', step, 'point', point, 'angle', oldangle
     if not step:return []
     diff = anglediff(oldangle, angle)
-    while abs(diff) < (np.pi / 2):
+    while abs(diff) < (np.pi / 3):
         stroke.append(point)        
         point = makestep(point, step)
         if not checkbound(point, image):# or mask[point[0], point[1]] == 255:
@@ -108,10 +108,18 @@ def Stroke(image, point):
         diff = anglediff(oldangle, angle)
     return stroke
     
+pointtowalk = []
+for x in edges:
+    for i in xrange(-1, 2):
+        for j in xrange(-1, 2):
+            pointtowalk.append((x[0] + j, x[1] + i))
 
-
-for i in xrange(1, gray.shape[1] - 1):
-    for j in xrange(1, gray.shape[0] - 1):
+#for i in xrange(1, gray.shape[1] - 1):
+#    for j in xrange(1, gray.shape[0] - 1):
+for point in pointtowalk:
+    j = point[0]
+    i = point[1]
+    if (point[0] + 1 < gray.shape[0]) and (point[1] + 1 < gray.shape[1]) and (point [0] - 1 > 0) and (point [1] - 1 > 0):
         if mask[j, i] != 255:
             res = Stroke(gray, (j, i))
             print res
@@ -119,7 +127,7 @@ for i in xrange(1, gray.shape[1] - 1):
                 tmp = gray.copy()
                 for p in res:tmp[p[0], p[1]] = 255
                 cv2.imshow('77', tmp)
-                #cv2.imshow('7', mask)
+                cv2.imshow('7', mask)
                 cv2.waitKey(1)
                 print len(res)
         #exit()
