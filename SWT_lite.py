@@ -1,7 +1,11 @@
+# -*- coding: utf-8 -*-
 import cv2
 
 import numpy as np
 
+#Класс, в котором я собирался реализовать некое потобие алгоритма брезенхейма (для прохода по лучу)
+#пока как бы в разработке
+'''
 class DSelecter:
     def __init__(self, point, angle):
         X = point[0]
@@ -43,7 +47,9 @@ class DSelecter:
             self.y += self.pdy
         self.t += 1
         return (self.x, self.y)
+'''
 
+#Матрицы для поиска градиента по свертке (с вики)
 Gy = np.array([
             [-1, -2, -1],
             [0, 0, 0],
@@ -58,22 +64,33 @@ Gx = np.array([
         ]
     )
 
+#Выделяет на картинке область с центром в точке center
+#Кривая, но мне хватало
 def SquareSelect(image, center):
     return image[center[0] - 1:center[0] + 2, center[1] - 1:center[1] + 2]
     
-
+#Свертка. По крайней мере я себе ее так представлял
 def convolution(A, kernel):
     return sum(sum(kernel * A))/6#6 - coff norm
 
+#Дает нам угол наклона градиента к оси ОХ. Я мог накосячить с системой координат
+#Но что-то работает
 def gradient(image, anchor):
     A = SquareSelect(image, anchor)
     dx = convolution(A, Gx)
     dy = convolution(A, Gy)
     g = float(np.sqrt(dx**2 + dy**2))
     if not g: return None
-    angle = np.arccos(dx / g)
+    #angle = np.arccos(dx / g)
     return np.arccos(dx / g)
 
+#Тут грустная но поучительная история: я не верно перевел (или неверно понял)
+#фразу в документе, и решил что надо нам ходить *по* контуру
+#Так родилась эта ф-ия
+
+#Ф-ия берет угол, и дает нам направление в котором надо идти
+#Может можно и проще, но на момент написания это показалось мне озарением
+#На данный момент не актуальна, т.к. не совсем верно позволяет найти луч (ошибка будет на больших лучах)
 def dirselect(angle):
     if (angle == None) or (np.isnan(angle)): return None    
     delta = np.pi / 4
@@ -83,6 +100,7 @@ def dirselect(angle):
     direct = (angle / delta)
     return turns[int(np.round(direct)) % 8]
 
+#Дает разницу между 2 углами. Наверно
 def anglediff(f, s):
     if (s == None)or (np.isnan(s)):return 0.
     tmpangle = min([abs(f - s),
@@ -91,25 +109,16 @@ def anglediff(f, s):
     return tmpangle
 
 
-A = np.array([
-        [ 255, 0, 0],
-        [ 255, 0, 0],
-        [ 255, 0, 0],
-    ])
-#print A
-#print convolution(A, Gx)
-#print convolution(A, Gy)
-#print dirselect(gradient(A, (1, 1)))
-#exit()
-
 img = cv2.imread('img/numbers/1.jpg')
 cv2.imshow('orig', img)
 
 
+#Сюда запоминаем точки контура
 edges = []
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 gray = cv2.Canny(gray, 10, 230)
 
+#Название массива не совсем корректно. Тут мы получаем градиент (точнее угол) всех (ну почти) точек
 extracted = np.zeros(gray.shape)
 extracted[:] = float('nan')
 for j in xrange(1, gray.shape[1]-1):
@@ -119,31 +128,37 @@ for j in xrange(1, gray.shape[1]-1):
         extracted[i, j] = gradient(gray, (i, j))
 
 #stepmap = [ [dirselect(x) for x in vect] for vect in extracted]
-mask = np.zeros(gray.shape)
-#print gray[10:20, 10:15]
-#print extracted[15:20, 11:14]
-#print stepmap[ 15][11:14]
-#exit()
 
+#Хранит "слепок" всех лучей, требуется по сути только для отладки
+mask = np.zeros(gray.shape)
+
+#Должен давать нам 1 штрих
 def Stroke(image, point):
+    #Всякая вспомогательная ерунда
     makestep = lambda point, step: (point[0] + step[0], point[1] + step[1])
     checkbound = lambda point, image: (
             (point[0] + 1 < image.shape[0]) and (point[1] + 1 < image.shape[1]) and
             (point [0] - 1 > 0) and (point [1] - 1 > 0))
     stroke = []
-    if not checkbound(point, image): return []
-    oldangle = extracted[point[0], point[1]]
+    if not checkbound(point, image): return []#Вобще не лучшая идея - возвращать список, ну да ладно
+    oldangle = extracted[point[0], point[1]]#Получаем угол
     angle = oldangle
     if (oldangle == None) or (np.isnan(oldangle)): return []
     #ds = DSelecter(point, angle):todo implement dselecter
+
+    #Получаем шаг. Тут надо вставить брезенхейма. Ну мне так кажется
     step = dirselect(extracted[point[0], point[1]])#stepmap[point[0]][point[1]]
     step = (step[1], step[0])
     
     if not step:return []
     diff = anglediff(oldangle, angle)
+    #Пока не уткнемся в градиент различающийся с нашим более чем в 30* ползем в направлении step
+    #Из-за кривого шага на больших расстояниях дает нехороший результат
     while abs(diff) < (np.pi / 3):
         stroke.append(point)        
         point = makestep(point, step)
+
+        #Если уткнулись в край картинки - считаем луч ошибочным
         if not checkbound(point, image):# or mask[point[0], point[1]] == 255:
             return []
         #mask[point[0], point[1]] = 255
@@ -151,7 +166,9 @@ def Stroke(image, point):
         diff = anglediff(oldangle, angle)
     #print 'step:', step, 'point', point, 'angle', oldangle
     return stroke
-    
+
+
+#Костыль, не используется
 pointtowalk = []
 for x in edges:
     for i in xrange(-1, 2):
@@ -163,29 +180,31 @@ rays = []
 #    j = point[0]
 #    i = point[1]
 #    if (point[0] + 1 < gray.shape[0]) and (point[1] + 1 < gray.shape[1]) and (point [0] - 1 > 0) and (point [1] - 1 > 0):
-for i in xrange(1, gray.shape[1] - 1):
+for i in xrange(1, gray.shape[1] - 1):#Бежим по всем точкам
     for j in xrange(1, gray.shape[0] - 1):
-
+        #Проверяем прошли ли мы эту точку
         if mask[j, i] != 255:
             res = Stroke(gray, (j, i))            
             if len(res) > 0:
                 #print res
                 rays.append(res)
                 tmp = gray.copy()
-                for p in res:
+                for p in res:#Показываем луч
                     tmp[p[0], p[1]] = 255
                     mask[p[0], p[1]] = 255
                 cv2.imshow('77', tmp)
                 cv2.imshow('7', mask)
-                cv2.waitKey(1)
+                #Для удобства просмотра
+                cv2.waitKey(10)
                 #print len(res)
         #exit()
+#Тут я хотел продолжить реализацию, но так и не понял что делать дальше =( (грустный смайлик)
 swimage = np.zeros(gray.shape)
 for ray in rays:
     for p in ray:
         swimage[p[0], p[1]] = len(ray)
-print swimage        
-cv2.imshow('swimage', swimage)
+
+
 
 cv2.imshow('gray', gray)
 cv2.imshow('ext', extracted)
