@@ -178,25 +178,7 @@ for point in pointtowalk:
                 #print len(res)
         #exit()
 
-#for p in edges:
-#    print extracted[p[0], p[1]]
-
-#print extracted
-#print stepmap
 cv2.imshow('gray', gray)
 cv2.imshow('ext', extracted)
 cv2.waitKey(1000)
 
-'''
-stat = {}
-for i in xrange(1, gray.shape[1] - 1):
-    for j in xrange(1, gray.shape[0] - 1):
-        res = dirselect(gradient(gray, (j, i)))
-        #print res
-#gray = cv2.Sobel(gray, 5, 1, 1)
-
-'''
-'''
-
-
-'''
