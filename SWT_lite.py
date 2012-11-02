@@ -149,7 +149,7 @@ def Stroke(image, point):
         #mask[point[0], point[1]] = 255
         angle = extracted[point[0], point[1]]
         diff = anglediff(oldangle, angle)
-    print 'step:', step, 'point', point, 'angle', oldangle
+    #print 'step:', step, 'point', point, 'angle', oldangle
     return stroke
     
 pointtowalk = []
@@ -158,25 +158,34 @@ for x in edges:
         for j in xrange(-1, 2):
             pointtowalk.append((x[0] + j, x[1] + i))
 
-#for i in xrange(1, gray.shape[1] - 1):
-#    for j in xrange(1, gray.shape[0] - 1):
-for point in pointtowalk:
-    j = point[0]
-    i = point[1]
-    if (point[0] + 1 < gray.shape[0]) and (point[1] + 1 < gray.shape[1]) and (point [0] - 1 > 0) and (point [1] - 1 > 0):
+rays = []
+#for point in pointtowalk:
+#    j = point[0]
+#    i = point[1]
+#    if (point[0] + 1 < gray.shape[0]) and (point[1] + 1 < gray.shape[1]) and (point [0] - 1 > 0) and (point [1] - 1 > 0):
+for i in xrange(1, gray.shape[1] - 1):
+    for j in xrange(1, gray.shape[0] - 1):
+
         if mask[j, i] != 255:
             res = Stroke(gray, (j, i))            
             if len(res) > 0:
-                print res
+                #print res
+                rays.append(res)
                 tmp = gray.copy()
                 for p in res:
                     tmp[p[0], p[1]] = 255
                     mask[p[0], p[1]] = 255
                 cv2.imshow('77', tmp)
                 cv2.imshow('7', mask)
-                cv2.waitKey(10000)
+                cv2.waitKey(1)
                 #print len(res)
         #exit()
+swimage = np.zeros(gray.shape)
+for ray in rays:
+    for p in ray:
+        swimage[p[0], p[1]] = len(ray)
+print swimage        
+cv2.imshow('swimage', swimage)
 
 cv2.imshow('gray', gray)
 cv2.imshow('ext', extracted)
