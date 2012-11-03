@@ -161,6 +161,8 @@ def Stroke(image, point):
         #Если уткнулись в край картинки - считаем луч ошибочным
         if not checkbound(point, image):# or mask[point[0], point[1]] == 255:
             return []
+        if (gray[point[0], point[1]] != 0):
+            return []
         #mask[point[0], point[1]] = 255
         angle = extracted[point[0], point[1]]
         diff = anglediff(oldangle, angle)
