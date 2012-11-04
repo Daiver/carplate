@@ -50,20 +50,26 @@ def Stroke(image, angles_img, point):
 
 #Поиск компонент. Наверно :)
 def SearchComponent(image, center, mask):
-    component = []
+    component = [center]
     q = Queue()
     q.put(center)
+    mask[center[0], center[1]] = 255
     while not q.empty():
         point = q.get()
-        mask[point[0], point[1]] = 255
-        for i in xrange(-1, 2, 2):
-            for j in xrange(-1, 2, 2):
+        #print point        
+        for i in xrange(-1, 2):
+            for j in xrange(-1, 2):
+                if i == j: continue
+                #print 'i', i, 'j', j
                 tmp = makestep(point, (i, j))
                 if checkbound(tmp, image) and (
                     mask[tmp[0], tmp[1]] == 0) and (
-                    abs(image[point[0], point[1]] - image[tmp[0], tmp[1]]) < 5):
+                        image[tmp[0], tmp[1]] < 255) and (
+                    abs(image[point[0], point[1]] - image[tmp[0], tmp[1]]) < 20):
                     q.put(tmp)
                     component.append(tmp)
+                    mask[tmp[0], tmp[1]] = 255
+    return component
                     
 
 img = cv2.imread('img/numbers/1.jpg')
@@ -125,7 +131,13 @@ mask = np.zeros(gray.shape)
 for j in xrange(gray.shape[1]):
     for i in xrange(gray.shape[0]):
         if (mask[i, j] == 0) and (swimage[i, j] < 255):#255 - "барьер"
-            print SearchComponent(swimage, (i, j), mask)
+            res = SearchComponent(swimage, (i, j), mask)
+            if len(res) > 1:
+                tmp = gray.copy()
+                for p in res:#Показываем луч
+                    tmp[p[0], p[1]] = 255                    
+                cv2.imshow('77', tmp)
+                cv2.waitKey(1000)
 
 
 np.set_printoptions(threshold='nan')
