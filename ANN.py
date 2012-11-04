@@ -5,6 +5,8 @@ import numpy as np
 
 from random import random
 
+from Classifier import Classifier
+
 def sigmoid(z):
      return 1.0 / (1.0 + np.exp(-z));
 
@@ -13,7 +15,7 @@ def ExecTime(f, *arg, **karg):
      f(*arg, **karg)
      print 'time', f, time() - st
 
-class ANN:
+class ANN(Classifier):
     def __init__(self, indim, hiddendim, nb_classes):
         self.indim = indim
         self.hiddendim = hiddendim

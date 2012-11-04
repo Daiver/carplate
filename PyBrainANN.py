@@ -12,7 +12,9 @@ from pybrain.structure.modules   import SoftmaxLayer
 
 import pickle
 
-class ANN:
+from Classifier import Classifier
+
+class ANN(Classifier):
     def __init__(self, indim, hiddendim, nb_classes):
         #net = buildNetwork(size[0] * size[1], 96, ds.outdim, outclass=SoftmaxLayer)
         self.ds = ClassificationDataSet(indim, nb_classes=nb_classes)
