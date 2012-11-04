@@ -7,35 +7,8 @@ from Queue import Queue
 
 from SWT_Support import *
 
-def SearchComponent(image, center):
-    cmponent = []
-    
-
-img = cv2.imread('img/numbers/1.jpg')
-cv2.imshow('orig', img)
-
-
-#Сюда запоминаем точки контура
-edges = []
-gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-gray = cv2.Canny(gray, 10, 230)
-
-#Название списка не совсем корректно. Тут мы получаем градиент (точнее угол) всех (ну почти) точек
-extracted = np.zeros(gray.shape)
-extracted[:] = float('nan')
-for j in xrange(1, gray.shape[1]-1):
-    for i in xrange(1, gray.shape[0]-1):    
-        if gray[i, j] == 255:
-            edges.append((i, j))
-        extracted[i, j] = gradient(gray, (i, j))
-
-#stepmap = [ [dirselect(x) for x in vect] for vect in extracted]
-
-#Хранит "слепок" всех лучей, требуется по сути только для отладки
-mask = np.zeros(gray.shape)
-
 #Должен давать нам 1 штрих
-def Stroke(image, point):
+def Stroke(image, angles_img, point):
     #Всякая вспомогательная ерунда
     makestep = lambda point, step: (point[0] + step[0], point[1] + step[1])
     checkbound = lambda point, image: (
@@ -43,13 +16,13 @@ def Stroke(image, point):
             (point [0] - 1 > 0) and (point [1] - 1 > 0))
     stroke = []
     if not checkbound(point, image): return []#Вобще не лучшая идея - возвращать список, ну да ладно
-    oldangle = extracted[point[0], point[1]]#Получаем угол
+    oldangle = angles_img[point[0], point[1]]#Получаем угол
     angle = oldangle
     if (oldangle == None) or (np.isnan(oldangle)): return []
     #ds = DSelecter(point, angle):todo implement dselecter
 
     #Получаем шаг. Тут надо вставить брезенхейма. Ну мне так кажется
-    step = dirselect(extracted[point[0], point[1]])#stepmap[point[0]][point[1]]
+    step = dirselect(angles_img[point[0], point[1]])#stepmap[point[0]][point[1]]
     step = (step[1], step[0])
     
     if not step:return []
@@ -66,29 +39,46 @@ def Stroke(image, point):
         if (gray[point[0], point[1]] != 0):
             return []
         #mask[point[0], point[1]] = 255
-        angle = extracted[point[0], point[1]]
+        angle = angles_img[point[0], point[1]]
         diff = anglediff(oldangle, angle)
     #print 'step:', step, 'point', point, 'angle', oldangle
     return stroke
 
 
-#Костыль, не используется
-pointtowalk = []
-for x in edges:
-    for i in xrange(-1, 2):
-        for j in xrange(-1, 2):
-            pointtowalk.append((x[0] + j, x[1] + i))
+def SearchComponent(image, center):
+    cmponent = []
+    
+
+img = cv2.imread('img/numbers/1.jpg')
+cv2.imshow('orig', img)
+
+
+#Сюда запоминаем точки контура
+edges = []
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+gray = cv2.Canny(gray, 10, 230)
+
+#Название списка не совсем корректно. Тут мы получаем градиент (точнее угол) всех (ну почти) точек
+angles_img = np.zeros(gray.shape)
+angles_img[:] = float('nan')
+for j in xrange(1, gray.shape[1]-1):
+    for i in xrange(1, gray.shape[0]-1):    
+        if gray[i, j] == 255:
+            edges.append((i, j))
+        angles_img[i, j] = gradient(gray, (i, j))
+
+#stepmap = [ [dirselect(x) for x in vect] for vect in angles_img]
+
+#Хранит "слепок" всех лучей, требуется по сути только для отладки
+mask = np.zeros(gray.shape)
+
 
 rays = []
-#for point in pointtowalk:
-#    j = point[0]
-#    i = point[1]
-#    if (point[0] + 1 < gray.shape[0]) and (point[1] + 1 < gray.shape[1]) and (point [0] - 1 > 0) and (point [1] - 1 > 0):
 for i in xrange(1, gray.shape[1] - 1):#Бежим по всем точкам
     for j in xrange(1, gray.shape[0] - 1):
         #Проверяем прошли ли мы эту точку
         if mask[j, i] != 255:
-            res = Stroke(gray, (j, i))            
+            res = Stroke(gray, angles_img, (j, i))            
             if len(res) > 0:
                 #print res
                 rays.append(res)
@@ -120,6 +110,6 @@ np.set_printoptions(threshold='nan')
 print swimage
 cv2.imshow('grljljkay', swimage)
 cv2.imshow('gray', gray)
-cv2.imshow('ext', extracted)
+cv2.imshow('ext', angles_img)
 cv2.waitKey(1000)
 
