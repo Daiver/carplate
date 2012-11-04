@@ -197,17 +197,20 @@ for i in xrange(1, gray.shape[1] - 1):#Бежим по всем точкам
                 cv2.imshow('77', tmp)
                 cv2.imshow('7', mask)
                 #Для удобства просмотра
-                cv2.waitKey(10)
+                #cv2.waitKey(1)
                 #print len(res)
         #exit()
 #Тут я хотел продолжить реализацию, но так и не понял что делать дальше =( (грустный смайлик)
 swimage = np.zeros(gray.shape)
+swimage[:] = 255
 for ray in rays:
     for p in ray:
-        swimage[p[0], p[1]] = len(ray)
+        if swimage[p[0], p[1]] < len(ray):
+            #print len(ray)
+            swimage[p[0], p[1]] = len(ray)
 
-
-
+print swimage
+cv2.imshow('grljljkay', swimage)
 cv2.imshow('gray', gray)
 cv2.imshow('ext', extracted)
 cv2.waitKey(1000)
