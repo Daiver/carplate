@@ -7,15 +7,19 @@ from Queue import Queue
 
 from SWT_Support import *
 
-#Должен давать нам 1 штрих
-def Stroke(image, angles_img, point):
-    #Всякая вспомогательная ерунда
-    makestep = lambda point, step: (point[0] + step[0], point[1] + step[1])
-    checkbound = lambda point, image: (
+makestep = lambda point, step: (point[0] + step[0], point[1] + step[1])
+checkbound = lambda point, image: (
+            (point[0] < image.shape[0]) and (point[1] < image.shape[1]) and
+            (point [0] >= 0) and (point [1] >= 0))
+
+checkbound_sq = lambda point, image: (
             (point[0] + 1 < image.shape[0]) and (point[1] + 1 < image.shape[1]) and
             (point [0] - 1 > 0) and (point [1] - 1 > 0))
+
+#Должен давать нам 1 штрих
+def Stroke(image, angles_img, point):
     stroke = []
-    if not checkbound(point, image): return []#Вобще не лучшая идея - возвращать список, ну да ладно
+    if not checkbound_sq(point, image): return []#Вобще не лучшая идея - возвращать список, ну да ладно
     oldangle = angles_img[point[0], point[1]]#Получаем угол
     angle = oldangle
     if (oldangle == None) or (np.isnan(oldangle)): return []
@@ -34,7 +38,7 @@ def Stroke(image, angles_img, point):
         point = makestep(point, step)
 
         #Если уткнулись в край картинки - считаем луч ошибочным
-        if not checkbound(point, image):# or mask[point[0], point[1]] == 255:
+        if not checkbound_sq(point, image):# or mask[point[0], point[1]] == 255:
             return []
         if (gray[point[0], point[1]] != 0):
             return []
@@ -44,10 +48,23 @@ def Stroke(image, angles_img, point):
     #print 'step:', step, 'point', point, 'angle', oldangle
     return stroke
 
-
-def SearchComponent(image, center):
-    cmponent = []
-    
+#Поиск компонент. Наверно :)
+def SearchComponent(image, center, mask):
+    component = []
+    q = Queue()
+    q.put(center)
+    while not q.empty():
+        point = q.get()
+        mask[point[0], point[1]] = 255
+        for i in xrange(-1, 2, 2):
+            for j in xrange(-1, 2, 2):
+                tmp = makestep(point, (i, j))
+                if checkbound(tmp, image) and (
+                    mask[tmp[0], tmp[1]] == 0) and (
+                    abs(image[point[0], point[1]] - image[tmp[0], tmp[1]]) < 5):
+                    q.put(tmp)
+                    component.append(tmp)
+                    
 
 img = cv2.imread('img/numbers/1.jpg')
 cv2.imshow('orig', img)
@@ -104,6 +121,11 @@ for ray in rays:
 swimage %= 255#Криво, ну да ладно
 
 mask = np.zeros(gray.shape)
+
+for j in xrange(gray.shape[1]):
+    for i in xrange(gray.shape[0]):
+        if (mask[i, j] == 0) and (swimage[i, j] < 255):#255 - "барьер"
+            print SearchComponent(swimage, (i, j), mask)
 
 
 np.set_printoptions(threshold='nan')
