@@ -142,7 +142,7 @@ for j in xrange(gray.shape[1]):
                 tmp = gray.copy()
                 for p in res:#Показываем луч
                     tmp[p[0], p[1]] = 255                    
-                cv2.imshow('77', tmp)
+                cv2.imshow('11111', tmp)
                 cv2.waitKey(1000)
 
 
