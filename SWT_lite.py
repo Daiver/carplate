@@ -16,6 +16,11 @@ checkbound_sq = lambda point, image: (
             (point[0] + 1 < image.shape[0]) and (point[1] + 1 < image.shape[1]) and
             (point [0] - 1 > 0) and (point [1] - 1 > 0))
 
+#barrier const for CC
+CC_B = 255
+#
+CC_D = 30
+
 #Должен давать нам 1 штрих
 def Stroke(image, angles_img, point):
     stroke = []
@@ -64,8 +69,9 @@ def SearchComponent(image, center, mask):
                 tmp = makestep(point, (i, j))
                 if checkbound(tmp, image) and (
                     mask[tmp[0], tmp[1]] == 0) and (
-                        image[tmp[0], tmp[1]] < 255) and (
-                    abs(image[point[0], point[1]] - image[tmp[0], tmp[1]]) < 20):
+                        image[tmp[0], tmp[1]] < CC_B) and (
+                    abs(image[point[0], point[1]] - image[tmp[0], tmp[1]]) < CC_D):
+
                     q.put(tmp)
                     component.append(tmp)
                     mask[tmp[0], tmp[1]] = 255
@@ -130,7 +136,7 @@ mask = np.zeros(gray.shape)
 
 for j in xrange(gray.shape[1]):
     for i in xrange(gray.shape[0]):
-        if (mask[i, j] == 0) and (swimage[i, j] < 255):#255 - "барьер"
+        if (mask[i, j] == 0) and (swimage[i, j] < CC_B):#CC_B - "барьер"
             res = SearchComponent(swimage, (i, j), mask)
             if len(res) > 1:
                 tmp = gray.copy()
