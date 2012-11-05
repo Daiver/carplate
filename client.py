@@ -1,8 +1,8 @@
 from socket import *
 
 HOST = 'localhost'
-PORT = 21568
-BUFSIZ = 1024
+PORT = 21571
+BUFSIZ = 1024000
 ADDR = (HOST, PORT)
 
 tcpCliSock = socket(AF_INET, SOCK_STREAM)
@@ -12,7 +12,7 @@ while 1:
     data = raw_input('> ')
     if not data: break 
     tcpCliSock.send(data)
-    data = tcpCliSock.recv(1024)
+    data = tcpCliSock.recv(BUFSIZ)
     if not data: break 
     print data
 
