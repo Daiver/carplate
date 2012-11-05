@@ -6,9 +6,12 @@ import numpy as np
 
 from letterselect import CutLetters
 
+from ANNClassifier import ANNCFromFile
+
 from time import time
 
 size = (30, 40)
+'''
 def FeaturesFromImage(image):
     #tmp = image[:].reshape((size[0] * size[1]))
     res = []
@@ -16,6 +19,9 @@ def FeaturesFromImage(image):
         for j in xrange(image.shape[0]):
             res.append(0. if image[j, i] < 230 else 1.)
     return res#tmp.tolist()
+'''
+
+classifier = ANNCFromFile('learned3', size)
 
 def processimage(imgname):
     size = (30, 40)
@@ -28,8 +34,9 @@ def processimage(imgname):
     letters = CutLetters(gray)
 
     for i, x in enumerate(letters):
-        x = cv2.resize(x, size, interpolation=cv2.cv.CV_INTER_NN)    
-        print net.activate(FeaturesFromImage(x)).argmax()
+        #x = cv2.resize(x, size, interpolation=cv2.cv.CV_INTER_NN)    
+        #print net.activate(FeaturesFromImage(x)).argmax()
+        print classifier.recognize(x)
         
     return image
 
