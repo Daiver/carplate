@@ -8,10 +8,16 @@ import sip
 
 from test import processimage
 
+from client import Client
+
+from letterselect import CutLetters
+
+import cv2
  
 class Window(QtGui.QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, client, parent=None):
         super(Window, self).__init__(parent)
+        self.client = client
         self.label = QtGui.QLabel(self)
         self.label.setMinimumSize(300, 200)
         #self.comboBox = QtGui.QComboBox(self)
@@ -21,17 +27,36 @@ class Window(QtGui.QWidget):
         #vbox.addWidget(self.comboBox)
         self.initImages()
         #self.comboBox.currentIndexChanged.connect(self.onCurrentIndexChanged)
-        btnQuit = QtGui.QPushButton(u"Btn", self)
-        btnQuit.setGeometry(550, 75, 100, 30)        
-        self.connect(btnQuit, QtCore.SIGNAL('clicked()'), self.OnBtnPush)
+        btnCnt = QtGui.QPushButton(u"Connect", self)
+        btnCnt.setGeometry(550, 53, 100, 30)        
+        self.connect(btnCnt, QtCore.SIGNAL('clicked()'), self.ClientConnect)
+        
+        btnRecimg = QtGui.QPushButton(u"recognize", self)
+        btnRecimg.setGeometry(550, 75, 100, 30)        
+        self.connect(btnRecimg, QtCore.SIGNAL('clicked()'), self.OnRecBtnPush)
+
+        btnQuit = QtGui.QPushButton(u"Exit", self)
+        btnQuit.setGeometry(550, 105, 100, 30)        
+        self.connect(btnQuit, QtCore.SIGNAL('clicked()'), exit)
 
         self.textedit = QtGui.QTextEdit(self)
         self.textedit.setGeometry(100, 100, 100, 100)
         vbox.addWidget(self.textedit)
 
-    def OnBtnPush(self):
+    def ClientConnect(self):
+        self.client.Connect()
+
+    def OnRecBtnPush(self):
         #print 'button has pushed'
-        processimage(str(self.textedit.toPlainText()))
+        #processimage(str(self.textedit.toPlainText()))
+        img = cv2.imread(str(self.textedit.toPlainText()))
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        letters = CutLetters(gray)
+        
+        for x in letters:
+            self.client.SendImage(x)
+            print self.client.Receiv()
+        #cl.Close()
  
     def onCurrentIndexChanged(self, index):
         self.label.setPixmap(QtGui.QPixmap.fromImage(self.images[index]))
@@ -45,21 +70,20 @@ class Window(QtGui.QWidget):
     def createImage0(self):
         '''Create an QImage object, the copy data from other buffer to the image buffer.
         '''
-        #image = QtGui.QImage(512, 512,  QtGui.QImage.Format_Indexed8)
-        #image.setColorTable(self.colorTable)
-        #buff = ctypes.create_string_buffer('\xFF'*512*16, 512*16)
-        #buff2 = ctypes.create_string_buffer('\x1f'*512*32, 512*32)
-        #img_ptr = image.bits()
         self.buff = ctypes.create_string_buffer('\x7F'*512*512)
         image = QtGui.QImage(sip.voidptr(ctypes.addressof(self.buff)), 512, 512,  QtGui.QImage.Format_Indexed8)
         image.setColorTable(self.colorTable)
-        #ctypes.memmove(int(img_ptr),  buff,  buff._length_)
-        #ctypes.memmove(int(img_ptr)+buff._length_,  buff2,  buff2._length_)
-        #ctypes.memmove(int(img_ptr)+buff._length_+buff2._length_,  buff,  buff._length_)
         self.images.append(image)
  
 if __name__ == "__main__":
+    HOST = 'localhost'
+    PORT = 21572
+    ADDR = (HOST, PORT)
+    cl = Client(ADDR)
+    #img = cv2.imread('img/pure/3.jpg')
+    #gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    #letters = CutLetters(gray)    
     app = QtGui.QApplication(sys.argv)
-    w = Window()
+    w = Window(client=cl)
     w.show()
     sys.exit(app.exec_())

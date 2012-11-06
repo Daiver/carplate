@@ -45,7 +45,7 @@ class Client:
 
     def Close(self):
         self.tcpCliSock.close()
-
+'''
 HOST = 'localhost'
 PORT = 21572
 
@@ -61,7 +61,7 @@ for x in letters:
     cl.SendImage(x)
     print cl.Receiv()
 cl.Close()
-
+'''
 #cv2.imshow('', letters[0])
 #cv2.waitKey(10000)
 '''
