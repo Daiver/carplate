@@ -10,6 +10,12 @@ import simplejson as json
 
 from ImageConverter import *
 
+from ANNClassifier import ANNCFromFile
+
+image_size = (30, 40)
+
+classifier = ANNCFromFile('learned3', image_size)
+
 class ClientHandlerRecognizer(Thread):
     def __init__(self, clientsock, addr):
         super(ClientHandlerRecognizer, self).__init__()
@@ -32,19 +38,25 @@ class ClientHandlerRecognizer(Thread):
             data = self.clientsock.recv(self.BUFSIZ)
             if not data: raise Exception('failed to reciev image')
             tmp += data                    
-        print 'final len ', len(tmp)
+        #print 'final len ', len(tmp)
         image = imgFromStr(tmp, shape)
-        cv2.imshow('', image)
-        cv2.waitKey(10000)
+        return image
+        #cv2.imshow('', image)
+        #cv2.waitKey(10000)
 
     def run(self):
         self.finish = False
         while not self.finish:
             data = self.clientsock.recv(self.BUFSIZ)
+            if not data: break
+            print data
             request = json.loads(data)
             if not data: break
             if request['method'] == 'reciev_image':
-                self.RecievImage(request['args'])
+                img = self.RecievImage(request['args'])
+                ans = json.dumps({'ans' : int(classifier.recognize(img))})
+                self.clientsock.send(ans)
+                #print int(classifier.recognize(img))
             else:
                 self.clientsock.send('hello')
         print 'close conn', self.addr
@@ -74,7 +86,7 @@ class Server:
 
 if __name__=='__main__': 
     HOST = 'localhost'
-    PORT = 21571
+    PORT = 21572
     ADDR = (HOST, PORT)
     server = Server(ADDR, ClientHandlerRecognizer)
     server.run()

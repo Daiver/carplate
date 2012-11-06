@@ -6,6 +6,8 @@ import simplejson as json
 
 from ImageConverter import *
 
+from letterselect import CutLetters
+
 BUFSIZ = 1000000000
 
 class Client:
@@ -17,7 +19,7 @@ class Client:
         self.tcpCliSock.connect(self.addr)
 
     def SendImage(self, img):
-        tmp = imgToStr(gray)
+        tmp = imgToStr(img)
         request = {
                     'method' : 'reciev_image',
                     'args':{
@@ -31,6 +33,7 @@ class Client:
         if not ans:raise Exception('Conection is down')
         ans = json.loads(ans)
         if ans['ans'] != 'ready': raise Exception('Sending refused')
+        #print len(tmp)
         self.Send(tmp)
         
 
@@ -44,18 +47,22 @@ class Client:
         self.tcpCliSock.close()
 
 HOST = 'localhost'
-PORT = 21571
+PORT = 21572
 
 ADDR = (HOST, PORT)
 
-img = cv2.imread('img/pure/1.jpg')
+img = cv2.imread('img/pure/2.jpg')
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+letters = CutLetters(gray)
 
 cl = Client(ADDR)
 cl.Connect()
-cl.SendImage(gray)
-
+cl.SendImage(letters[0])
+print cl.Receiv()
 cl.Close()
+
+cv2.imshow('', letters[0])
+cv2.waitKey(10000)
 '''
 
 
