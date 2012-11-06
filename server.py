@@ -49,7 +49,7 @@ class ClientHandlerRecognizer(Thread):
         while not self.finish:
             data = self.clientsock.recv(self.BUFSIZ)
             if not data: break
-            print data
+            print 'request:', data
             request = json.loads(data)
             if not data: break
             if request['method'] == 'reciev_image':
