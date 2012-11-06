@@ -7,15 +7,20 @@ import cv2
 
 from ImageConverter import *
 
-class ClientHandlerEcho(Thread):
+class ClientHandlerRecognizer(Thread):
     def __init__(self, clientsock, addr):
         super(ClientHandlerEcho, self).__init__()
         self.clientsock = clientsock
         self.addr = addr
         self.BUFSIZ = 1000000000
+        self.finish = True
+
+    def Close(self):
+        self.finish = True
 
     def run(self):
-        while 1:
+        self.finish = False
+        while not self.finish:
             data = self.clientsock.recv(self.BUFSIZ)
             if not data: break
             if data == 'sendimage':
@@ -47,21 +52,27 @@ class Server:
         self.addr = addr        
         self.serversock = socket(AF_INET, SOCK_STREAM)
         self.ClientHandler = ClientHandler
+        self.finish = True
+
+    def Stop(self):
+        self.finish = True
+        #TODO stop ALL clients
 
     def run(self):
         self.serversock.bind(self.addr)
         self.serversock.listen(2)
-        while 1:
+        self.finish = False
+        while not self.finish:
             print 'waiting for connection…'
             clientsock, addr = self.serversock.accept()
             print '…connected from:', addr
-            t = self.ClientHandler(clientsock, addr)#Thread(target=handler, args=(clientsock, addr))
+            t = self.ClientHandler(clientsock, addr)
             t.start()
 
 if __name__=='__main__': 
     HOST = 'localhost'
     PORT = 21571
     ADDR = (HOST, PORT)
-    server = Server(ADDR, ClientHandlerEcho)
+    server = Server(ADDR, ClientHandlerRecognizer)
     server.run()
     

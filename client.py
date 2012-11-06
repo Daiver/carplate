@@ -1,13 +1,51 @@
-from socket import *
+from socket import socket, AF_INET, SOCK_STREAM
 
 import cv2
 import numpy as np
+import simplejson as json
 
 from ImageConverter import *
 
+BUFSIZ = 1000000000
+
+class Client:
+    def __init__(self, addr):
+        self.addr = addr
+        self.tcpCliSock = socket(AF_INET, SOCK_STREAM)
+
+    def Connect(self):
+        self.tcpCliSock.connect(self.addr)
+
+    def SendImage(self, img):
+        tmp = imgToStr(gray)
+        request = {
+                    'method' : 'reciev_image',
+                    'args':{
+                            'shape' : img.shape,
+                            'size' : len(tmp)
+                        }
+                }
+        jreq = json.dumps(request)
+        self.Send(jreq)
+        ans = self.Receiv()
+        if not ans:raise Exception('Conection is down')
+        if ans['ans'] != 'ready:': raise Exception('Sending refused')
+        tcpCliSock.send(tmp)
+        
+
+    def Send(self, data):
+        self.tcpCliSock.send(data)
+
+    def Receiv(self):
+        return tcpCliSock.recv(BUFSIZ)
+
+    def Close(self):
+        self.tcpCliSock.close()
+
+'''
 HOST = 'localhost'
 PORT = 21571
-BUFSIZ = 1000000000
+
 ADDR = (HOST, PORT)
 
 tcpCliSock = socket(AF_INET, SOCK_STREAM)
@@ -36,6 +74,7 @@ data = tcpCliSock.recv(BUFSIZ)
 print data
 
 tcpCliSock.close()
+'''
 
 '''img = cv2.imread('img/pure/3.jpg')
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
