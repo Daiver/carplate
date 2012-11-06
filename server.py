@@ -2,17 +2,35 @@
 from socket import socket, AF_INET, SOCK_STREAM
 from threading import Thread
 
+import numpy as np
+import cv2
+
+def imgfromstr(s, size):
+    return np.fromstring(s, dtype=float, sep=',').reshape(size)
+
 class ClientHandlerEcho(Thread):
     def __init__(self, clientsock, addr):
         super(ClientHandlerEcho, self).__init__()
         self.clientsock = clientsock
         self.addr = addr
-        self.BUFSIZ = 1024000
+        self.BUFSIZ = 100000000
 
     def run(self):
         while 1:
             data = self.clientsock.recv(self.BUFSIZ)
-            if not data: break 
+            if not data: break
+            if data == 'sendimage':
+                print 'ready for image'
+                data = self.clientsock.recv(self.BUFSIZ)
+                if not data: break
+                data = data.split(' ')
+                size = (int(data[0]), int(data[1]))
+                data = self.clientsock.recv(self.BUFSIZ)
+                if not data: break
+                image = imgfromstr(data, size)
+                cv2.imshow('', image)
+                cv2.waitKey(10000)
+                
             self.clientsock.send('echoed:..' + data)
         print 'close conn', self.addr
         self.clientsock.close()
