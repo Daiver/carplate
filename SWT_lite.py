@@ -17,9 +17,9 @@ checkbound_sq = lambda point, image: (
             (point [0] - 1 > 0) and (point [1] - 1 > 0))
 
 #barrier const for CC
-CC_B = 255
+CC_B = float('inf')
 #
-CC_D = 30
+CC_D = 3
 
 #Должен давать нам 1 штрих
 def Stroke(image, angles_img, point):
@@ -64,7 +64,7 @@ def SearchComponent(image, center, mask):
         #print point        
         for i in xrange(-1, 2):
             for j in xrange(-1, 2):
-                if i == j: continue
+                if i == 0 and j == 0: continue
                 #print 'i', i, 'j', j
                 tmp = makestep(point, (i, j))
                 if checkbound(tmp, image) and (
@@ -118,19 +118,19 @@ for i in xrange(1, gray.shape[1] - 1):#Бежим по всем точкам
                 cv2.imshow('77', tmp)
                 cv2.imshow('7', mask)
                 #Для удобства просмотра
-                cv2.waitKey(5)
+                #cv2.waitKey(5)
                 #print len(res)
         #exit()
 #Тут я хотел продолжить реализацию, но так и не понял что делать дальше =( (грустный смайлик)
 swimage = np.zeros(gray.shape)
-swimage[:] = 255
+swimage[:] = float('inf')
 for ray in rays:
     for p in ray:
         if swimage[p[0], p[1]] > len(ray):
             #print len(ray)
             swimage[p[0], p[1]] = len(ray)
 
-swimage %= 255#Криво, ну да ладно
+#swimage %= 255#Криво, ну да ладно
 
 mask = np.zeros(gray.shape)
 
@@ -147,7 +147,7 @@ for j in xrange(gray.shape[1]):
 
 
 np.set_printoptions(threshold='nan')
-print swimage
+#print swimage
 cv2.imshow('grljljkay', swimage)
 cv2.imshow('gray', gray)
 cv2.imshow('ext', angles_img)
