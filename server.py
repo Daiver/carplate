@@ -5,6 +5,9 @@ from threading import Thread
 import numpy as np
 import cv2
 
+import simplejson as json
+
+
 from ImageConverter import *
 
 class ClientHandlerRecognizer(Thread):
@@ -18,32 +21,32 @@ class ClientHandlerRecognizer(Thread):
     def Close(self):
         self.finish = True
 
+    def RecievImage(self, arg):
+        shape = arg['shape']
+        size = arg['size']
+        ans = json.dumps({'ans' : 'ready'})
+        self.clientsock.send(ans)
+        tmp = ''
+        data = ''
+        while len(tmp) < size:
+            data = self.clientsock.recv(self.BUFSIZ)
+            if not data raise Exception('failed to reciev image')
+            tmp += data                    
+        print 'final len ', len(tmp)
+        image = imgFromStr(tmp, shape)
+        cv2.imshow('', image)
+        cv2.waitKey(10000)
+
     def run(self):
         self.finish = False
         while not self.finish:
             data = self.clientsock.recv(self.BUFSIZ)
+            request = json.loads(data)
             if not data: break
-            if data == 'sendimage':
-                self.clientsock.send('ready for size')
-                data = self.clientsock.recv(self.BUFSIZ)
-                if not data: break
-                print 'size', data
-                data = data.split('_')                
-                size = (int(data[0]), int(data[1]))
-                finalsize = int(data[2])
-                self.clientsock.send('ready for image')
-                tmp = ''
-                data = ''
-                while len(tmp) < finalsize:
-                    data = self.clientsock.recv(self.BUFSIZ)                
-                    print 'data len', len(data)
-                    tmp += data                    
-                print 'final len ', len(tmp)
-                image = imgFromStr(tmp, size)
-                cv2.imshow('', image)
-                cv2.waitKey(10000)
-                
-            self.clientsock.send('echoed:..' + data)
+            if request['method'] == 'reciev_image':
+                self.RecievImage(request['args'])
+            else:
+                self.clientsock.send('hello')
         print 'close conn', self.addr
         self.clientsock.close()
 
