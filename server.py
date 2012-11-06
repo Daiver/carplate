@@ -12,7 +12,7 @@ from ImageConverter import *
 
 class ClientHandlerRecognizer(Thread):
     def __init__(self, clientsock, addr):
-        super(ClientHandlerEcho, self).__init__()
+        super(ClientHandlerRecognizer, self).__init__()
         self.clientsock = clientsock
         self.addr = addr
         self.BUFSIZ = 1000000000
@@ -30,7 +30,7 @@ class ClientHandlerRecognizer(Thread):
         data = ''
         while len(tmp) < size:
             data = self.clientsock.recv(self.BUFSIZ)
-            if not data raise Exception('failed to reciev image')
+            if not data: raise Exception('failed to reciev image')
             tmp += data                    
         print 'final len ', len(tmp)
         image = imgFromStr(tmp, shape)

@@ -29,24 +29,35 @@ class Client:
         self.Send(jreq)
         ans = self.Receiv()
         if not ans:raise Exception('Conection is down')
-        if ans['ans'] != 'ready:': raise Exception('Sending refused')
-        tcpCliSock.send(tmp)
+        ans = json.loads(ans)
+        if ans['ans'] != 'ready': raise Exception('Sending refused')
+        self.Send(tmp)
         
 
     def Send(self, data):
         self.tcpCliSock.send(data)
 
     def Receiv(self):
-        return tcpCliSock.recv(BUFSIZ)
+        return self.tcpCliSock.recv(BUFSIZ)
 
     def Close(self):
         self.tcpCliSock.close()
 
-'''
 HOST = 'localhost'
 PORT = 21571
 
 ADDR = (HOST, PORT)
+
+img = cv2.imread('img/pure/1.jpg')
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+cl = Client(ADDR)
+cl.Connect()
+cl.SendImage(gray)
+
+cl.Close()
+'''
+
 
 tcpCliSock = socket(AF_INET, SOCK_STREAM)
 tcpCliSock.connect(ADDR)
