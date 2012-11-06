@@ -5,29 +5,36 @@ from threading import Thread
 import numpy as np
 import cv2
 
-def imgfromstr(s, size):
-    return np.fromstring(s, dtype=float, sep=',').reshape(size)
+from ImageConverter import *
 
 class ClientHandlerEcho(Thread):
     def __init__(self, clientsock, addr):
         super(ClientHandlerEcho, self).__init__()
         self.clientsock = clientsock
         self.addr = addr
-        self.BUFSIZ = 100000000
+        self.BUFSIZ = 1000000000
 
     def run(self):
         while 1:
             data = self.clientsock.recv(self.BUFSIZ)
             if not data: break
             if data == 'sendimage':
-                print 'ready for image'
+                self.clientsock.send('ready for size')
                 data = self.clientsock.recv(self.BUFSIZ)
                 if not data: break
-                data = data.split(' ')
+                print 'size', data
+                data = data.split('_')                
                 size = (int(data[0]), int(data[1]))
-                data = self.clientsock.recv(self.BUFSIZ)
-                if not data: break
-                image = imgfromstr(data, size)
+                finalsize = int(data[2])
+                self.clientsock.send('ready for image')
+                tmp = ''
+                data = ''
+                while len(tmp) < finalsize:
+                    data = self.clientsock.recv(self.BUFSIZ)                
+                    print 'data len', len(data)
+                    tmp += data                    
+                print 'final len ', len(tmp)
+                image = imgFromStr(tmp, size)
                 cv2.imshow('', image)
                 cv2.waitKey(10000)
                 
