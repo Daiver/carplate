@@ -54,7 +54,7 @@ def Stroke(image, angles_img, point):
     return stroke
 
 #Поиск компонент. Наверно :)
-def SearchComponent(image, center, mask):
+def SearchComponent(image, center, mask, cntrimg):
     component = [center]
     q = Queue()
     q.put(center)
@@ -70,7 +70,7 @@ def SearchComponent(image, center, mask):
                 if checkbound(tmp, image) and (
                     mask[tmp[0], tmp[1]] == 0) and (
                         image[tmp[0], tmp[1]] < CC_B) and (
-                    abs(image[point[0], point[1]] - image[tmp[0], tmp[1]]) < CC_D):
+                    abs(image[point[0], point[1]] - image[tmp[0], tmp[1]]) < CC_D) and (cntrimg[tmp[0], tmp[1]] == 0):
 
                     q.put(tmp)
                     component.append(tmp)
@@ -78,7 +78,7 @@ def SearchComponent(image, center, mask):
     return component
                     
 
-img = cv2.imread('img/numbers/1.jpg')
+img = cv2.imread('img/cars/1.jpg')
 cv2.imshow('orig', img)
 
 
@@ -137,7 +137,7 @@ mask = np.zeros(gray.shape)
 for j in xrange(gray.shape[1]):
     for i in xrange(gray.shape[0]):
         if (mask[i, j] == 0) and (swimage[i, j] < CC_B):#CC_B - "барьер"
-            res = SearchComponent(swimage, (i, j), mask)
+            res = SearchComponent(swimage, (i, j), mask, gray)
             if len(res) > 1:
                 tmp = gray.copy()
                 for p in res:#Показываем луч
