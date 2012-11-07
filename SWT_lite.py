@@ -85,7 +85,7 @@ def SearchComponent(image, center, mask, cntrimg):
     return component
                     
 
-img = cv2.imread('img/numbers/1.jpg')
+img = cv2.imread('img/cars/1.jpg')
 cv2.imshow('orig', img)
 
 
@@ -145,13 +145,13 @@ for j in xrange(gray.shape[1]):
     for i in xrange(gray.shape[0]):
         if (mask[i, j] == 0) and (swimage[i, j] < CC_B):#CC_B - "барьер"
             res = SearchComponent(swimage, (i, j), mask, gray)
-            if len(res) > 1:
+            if len(res) > 5:
                 tmp = gray.copy()
-                print Variance(res, swimage)
-                for p in res:#Показываем луч
-                    tmp[p[0], p[1]] = 255                    
-                cv2.imshow('11111', tmp)
-                cv2.waitKey(1000)
+                if Variance(res, swimage) < 80:
+                    for p in res:#Показываем луч
+                        tmp[p[0], p[1]] = 255                    
+                    cv2.imshow('11111', tmp)
+                    cv2.waitKey(1000)
 
 
 np.set_printoptions(threshold='nan')
