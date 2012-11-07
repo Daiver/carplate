@@ -21,6 +21,11 @@ CC_B = float('inf')
 #
 CC_D = 3
 
+def Variance(vec, image):
+    avg = float(sum((image[p[0], p[1]] for p in vec))) / len(vec)
+    res = 1.0 / len(vec) * sum(( (image[p[0], p[1]] - avg)**2 for p in vec))
+    return res
+
 #Должен давать нам 1 штрих
 def Stroke(image, angles_img, point):
     stroke = []
@@ -70,7 +75,9 @@ def SearchComponent(image, center, mask, cntrimg):
                 if checkbound(tmp, image) and (
                     mask[tmp[0], tmp[1]] == 0) and (
                         image[tmp[0], tmp[1]] < CC_B) and (
-                    abs(image[point[0], point[1]] - image[tmp[0], tmp[1]]) < CC_D) and (cntrimg[tmp[0], tmp[1]] == 0):
+                   cntrimg[tmp[0], tmp[1]] == 0) and(
+                   #abs(image[point[0], point[1]] - image[tmp[0], tmp[1]]) < CC_D) :
+                   1/3. < image[point[0], point[1]] / image[tmp[0], tmp[1]]):
 
                     q.put(tmp)
                     component.append(tmp)
@@ -78,7 +85,7 @@ def SearchComponent(image, center, mask, cntrimg):
     return component
                     
 
-img = cv2.imread('img/cars/1.jpg')
+img = cv2.imread('img/numbers/1.jpg')
 cv2.imshow('orig', img)
 
 
@@ -140,6 +147,7 @@ for j in xrange(gray.shape[1]):
             res = SearchComponent(swimage, (i, j), mask, gray)
             if len(res) > 1:
                 tmp = gray.copy()
+                print Variance(res, swimage)
                 for p in res:#Показываем луч
                     tmp[p[0], p[1]] = 255                    
                 cv2.imshow('11111', tmp)
