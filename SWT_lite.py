@@ -26,6 +26,9 @@ def Variance(vec, image):
     res = 1.0 / len(vec) * sum(( (image[p[0], p[1]] - avg)**2 for p in vec))
     return res
 
+def CutRect(image, p1, p2):
+    return image[p1[0]:p2[0], p1[1]:p2[1]]
+
 #Должен давать нам 1 штрих
 def Stroke(image, angles_img, point):
     stroke = []
@@ -94,11 +97,16 @@ def SearchComponent(image, center, mask, cntrimg):
     maxY = max((p[1] for p in component))
     minX = min((p[0] for p in component))
     maxX = max((p[0] for p in component))
-    return {'points' : component, 'variance' : variance, 'height' : maxY  - minY, 'width' : maxX - minX}
+    return {'points' : component, 
+        'variance' : variance, 
+        'height' : maxY  - minY, 
+        'width' : maxX - minX, 
+        'X' : minX, 'Y' : minY, 'X2' : maxX, 'Y2' : maxY}
                     
 print 'loading image....'
-img = cv2.imread('img/cars/2.jpg')
-#img = cv2.imread('img/numbers/1.jpg')
+#img = cv2.imread('img/cars/2.jpg')
+#img = cv2.imread('img/pure/2.jpg')
+img = cv2.imread('img/numbers/1.jpg')
 cv2.imshow('orig', img)
 
 print 'Finding counters...'
@@ -142,8 +150,8 @@ for e in edges:
                 for p in res:#Показываем луч
                     tmp[p[0], p[1]] = 255
                     mask[p[0], p[1]] = 255
-                cv2.imshow('77', tmp)
-                cv2.imshow('7', mask)
+                #cv2.imshow('77', tmp)
+                #cv2.imshow('7', mask)
                 #Для удобства просмотра
                 #cv2.waitKey(5)
                 #print len(res)
@@ -189,7 +197,10 @@ for c in components:
             break
 
 tmp = orig.copy()
+i = 0
 for c in lettercandidats:
+    i += 1
+    cv2.imshow(str(i), CutRect(orig, (c['X'], c['Y']), (c['X2'], c['Y2'])))
     for p in c['points']:#Показываем компонент
         tmp[p[0], p[1]] = 255                    
 cv2.imshow('11111', tmp)
