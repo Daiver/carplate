@@ -89,8 +89,8 @@ def SearchComponent(image, center, mask, cntrimg):
     return component
                     
 print 'loading image....'
-#img = cv2.imread('img/cars/1.jpg')
-img = cv2.imread('img/numbers/1.jpg')
+img = cv2.imread('img/cars/1.jpg')
+#img = cv2.imread('img/numbers/1.jpg')
 cv2.imshow('orig', img)
 
 print 'Finding counters...'
@@ -161,7 +161,8 @@ for j in xrange(gray.shape[1]):
             res = SearchComponent(swimage, (i, j), mask, gray)
             if len(res) > 5:
                 tmp = gray.copy()
-                if True:#Variance(res, swimage) < 80:
+                if Variance(res, swimage) < 200:
+                    print Variance(res, swimage) 
                     for p in res:#Показываем компонент
                         tmp[p[0], p[1]] = 255                    
                     cv2.imshow('11111', tmp)
