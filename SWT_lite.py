@@ -50,11 +50,15 @@ def Stroke(image, angles_img, point):
         #Если уткнулись в край картинки - считаем луч ошибочным
         if not checkbound_sq(point, image):# or mask[point[0], point[1]] == 255:
             return []
-        if (gray[point[0], point[1]] != 0):
-            return []
+        if (image[point[0], point[1]] != 0):
+            #return []
         #mask[point[0], point[1]] = 255
-        angle = angles_img[point[0], point[1]]
-        diff = anglediff(oldangle, angle)
+            angle = angles_img[point[0], point[1]]
+            diff = anglediff(oldangle, angle)
+            if abs(diff) > (np.pi / 3):
+                return stroke
+            else:
+                return []
     #print 'step:', step, 'point', point, 'angle', oldangle
     return stroke
 
@@ -114,8 +118,12 @@ mask = np.zeros(gray.shape)
 
 print 'Tracing rays...'
 rays = []
-for i in xrange(1, gray.shape[1] - 1):#Бежим по всем точкам
-    for j in xrange(1, gray.shape[0] - 1):
+#for i in xrange(1, gray.shape[1] - 1):#Бежим по всем точкам
+#    for j in xrange(1, gray.shape[0] - 1):
+for e in edges:
+    if True:#=)
+        i = e[1]
+        j = e[0]
         #Проверяем прошли ли мы эту точку
         if mask[j, i] != 255:
             res = Stroke(gray, angles_img, (j, i))            
@@ -129,7 +137,7 @@ for i in xrange(1, gray.shape[1] - 1):#Бежим по всем точкам
                 cv2.imshow('77', tmp)
                 cv2.imshow('7', mask)
                 #Для удобства просмотра
-                #cv2.waitKey(5)
+                cv2.waitKey(5)
                 #print len(res)
         #exit()
 
