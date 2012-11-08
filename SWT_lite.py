@@ -81,12 +81,20 @@ def SearchComponent(image, center, mask, cntrimg):
                         image[tmp[0], tmp[1]] < CC_B) and (
                    cntrimg[tmp[0], tmp[1]] == 0) and(
                    #abs(image[point[0], point[1]] - image[tmp[0], tmp[1]]) < CC_D) :
-                   1/23. < image[point[0], point[1]] / image[tmp[0], tmp[1]] < 4):
+                   1/5. < image[point[0], point[1]] / image[tmp[0], tmp[1]] < 5):
 
                     q.put(tmp)
                     component.append(tmp)
                     mask[tmp[0], tmp[1]] = 255
-    return component
+    #if len(component) < 2:
+    #    return {}
+    variance = Variance(component, image)
+    #beauty but weak
+    minY = min((p[1] for p in component))
+    maxY = max((p[1] for p in component))
+    minX = min((p[0] for p in component))
+    maxX = max((p[0] for p in component))
+    return {'points' : component, 'variance' : variance, 'height' : maxY  - minY, 'width' : maxX - minX}
                     
 print 'loading image....'
 img = cv2.imread('img/cars/2.jpg')
@@ -154,19 +162,38 @@ for ray in rays:
 #swimage %= 255#Криво, ну да ладно
 
 mask = np.zeros(gray.shape)
+components = []
 print 'Search Components'
 for j in xrange(gray.shape[1]):
     for i in xrange(gray.shape[0]):
         if (mask[i, j] == 0) and (swimage[i, j] < CC_B):#CC_B - "барьер"
             res = SearchComponent(swimage, (i, j), mask, gray)
-            if len(res) > 5:
-                tmp = gray.copy()
-                if Variance(res, swimage) < 80:
-                    print Variance(res, swimage) 
-                    for p in res:#Показываем компонент
-                        tmp[p[0], p[1]] = 255                    
-                    cv2.imshow('11111', tmp)
-                    cv2.waitKey(1000)
+            if (len(res['points']) > 5 and ((res['width'] * res['height']) < (len(res['points']) * 3))
+                and ((res['height'] != 0) and (1/4. < res['width'] / res['height'] < 4))):
+                if res['variance'] < 500:
+                    components.append(res)
+                    #print res['variance']
+                    #tmp = gray.copy()
+                    #for p in res['points']:#Показываем компонент
+                    #    tmp[p[0], p[1]] = 255                    
+                    #cv2.imshow('11111', tmp)
+                    #cv2.waitKey(1000)
+print 'filtering letter candidats...'
+lettercandidats = []
+for c in components:
+    for c2 in components:
+        if ((c != c2) and (c['width'] != 0 and c['height'] != 0
+            and (5/6. < c2['width']/c['width'] < 1.2))
+            and (5/6. < c2['height']/c['height'] < 1.2)):
+            lettercandidats.append(c)
+            break
+
+for c in lettercandidats:
+    tmp = gray.copy()
+    for p in c['points']:#Показываем компонент
+        tmp[p[0], p[1]] = 255                    
+    cv2.imshow('11111', tmp)
+    cv2.waitKey(1000)
 
 
 np.set_printoptions(threshold='nan')
