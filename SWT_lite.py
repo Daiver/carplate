@@ -81,7 +81,7 @@ def SearchComponent(image, center, mask, cntrimg):
                         image[tmp[0], tmp[1]] < CC_B) and (
                    cntrimg[tmp[0], tmp[1]] == 0) and(
                    #abs(image[point[0], point[1]] - image[tmp[0], tmp[1]]) < CC_D) :
-                   1/5. < image[point[0], point[1]] / image[tmp[0], tmp[1]] < 5):
+                   1/6. < image[point[0], point[1]] / image[tmp[0], tmp[1]] < 6):
 
                     q.put(tmp)
                     component.append(tmp)
@@ -168,9 +168,9 @@ for j in xrange(gray.shape[1]):
     for i in xrange(gray.shape[0]):
         if (mask[i, j] == 0) and (swimage[i, j] < CC_B):#CC_B - "барьер"
             res = SearchComponent(swimage, (i, j), mask, gray)
-            if (len(res['points']) > 5 and ((res['width'] * res['height']) < (len(res['points']) * 3))
-                and ((res['height'] != 0) and (1/4. < res['width'] / res['height'] < 4))):
-                if res['variance'] < 500:
+            if (len(res['points']) > 10 and ((res['width'] * res['height']) < (len(res['points']) * 3))
+                and ((res['height'] != 0) and (1/2. < res['width'] / res['height'] < 2))):
+                if res['variance'] < 700:
                     components.append(res)
                     #print res['variance']
                     #tmp = gray.copy()
@@ -183,22 +183,23 @@ lettercandidats = []
 for c in components:
     for c2 in components:
         if ((c != c2) and (c['width'] != 0 and c['height'] != 0
-            and (5/6. < c2['width']/c['width'] < 1.2))
-            and (5/6. < c2['height']/c['height'] < 1.2)):
+            and (4/6. < c2['width']/c['width'] < 1.5))
+            and (4/6. < c2['height']/c['height'] < 1.5)):
             lettercandidats.append(c)
             break
 
+tmp = orig.copy()
 for c in lettercandidats:
-    tmp = gray.copy()
     for p in c['points']:#Показываем компонент
         tmp[p[0], p[1]] = 255                    
-    cv2.imshow('11111', tmp)
-    cv2.waitKey(1000)
+cv2.imshow('11111', tmp)
+cv2.imwrite('test.jpg', tmp)
+cv2.waitKey(1000000)
 
 
 np.set_printoptions(threshold='nan')
 #print swimage
-cv2.imshow('grljljkay', swimage)
-cv2.imshow('gray', gray)
-cv2.imshow('ext', angles_img)
+#cv2.imshow('grljljkay', swimage)
+#cv2.imshow('gray', gray)
+#cv2.imshow('ext', angles_img)
 cv2.waitKey(1000)
