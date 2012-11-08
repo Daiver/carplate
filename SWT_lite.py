@@ -84,16 +84,19 @@ def SearchComponent(image, center, mask, cntrimg):
                     mask[tmp[0], tmp[1]] = 255
     return component
                     
-
-img = cv2.imread('img/cars/1.jpg')
+print 'loading image....'
+#img = cv2.imread('img/cars/1.jpg')
+img = cv2.imread('img/numbers/1.jpg')
 cv2.imshow('orig', img)
 
-
+print 'Finding counters...'
 #Сюда запоминаем точки контура
 edges = []
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+orig = gray.copy()
 gray = cv2.Canny(gray, 10, 230)
 
+print 'Calc gradient\'s angle...'
 #Название списка не совсем корректно. Тут мы получаем градиент (точнее угол) всех (ну почти) точек
 angles_img = np.zeros(gray.shape)
 angles_img[:] = float('nan')
@@ -101,14 +104,15 @@ for j in xrange(1, gray.shape[1]-1):
     for i in xrange(1, gray.shape[0]-1):    
         if gray[i, j] == 255:
             edges.append((i, j))
-        angles_img[i, j] = gradient(gray, (i, j))
+        angles_img[i, j] = gradient(orig, (i, j))
+        #angles_img[i, j] = gradient(gray, (i, j))
 
 #stepmap = [ [dirselect(x) for x in vect] for vect in angles_img]
 
 #Хранит "слепок" всех лучей, требуется по сути только для отладки
 mask = np.zeros(gray.shape)
 
-
+print 'Tracing rays...'
 rays = []
 for i in xrange(1, gray.shape[1] - 1):#Бежим по всем точкам
     for j in xrange(1, gray.shape[0] - 1):
@@ -128,7 +132,9 @@ for i in xrange(1, gray.shape[1] - 1):#Бежим по всем точкам
                 #cv2.waitKey(5)
                 #print len(res)
         #exit()
+
 #Тут я хотел продолжить реализацию, но так и не понял что делать дальше =( (грустный смайлик)
+print 'Calc Stroke Width...'
 swimage = np.zeros(gray.shape)
 swimage[:] = float('inf')
 for ray in rays:
@@ -140,7 +146,7 @@ for ray in rays:
 #swimage %= 255#Криво, ну да ладно
 
 mask = np.zeros(gray.shape)
-
+print 'Search Components'
 for j in xrange(gray.shape[1]):
     for i in xrange(gray.shape[0]):
         if (mask[i, j] == 0) and (swimage[i, j] < CC_B):#CC_B - "барьер"
@@ -148,7 +154,7 @@ for j in xrange(gray.shape[1]):
             if len(res) > 5:
                 tmp = gray.copy()
                 if Variance(res, swimage) < 80:
-                    for p in res:#Показываем луч
+                    for p in res:#Показываем компонент
                         tmp[p[0], p[1]] = 255                    
                     cv2.imshow('11111', tmp)
                     cv2.waitKey(1000)
