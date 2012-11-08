@@ -137,7 +137,7 @@ for e in edges:
                 cv2.imshow('77', tmp)
                 cv2.imshow('7', mask)
                 #Для удобства просмотра
-                cv2.waitKey(5)
+                #cv2.waitKey(5)
                 #print len(res)
         #exit()
 
@@ -161,7 +161,7 @@ for j in xrange(gray.shape[1]):
             res = SearchComponent(swimage, (i, j), mask, gray)
             if len(res) > 5:
                 tmp = gray.copy()
-                if Variance(res, swimage) < 80:
+                if True:#Variance(res, swimage) < 80:
                     for p in res:#Показываем компонент
                         tmp[p[0], p[1]] = 255                    
                     cv2.imshow('11111', tmp)
