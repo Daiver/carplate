@@ -84,7 +84,7 @@ def SearchComponent(image, center, mask, cntrimg):
                         image[tmp[0], tmp[1]] < CC_B) and (
                    cntrimg[tmp[0], tmp[1]] == 0) and(
                    #abs(image[point[0], point[1]] - image[tmp[0], tmp[1]]) < CC_D) :
-                   1/6. < image[point[0], point[1]] / image[tmp[0], tmp[1]] < 6):
+                   1/5. < image[point[0], point[1]] / image[tmp[0], tmp[1]] < 5):
 
                     q.put(tmp)
                     component.append(tmp)
@@ -104,9 +104,9 @@ def SearchComponent(image, center, mask, cntrimg):
         'X' : minX, 'Y' : minY, 'X2' : maxX, 'Y2' : maxY}
                     
 print 'loading image....'
-#img = cv2.imread('img/cars/2.jpg')
+img = cv2.imread('img/cars/2.jpg')
 #img = cv2.imread('img/pure/2.jpg')
-img = cv2.imread('img/numbers/1.jpg')
+#img = cv2.imread('img/numbers/1.jpg')
 cv2.imshow('orig', img)
 
 print 'Finding counters...'
@@ -146,10 +146,10 @@ for e in edges:
             if len(res) > 0:
                 #print res
                 rays.append(res)
-                tmp = gray.copy()
-                for p in res:#Показываем луч
-                    tmp[p[0], p[1]] = 255
-                    mask[p[0], p[1]] = 255
+                #tmp = gray.copy()
+                #for p in res:#Показываем луч
+                #    tmp[p[0], p[1]] = 255
+                #    mask[p[0], p[1]] = 255
                 #cv2.imshow('77', tmp)
                 #cv2.imshow('7', mask)
                 #Для удобства просмотра
@@ -176,9 +176,12 @@ for j in xrange(gray.shape[1]):
     for i in xrange(gray.shape[0]):
         if (mask[i, j] == 0) and (swimage[i, j] < CC_B):#CC_B - "барьер"
             res = SearchComponent(swimage, (i, j), mask, gray)
-            if (len(res['points']) > 10 and ((res['width'] * res['height']) < (len(res['points']) * 3))
-                and ((res['height'] != 0) and (1/2. < res['width'] / res['height'] < 2))):
-                if res['variance'] < 700:
+            if (
+                len(res['points']) > 8 
+                and ((res['width'] * res['height']) < (len(res['points']) * 5))
+                and ((res['height'] != 0) and (res['width'] != 0) and (1/4. < res['width'] / res['height'] < 4))
+                ):
+                if res['variance'] < 400:
                     components.append(res)
                     #print res['variance']
                     #tmp = gray.copy()
