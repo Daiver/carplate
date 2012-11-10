@@ -218,7 +218,11 @@ def FindLetters(gray):
                 lettercandidats.append(c)
                 break
     return lettercandidats
-    
+
+def GetLetters(img):
+    lettercandidats = FindLetters(img)
+    return [CutRect(img, (c['X'], c['Y']), (c['X2'], c['Y2'])) for c in lettercandidats]
+
 
 if __name__ == '__main__':
     print 'loading image....'

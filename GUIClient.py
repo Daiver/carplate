@@ -13,7 +13,9 @@ from client import Client
 from letterselect import CutLetters
 
 import cv2
- 
+
+from SWT_lite import GetLetters
+
 class Window(QtGui.QWidget):
     def __init__(self, client, parent=None):
         super(Window, self).__init__(parent)
@@ -51,7 +53,7 @@ class Window(QtGui.QWidget):
         #processimage(str(self.textedit.toPlainText()))
         img = cv2.imread(str(self.textedit.toPlainText()))
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        letters = CutLetters(gray)
+        letters = GetLetters(gray)#CutLetters(gray)
         
         for x in letters:
             self.client.SendImage(x)
