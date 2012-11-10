@@ -1,76 +1,86 @@
 from math import *
 
-######point = (x, y)
+class Selector :
 
-def Coord(x0, y0, alpha, h) :
-    coord = []
-    if  0 < alpha < pi and not alpha == pi/2 :
-        return (h * cos(alpha) + x0, h * sin(alpha) + y0)
-    elif pi < alpha < 2*pi and not alpha == 3*pi/2 :
-        return (h * cos(alpha) + x0, y0 + h * sin(alpha))
-    elif alpha == pi/2:
-        return (x0, y0 + h)
-    elif alpha == 3*pi/2 :
-        return (x0, y0 - h)
-    elif alpha == 0 or alpha == 2*pi :
-        return (x0 + h, y0)
-    else :
-        return (x0 - h, y0)
+    def __init__(self, x1, y1, alpha) :
+        self.alpha = alpha
+        self.flag = False
+        self.step = 3
+        self.point1 = (x1, y1)
+        self.point2 = (x1, y1)
 
-def Swap(a, b) :
-    t = a
-    a = b
-    b = t
+    def TakeSecondPointForLine(self) :
+        if  0 < self.alpha < pi and not self.alpha == pi/2 :
+            return (self.step * cos(self.alpha) + self.point1[0], self.step * sin(self.alpha) + self.point1[1])
+        elif pi < self.alpha < 2*pi and not self.alpha == 3*pi/2 :
+            return (self.step * cos(self.alpha) + self.point1[0], self.point1[1] + self.step * sin(self.alpha))
+        elif self.alpha == pi/2:
+            return (self.point1[0], self.point1[1] + self.step)
+        elif self.alpha == 3*pi/2 :
+            return (self.point1[0], self.point1[1] - self.step)
+        elif self.alpha == 0 or self.alpha == 2*pi :
+            return (self.point1[0] + self.step, self.point1[1])
+        else :
+            return (self.point1[0] - self.step, self.point1[1])
 
-    return a, b
+    def Swap(self, a, b) :
+        a, b = b, a
+        return a, b
 
-def Bresenham(x1, y1, x2, y2) :
-    if x2 < x1 :
-        x1, x2 = Swap(x1, x2)
-        print x1 , x2
-        y1, y2 = Swap(y1, y2)
-    dX = x2 - x1
-    dY = y2 -y1
+    
+    def Bresenham(self) :
+        if self.point2[0] < self.point1[0] :
+            self.flag = True
+            self.point1, self.point2 = self.Swap(self.point1, self.point2)
+            #print self.point1, self.point2
+            #self.point1[1], y2 = self.Swap(self.point1[1], self.point2[1])
+        dX = self.point2[0] - self.point1[0]
+        dY = self.point2[1] - self.point1[1]
 
-    if dY > 0 :
-        s = 1
-    elif dY < 0 :
-        s = -1
-    else :
-        s = 0
+        if dY > 0 :
+            s = 1
+        elif dY < 0 :
+            s = -1
+        else :
+            s = 0
 
-    d = 2 * dY - dX
-    y = y1
-    x = x1
+        d = 2 * dY - dX
+        y = self.point1[1]
+        x = self.point1[0]
 
-    line = []
-
-    if abs(dY) <= dX :
-        while x < x2 :
-            line.append((x, y))
-            x += 1
-            d += 2 * dY
-
-            if d > 0 :
-                d -= 2 * dX
-                y += s
-
-    else :
-        while (y2 - y) * s >= 0 :
-            line.append((x, y))
-            y += s
-            d += 2 * dX
-
-            if d> 0 :
-                d -= 2 * dY
+        line = []
+        if abs(dY) <= dX :
+            while x < self.point2[0] :
+                line.append((x, y))
                 x += 1
+                d += 2 * dY
+                if d > 0 :
+                    d -= 2 * dX
+                    y += s
+        else :
+            while (self.point2[1] - y) * s >= 0 :
+                line.append((x, y))
+                y += s
+                d += 2 * dX
+                if d > 0 :
+                    d -= 2 * dY
+                    x += 1
+        return line
 
-    return line
+    def GetPoint(self) :
+        self.point2 = self.TakeSecondPointForLine()
+        self.point2 = (int(self.point2[0]), int(self.point2[1]))
+        #self.point2[1] = int(self.point2[1])
+        line = self.Bresenham()
+        if self.flag :
+            self.point1 = line[len(line) - 2]
+            return self.point1
+        else :
+            self.point1 = line[1]
+            return self.point1
+                          
+#cl = Selector(5, 4, 4*pi/3)
+
+#print cl.GetPoint()
             
-
-crd = Coord(5,4, 4*pi/3, 7)
-print crd
-print Bresenham(5,4,int(crd[0]),int(crd[1]))
-        
-        
         

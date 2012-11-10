@@ -7,6 +7,8 @@ from Queue import Queue
 
 from SWT_Support import *
 
+from Bresenham import Selector
+
 makestep = lambda point, step: (point[0] + step[0], point[1] + step[1])
 checkbound = lambda point, image: (
             (point[0] < image.shape[0]) and (point[1] < image.shape[1]) and
@@ -19,7 +21,7 @@ checkbound_sq = lambda point, image: (
 #barrier const for CC
 CC_B = float('inf')
 #
-CC_D = 3
+#CC_D = 3
 
 def Variance(vec, image):
     avg = float(sum((image[p[0], p[1]] for p in vec))) / len(vec)
@@ -32,18 +34,20 @@ def CutRect(image, p1, p2):
 #Должен давать нам 1 штрих
 def Stroke(image, angles_img, point):
     stroke = []
-    if not checkbound_sq(point, image): return #Вобще не лучшая идея - возвращать список, ну да ладно
+    if not checkbound_sq(point, image): return 
     oldangle = angles_img[point[0], point[1]]#Получаем угол
     angle = oldangle
     if (oldangle == None) or (np.isnan(oldangle)): return 
     #ds = DSelecter(point, angle):todo implement dselecter
 
     #Получаем шаг. Тут надо вставить брезенхейма. Ну мне так кажется
+    #selector = Selector(point[0], point[1], (np.pi + angles_img[point[0], point[1]]) % (2*np.pi))
     step = dirselect(angles_img[point[0], point[1]])#stepmap[point[0]][point[1]]
     step = (step[1], step[0])
-    
     if not step:return 
+        
     diff = anglediff(oldangle, angle) 
+    #point = selector.GetPoint()
     point = makestep(point, step)
     if not checkbound_sq(point, image):# or mask[point[0], point[1]] == 255:
         return 
@@ -54,6 +58,7 @@ def Stroke(image, angles_img, point):
         #if (image[point[0], point[1]] != 0):
         stroke.append(point)        
         point = makestep(point, step)
+        #point = selector.GetPoint()
         #Если уткнулись в край картинки - считаем луч ошибочным
         if not checkbound_sq(point, image):# or mask[point[0], point[1]] == 255:
             return 
@@ -99,11 +104,13 @@ def SearchComponent(image, center, mask, cntrimg):
     maxY = max((p[1] for p in component))
     minX = min((p[0] for p in component))
     maxX = max((p[0] for p in component))
-    return {'points' : component, 
-        'variance' : variance, 
-        'height' : maxY  - minY, 
-        'width' : maxX - minX, 
-        'X' : minX, 'Y' : minY, 'X2' : maxX, 'Y2' : maxY}
+    return {
+            'points' : component, 
+            'variance' : variance, 
+            'height' : maxY  - minY, 
+            'width' : maxX - minX, 
+            'X' : minX, 'Y' : minY, 'X2' : maxX, 'Y2' : maxY
+        }
                     
 print 'loading image....'
 img = cv2.imread('img/cars/2.jpg')
@@ -149,15 +156,13 @@ for e in edges:
             if res :#len(res) > 0:
                 #print res
                 rays.append(res)
-                #tmp = gray.copy()
-                #for p in res:#Показываем луч
-                #    tmp[p[0], p[1]] = 255
+                tmp = gray.copy()
+                for p in res:#Показываем луч
+                    tmp[p[0], p[1]] = 255
                 #    mask[p[0], p[1]] = 255
-                #cv2.imshow('77', tmp)
-                #cv2.imshow('7', mask)
+                cv2.imshow('77', tmp)
                 #Для удобства просмотра
-                #cv2.waitKey(5)
-                #print len(res)
+                cv2.waitKey(5)
         #exit()
 
 #Тут я хотел продолжить реализацию, но так и не понял что делать дальше =( (грустный смайлик)
