@@ -117,7 +117,8 @@ img = cv2.imread('img/cars/2.jpg')
 #img = cv2.imread('img/cars/3.jpg')
 #img = cv2.imread('img/pure/2.jpg')
 #img = cv2.imread('img/numbers/1.jpg')
-cv2.imshow('orig', img)
+
+#cv2.imshow('orig', img)
 
 print 'Finding counters...'
 #Сюда запоминаем точки контура
@@ -156,13 +157,13 @@ for e in edges:
             if res :#len(res) > 0:
                 #print res
                 rays.append(res)
-                tmp = gray.copy()
-                for p in res:#Показываем луч
-                    tmp[p[0], p[1]] = 255
+                #tmp = gray.copy()
+                #for p in res:#Показываем луч
+                #    tmp[p[0], p[1]] = 255
                 #    mask[p[0], p[1]] = 255
-                cv2.imshow('77', tmp)
+                #cv2.imshow('77', tmp)
                 #Для удобства просмотра
-                cv2.waitKey(5)
+                #cv2.waitKey(5)
         #exit()
 
 #Тут я хотел продолжить реализацию, но так и не понял что делать дальше =( (грустный смайлик)

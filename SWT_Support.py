@@ -71,7 +71,7 @@ def SquareSelect(image, center):
     
 #Свертка. По крайней мере я себе ее так представлял
 def convolution(A, kernel):
-    return sum(sum(kernel * A))/6#6 - coff norm
+    return sum(sum(kernel * A))#/6#6 - coff norm
 
 #Дает нам угол наклона градиента к оси ОХ. Я мог накосячить с системой координат
 #Но что-то работает
