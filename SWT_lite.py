@@ -31,8 +31,8 @@ def Variance(vec, image):
 
 def VarianceFromRect(p1, p2, image):
     tmp = []
-    for i in xrange(p2[0], p1[0]):
-        for j in xrange(p2[1], p1[1]):
+    for i in xrange(p1[0], p2[0]):
+        for j in xrange(p1[1], p2[1]):
             tmp.append((i, j))
     if not tmp: return 0
     return Variance(tmp, image)
@@ -82,7 +82,7 @@ def Stroke(image, angles_img, point):
     #return stroke
 
 #Поиск компонент. Наверно :)
-def SearchComponent(image, center, mask, cntrimg):
+def SearchComponent(image, center, mask, cntrimg, original):
     component = [center]
     q = Queue()
     q.put(center)
@@ -113,7 +113,9 @@ def SearchComponent(image, center, mask, cntrimg):
     maxY = max((p[1] for p in component))
     minX = min((p[0] for p in component))
     maxX = max((p[0] for p in component))
-    bboxvariance = VarianceFromRect((minX, minY), (maxX, maxY), image)
+    bboxvariance = VarianceFromRect((minX, minY), (maxX, maxY), original)
+    if bboxvariance:
+        bboxvariance /= ((maxX-minX)*(maxY-minY))
     return {
             'points' : component, 
             'variance' : variance, 
@@ -129,6 +131,7 @@ def SearchComponent(image, center, mask, cntrimg):
 
 def FindLetters(gray):
     print 'Finding counters...'
+    orig = gray.copy()
     gray = cv2.Canny(gray, 10, 230)
     edges = []
     print 'Calc gradient\'s angle...'
@@ -188,9 +191,10 @@ def FindLetters(gray):
     for j in xrange(gray.shape[1]):
         for i in xrange(gray.shape[0]):
             if (mask[i, j] == 0) and (swimage[i, j] < CC_B):#CC_B - "барьер"
-                res = SearchComponent(swimage, (i, j), mask, gray)
+                res = SearchComponent(swimage, (i, j), mask, gray, orig)
                 if (
-                    len(res['points']) > 19 
+                    len(res['points']) > 19
+                    and (res['bboxvariance'] > 2.5)
                     and ((res['width'] * res['height']) * 0.17 < (len(res['points'])))
                     and ((res['height'] > 10) and (res['width'] > 3) and (1/2.5 < res['width'] / res['height'] < 2.5))
                     ):
@@ -219,20 +223,20 @@ def FindLetters(gray):
 if __name__ == '__main__':
     print 'loading image....'
     img = cv2.imread('img/cars/2.jpg')
-    gr = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    orig = gr.copy()
     #img = cv2.imread('img/cars/3.jpg')
     #img = cv2.imread('img/pure/2.jpg')
     #img = cv2.imread('img/numbers/1.jpg')
+    gr = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    orig = gr.copy()
     lettercandidats = FindLetters(gr)
 
     tmp = orig.copy()
     print 'writting letters'
     for i, c in enumerate(lettercandidats):
         cv2.imwrite('result/' + str(i) + ".jpg", CutRect(orig, (c['X'], c['Y']), (c['X2'], c['Y2'])))
-        cv2.imshow('result/' + str(i) + ".jpg", CutRect(orig, (c['X'], c['Y']), (c['X2'], c['Y2'])))
-        print c['bboxvariance']
-        cv2.waitKey(10000)
+        #cv2.imshow('result/' + str(i) + ".jpg", CutRect(orig, (c['X'], c['Y']), (c['X2'], c['Y2'])))
+        #print c['bboxvariance']
+        #cv2.waitKey(10000)
         for p in c['points']:#Показываем компонент
             tmp[p[0], p[1]] = 255                    
         #cv2.imshow('11111', tmp)
