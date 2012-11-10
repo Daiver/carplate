@@ -32,38 +32,40 @@ def CutRect(image, p1, p2):
 #Должен давать нам 1 штрих
 def Stroke(image, angles_img, point):
     stroke = []
-    if not checkbound_sq(point, image): return []#Вобще не лучшая идея - возвращать список, ну да ладно
+    if not checkbound_sq(point, image): return #Вобще не лучшая идея - возвращать список, ну да ладно
     oldangle = angles_img[point[0], point[1]]#Получаем угол
     angle = oldangle
-    if (oldangle == None) or (np.isnan(oldangle)): return []
+    if (oldangle == None) or (np.isnan(oldangle)): return 
     #ds = DSelecter(point, angle):todo implement dselecter
 
     #Получаем шаг. Тут надо вставить брезенхейма. Ну мне так кажется
     step = dirselect(angles_img[point[0], point[1]])#stepmap[point[0]][point[1]]
     step = (step[1], step[0])
     
-    if not step:return []
-    diff = anglediff(oldangle, angle)
+    if not step:return 
+    diff = anglediff(oldangle, angle) 
+    point = makestep(point, step)
+    if not checkbound_sq(point, image):# or mask[point[0], point[1]] == 255:
+        return 
+
     #Пока не уткнемся в градиент различающийся с нашим более чем в 30* ползем в направлении step
     #Из-за кривого шага на больших расстояниях дает нехороший результат
-    while abs(diff) < (np.pi / 3):
+    while image[point[0], point[1]] == 0:
+        #if (image[point[0], point[1]] != 0):
         stroke.append(point)        
         point = makestep(point, step)
-
         #Если уткнулись в край картинки - считаем луч ошибочным
         if not checkbound_sq(point, image):# or mask[point[0], point[1]] == 255:
-            return []
-        if (image[point[0], point[1]] != 0):
-            #return []
-        #mask[point[0], point[1]] = 255
-            angle = angles_img[point[0], point[1]]
-            diff = anglediff(oldangle, angle)
-            if abs(diff) > (np.pi / 3):
-                return stroke
-            else:
-                return []
+            return 
+        #if (image[point[0], point[1]] != 0):
+    angle = angles_img[point[0], point[1]]
+    diff = anglediff(oldangle, angle)
+    if abs(diff) > (np.pi / 3):
+        return stroke
+    else:
+        return 
     #print 'step:', step, 'point', point, 'angle', oldangle
-    return stroke
+    #return stroke
 
 #Поиск компонент. Наверно :)
 def SearchComponent(image, center, mask, cntrimg):
@@ -104,7 +106,7 @@ def SearchComponent(image, center, mask, cntrimg):
         'X' : minX, 'Y' : minY, 'X2' : maxX, 'Y2' : maxY}
                     
 print 'loading image....'
-img = cv2.imread('img/cars/4.jpg')
+img = cv2.imread('img/cars/2.jpg')
 #img = cv2.imread('img/cars/3.jpg')
 #img = cv2.imread('img/pure/2.jpg')
 #img = cv2.imread('img/numbers/1.jpg')
@@ -144,7 +146,7 @@ for e in edges:
         #Проверяем прошли ли мы эту точку
         if mask[j, i] != 255:
             res = Stroke(gray, angles_img, (j, i))            
-            if len(res) > 0:
+            if res :#len(res) > 0:
                 #print res
                 rays.append(res)
                 #tmp = gray.copy()
