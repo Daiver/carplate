@@ -104,9 +104,9 @@ def SearchComponent(image, center, mask, cntrimg):
         'X' : minX, 'Y' : minY, 'X2' : maxX, 'Y2' : maxY}
                     
 print 'loading image....'
-img = cv2.imread('img/cars/2.jpg')
+#img = cv2.imread('img/cars/2.jpg')
 #img = cv2.imread('img/pure/2.jpg')
-#img = cv2.imread('img/numbers/1.jpg')
+img = cv2.imread('img/numbers/1.jpg')
 cv2.imshow('orig', img)
 
 print 'Finding counters...'
@@ -178,10 +178,10 @@ for j in xrange(gray.shape[1]):
             res = SearchComponent(swimage, (i, j), mask, gray)
             if (
                 len(res['points']) > 8 
-                and ((res['width'] * res['height']) < (len(res['points']) * 5))
+                and ((res['width'] * res['height']) * 0.15 < (len(res['points'])))
                 and ((res['height'] != 0) and (res['width'] != 0) and (1/4. < res['width'] / res['height'] < 4))
                 ):
-                if res['variance'] < 400:
+                if res['variance'] < 80:
                     components.append(res)
                     #print res['variance']
                     #tmp = gray.copy()
@@ -206,14 +206,14 @@ for c in lettercandidats:
     cv2.imshow(str(i), CutRect(orig, (c['X'], c['Y']), (c['X2'], c['Y2'])))
     for p in c['points']:#Показываем компонент
         tmp[p[0], p[1]] = 255                    
-cv2.imshow('11111', tmp)
+#cv2.imshow('11111', tmp)
 cv2.imwrite('test.jpg', tmp)
-cv2.waitKey(1000000)
+#cv2.waitKey(1000000)
 
 
-np.set_printoptions(threshold='nan')
+#np.set_printoptions(threshold='nan')
 #print swimage
 #cv2.imshow('grljljkay', swimage)
 #cv2.imshow('gray', gray)
 #cv2.imshow('ext', angles_img)
-cv2.waitKey(1000)
+#cv2.waitKey(1000)
