@@ -91,7 +91,7 @@ def SearchComponent(image, center, mask, cntrimg):
                         image[tmp[0], tmp[1]] < CC_B) and (
                    cntrimg[tmp[0], tmp[1]] == 0) and(
                    #abs(image[point[0], point[1]] - image[tmp[0], tmp[1]]) < CC_D) :
-                   1/5. < image[point[0], point[1]] / image[tmp[0], tmp[1]] < 5):
+                   1/3. < image[point[0], point[1]] / image[tmp[0], tmp[1]] < 3):
 
                     q.put(tmp)
                     component.append(tmp)
