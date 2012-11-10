@@ -91,7 +91,7 @@ def SearchComponent(image, center, mask, cntrimg):
                         image[tmp[0], tmp[1]] < CC_B) and (
                    cntrimg[tmp[0], tmp[1]] == 0) and(
                    #abs(image[point[0], point[1]] - image[tmp[0], tmp[1]]) < CC_D) :
-                   1/3. < image[point[0], point[1]] / image[tmp[0], tmp[1]] < 3):
+                   1/4. < image[point[0], point[1]] / image[tmp[0], tmp[1]] < 4):
 
                     q.put(tmp)
                     component.append(tmp)
@@ -186,11 +186,11 @@ for j in xrange(gray.shape[1]):
         if (mask[i, j] == 0) and (swimage[i, j] < CC_B):#CC_B - "барьер"
             res = SearchComponent(swimage, (i, j), mask, gray)
             if (
-                len(res['points']) > 12 
-                and ((res['width'] * res['height']) * 0.15 < (len(res['points'])))
-                and ((res['height'] != 0) and (res['width'] != 0) and (1/4. < res['width'] / res['height'] < 4))
+                len(res['points']) > 15 
+                and ((res['width'] * res['height']) * 0.17 < (len(res['points'])))
+                and ((res['height'] > 10) and (res['width'] != 0) and (1/2.5 < res['width'] / res['height'] < 2.5))
                 ):
-                if res['variance'] < 50:
+                if res['variance'] < 30:
                     components.append(res)
                     #print res['variance']
                     #tmp = gray.copy()
