@@ -124,7 +124,7 @@ for j in xrange(1, gray.shape[1]-1):
     for i in xrange(1, gray.shape[0]-1):    
         if gray[i, j] == 255:
             edges.append((i, j))
-        angles_img[i, j] = gradient(orig, (i, j))
+            angles_img[i, j] = gradient(orig, (i, j))
         #angles_img[i, j] = gradient(gray, (i, j))
 
 #stepmap = [ [dirselect(x) for x in vect] for vect in angles_img]

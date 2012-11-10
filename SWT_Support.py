@@ -79,10 +79,11 @@ def gradient(image, anchor):
     A = SquareSelect(image, anchor)
     dx = convolution(A, Gx)
     dy = convolution(A, Gy)
-    g = float(np.sqrt(dx**2 + dy**2))
-    if not g: return None
+    return np.arctan2(dy, dx)
+    #g = float(np.sqrt(dx**2 + dy**2))
+    #if not g: return None
     #angle = np.arccos(dx / g)
-    return np.arccos(dx / g)
+    #return np.arccos(dx / g)
 
 #Тут грустная но поучительная история: я не верно перевел (или неверно понял)
 #фразу в документе, и решил что надо нам ходить *по* контуру
