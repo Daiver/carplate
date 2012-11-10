@@ -230,9 +230,12 @@ if __name__ == '__main__':
     print 'writting letters'
     for i, c in enumerate(lettercandidats):
         cv2.imwrite('result/' + str(i) + ".jpg", CutRect(orig, (c['X'], c['Y']), (c['X2'], c['Y2'])))
+        cv2.imshow('result/' + str(i) + ".jpg", CutRect(orig, (c['X'], c['Y']), (c['X2'], c['Y2'])))
+        print c['bboxvariance']
+        cv2.waitKey(10000)
         for p in c['points']:#Показываем компонент
             tmp[p[0], p[1]] = 255                    
-    #cv2.imshow('11111', tmp)
+        #cv2.imshow('11111', tmp)
     cv2.imwrite('test.jpg', tmp)
     print 'Sum len of letters:', len(lettercandidats)
     #cv2.waitKey(1000000)
