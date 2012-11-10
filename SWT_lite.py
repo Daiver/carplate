@@ -104,9 +104,9 @@ def SearchComponent(image, center, mask, cntrimg):
         'X' : minX, 'Y' : minY, 'X2' : maxX, 'Y2' : maxY}
                     
 print 'loading image....'
-#img = cv2.imread('img/cars/2.jpg')
+img = cv2.imread('img/cars/2.jpg')
 #img = cv2.imread('img/pure/2.jpg')
-img = cv2.imread('img/numbers/1.jpg')
+#img = cv2.imread('img/numbers/1.jpg')
 cv2.imshow('orig', img)
 
 print 'Finding counters...'
@@ -177,11 +177,11 @@ for j in xrange(gray.shape[1]):
         if (mask[i, j] == 0) and (swimage[i, j] < CC_B):#CC_B - "барьер"
             res = SearchComponent(swimage, (i, j), mask, gray)
             if (
-                len(res['points']) > 8 
+                len(res['points']) > 12 
                 and ((res['width'] * res['height']) * 0.15 < (len(res['points'])))
                 and ((res['height'] != 0) and (res['width'] != 0) and (1/4. < res['width'] / res['height'] < 4))
                 ):
-                if res['variance'] < 80:
+                if res['variance'] < 20:
                     components.append(res)
                     #print res['variance']
                     #tmp = gray.copy()
@@ -201,13 +201,15 @@ for c in components:
 
 tmp = orig.copy()
 i = 0
+print 'writting letters'
 for c in lettercandidats:
     i += 1
-    cv2.imshow(str(i), CutRect(orig, (c['X'], c['Y']), (c['X2'], c['Y2'])))
+    cv2.imwrite('out/' + str(i) + ".jpg", CutRect(orig, (c['X'], c['Y']), (c['X2'], c['Y2'])))
     for p in c['points']:#Показываем компонент
         tmp[p[0], p[1]] = 255                    
 #cv2.imshow('11111', tmp)
 cv2.imwrite('test.jpg', tmp)
+print 'Sum len of letters:', len(lettercandidats)
 #cv2.waitKey(1000000)
 
 
