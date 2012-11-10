@@ -112,101 +112,107 @@ def SearchComponent(image, center, mask, cntrimg):
             'X' : minX, 'Y' : minY, 'X2' : maxX, 'Y2' : maxY
         }
                     
-print 'loading image....'
-img = cv2.imread('img/cars/2.jpg')
-#img = cv2.imread('img/cars/3.jpg')
-#img = cv2.imread('img/pure/2.jpg')
-#img = cv2.imread('img/numbers/1.jpg')
 
 #cv2.imshow('orig', img)
 
-print 'Finding counters...'
-#Сюда запоминаем точки контура
-edges = []
-gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-orig = gray.copy()
-gray = cv2.Canny(gray, 10, 230)
 
-print 'Calc gradient\'s angle...'
-#Название списка не совсем корректно. Тут мы получаем градиент (точнее угол) всех (ну почти) точек
-angles_img = np.zeros(gray.shape)
-angles_img[:] = float('nan')
-for j in xrange(1, gray.shape[1]-1):
-    for i in xrange(1, gray.shape[0]-1):    
-        if gray[i, j] == 255:
-            edges.append((i, j))
-            angles_img[i, j] = gradient(orig, (i, j))
-        #angles_img[i, j] = gradient(gray, (i, j))
+def FindLetters(gray):
+    print 'Finding counters...'
+    gray = cv2.Canny(gray, 10, 230)
+    edges = []
+    print 'Calc gradient\'s angle...'
+    #Название списка не совсем корректно. Тут мы получаем градиент (точнее угол) всех (ну почти) точек
+    angles_img = np.zeros(gray.shape)
+    angles_img[:] = float('nan')
+    for j in xrange(1, gray.shape[1]-1):
+        for i in xrange(1, gray.shape[0]-1):    
+            if gray[i, j] == 255:
+                edges.append((i, j))
+                angles_img[i, j] = gradient(orig, (i, j))
+            #angles_img[i, j] = gradient(gray, (i, j))
 
-#stepmap = [ [dirselect(x) for x in vect] for vect in angles_img]
+    #stepmap = [ [dirselect(x) for x in vect] for vect in angles_img]
 
-#Хранит "слепок" всех лучей, требуется по сути только для отладки
-mask = np.zeros(gray.shape)
+    #Хранит "слепок" всех лучей, требуется по сути только для отладки
+    mask = np.zeros(gray.shape)
 
-print 'Tracing rays...'
-rays = []
-#for i in xrange(1, gray.shape[1] - 1):#Бежим по всем точкам
-#    for j in xrange(1, gray.shape[0] - 1):
-for e in edges:
-    if True:#=)
-        i = e[1]
-        j = e[0]
-        #Проверяем прошли ли мы эту точку
-        if mask[j, i] != 255:
-            res = Stroke(gray, angles_img, (j, i))            
-            if res :#len(res) > 0:
-                #print res
-                rays.append(res)
-                #tmp = gray.copy()
-                #for p in res:#Показываем луч
-                #    tmp[p[0], p[1]] = 255
-                #    mask[p[0], p[1]] = 255
-                #cv2.imshow('77', tmp)
-                #Для удобства просмотра
-                #cv2.waitKey(5)
-        #exit()
-
-#Тут я хотел продолжить реализацию, но так и не понял что делать дальше =( (грустный смайлик)
-print 'Calc Stroke Width...'
-swimage = np.zeros(gray.shape)
-swimage[:] = float('inf')
-for ray in rays:
-    for p in ray:
-        if swimage[p[0], p[1]] > len(ray):
-            #print len(ray)
-            swimage[p[0], p[1]] = len(ray)
-
-#swimage %= 255#Криво, ну да ладно
-
-mask = np.zeros(gray.shape)
-components = []
-print 'Search Components'
-for j in xrange(gray.shape[1]):
-    for i in xrange(gray.shape[0]):
-        if (mask[i, j] == 0) and (swimage[i, j] < CC_B):#CC_B - "барьер"
-            res = SearchComponent(swimage, (i, j), mask, gray)
-            if (
-                len(res['points']) > 15 
-                and ((res['width'] * res['height']) * 0.17 < (len(res['points'])))
-                and ((res['height'] > 10) and (res['width'] > 3) and (1/2.5 < res['width'] / res['height'] < 2.5))
-                ):
-                if res['variance'] < 30:
-                    components.append(res)
-                    #print res['variance']
+    print 'Tracing rays...'
+    rays = []
+    #for i in xrange(1, gray.shape[1] - 1):#Бежим по всем точкам
+    #    for j in xrange(1, gray.shape[0] - 1):
+    for e in edges:
+        if True:#=)
+            i = e[1]
+            j = e[0]
+            #Проверяем прошли ли мы эту точку
+            if mask[j, i] != 255:
+                res = Stroke(gray, angles_img, (j, i))            
+                if res :#len(res) > 0:
+                    #print res
+                    rays.append(res)
                     #tmp = gray.copy()
-                    #for p in res['points']:#Показываем компонент
-                    #    tmp[p[0], p[1]] = 255                    
-                    #cv2.imshow('11111', tmp)
-                    #cv2.waitKey(1000)
-print 'filtering letter candidats...'
-lettercandidats = []
-for c in components:
-    for c2 in components:
-        if ((c != c2) and (c['width'] != 0 and c['height'] != 0
-            and (4/6. < c2['width']/c['width'] < 1.5))
-            and (4/6. < c2['height']/c['height'] < 1.5)):
-            lettercandidats.append(c)
-            break
+                    #for p in res:#Показываем луч
+                    #    tmp[p[0], p[1]] = 255
+                    #    mask[p[0], p[1]] = 255
+                    #cv2.imshow('77', tmp)
+                    #Для удобства просмотра
+                    #cv2.waitKey(5)
+            #exit()
+
+    #Тут я хотел продолжить реализацию, но так и не понял что делать дальше =( (грустный смайлик)
+    print 'Calc Stroke Width...'
+    swimage = np.zeros(gray.shape)
+    swimage[:] = float('inf')
+    for ray in rays:
+        for p in ray:
+            if swimage[p[0], p[1]] > len(ray):
+                #print len(ray)
+                swimage[p[0], p[1]] = len(ray)
+
+    #swimage %= 255#Криво, ну да ладно
+
+    mask = np.zeros(gray.shape)
+    components = []
+    print 'Search Components'
+    for j in xrange(gray.shape[1]):
+        for i in xrange(gray.shape[0]):
+            if (mask[i, j] == 0) and (swimage[i, j] < CC_B):#CC_B - "барьер"
+                res = SearchComponent(swimage, (i, j), mask, gray)
+                if (
+                    len(res['points']) > 19 
+                    and ((res['width'] * res['height']) * 0.17 < (len(res['points'])))
+                    and ((res['height'] > 10) and (res['width'] > 3) and (1/2.5 < res['width'] / res['height'] < 2.5))
+                    ):
+                    if res['variance'] < 30:
+                        components.append(res)
+                        #print res['variance']
+                        #tmp = gray.copy()
+                        #for p in res['points']:#Показываем компонент
+                        #    tmp[p[0], p[1]] = 255                    
+                        #cv2.imshow('11111', tmp)
+                        #cv2.waitKey(1000)
+    print 'filtering letter candidats...'
+    lettercandidats = []
+    for c in components:
+        for c2 in components:
+            if (
+                (c != c2) #and (c['width'] != 0 and c['height'] != 0
+                and (2/3. < c2['width']/c['width'] < 1.5)
+                and (2/3. < c2['height']/c['height'] < 1.5)
+                ):
+                lettercandidats.append(c)
+                break
+    return lettercandidats
+    
+
+print 'loading image....'
+img = cv2.imread('img/cars/2.jpg')
+gr = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+orig = gr.copy()
+#img = cv2.imread('img/cars/3.jpg')
+#img = cv2.imread('img/pure/2.jpg')
+#img = cv2.imread('img/numbers/1.jpg')
+lettercandidats = FindLetters(gr)
 
 tmp = orig.copy()
 i = 0
