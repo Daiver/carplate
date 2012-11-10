@@ -188,7 +188,7 @@ for j in xrange(gray.shape[1]):
             if (
                 len(res['points']) > 15 
                 and ((res['width'] * res['height']) * 0.17 < (len(res['points'])))
-                and ((res['height'] > 10) and (res['width'] != 0) and (1/2.5 < res['width'] / res['height'] < 2.5))
+                and ((res['height'] > 10) and (res['width'] > 3) and (1/2.5 < res['width'] / res['height'] < 2.5))
                 ):
                 if res['variance'] < 30:
                     components.append(res)
