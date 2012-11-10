@@ -104,7 +104,8 @@ def SearchComponent(image, center, mask, cntrimg):
         'X' : minX, 'Y' : minY, 'X2' : maxX, 'Y2' : maxY}
                     
 print 'loading image....'
-img = cv2.imread('img/cars/2.jpg')
+img = cv2.imread('img/cars/4.jpg')
+#img = cv2.imread('img/cars/3.jpg')
 #img = cv2.imread('img/pure/2.jpg')
 #img = cv2.imread('img/numbers/1.jpg')
 cv2.imshow('orig', img)
@@ -181,7 +182,7 @@ for j in xrange(gray.shape[1]):
                 and ((res['width'] * res['height']) * 0.15 < (len(res['points'])))
                 and ((res['height'] != 0) and (res['width'] != 0) and (1/4. < res['width'] / res['height'] < 4))
                 ):
-                if res['variance'] < 20:
+                if res['variance'] < 50:
                     components.append(res)
                     #print res['variance']
                     #tmp = gray.copy()
