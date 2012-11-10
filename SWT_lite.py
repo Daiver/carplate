@@ -23,10 +23,19 @@ CC_B = float('inf')
 #
 #CC_D = 3
 
+
 def Variance(vec, image):
     avg = float(sum((image[p[0], p[1]] for p in vec))) / len(vec)
     res = 1.0 / len(vec) * sum(( (image[p[0], p[1]] - avg)**2 for p in vec))
     return res
+
+def VarianceFromRect(p1, p2, image):
+    tmp = []
+    for i in xrange(p2[0], p1[0]):
+        for j in xrange(p2[1], p1[1]):
+            tmp.append((i, j))
+    if not tmp: return 0
+    return Variance(tmp, image)
 
 def CutRect(image, p1, p2):
     return image[p1[0]:p2[0], p1[1]:p2[1]]
@@ -104,12 +113,14 @@ def SearchComponent(image, center, mask, cntrimg):
     maxY = max((p[1] for p in component))
     minX = min((p[0] for p in component))
     maxX = max((p[0] for p in component))
+    bboxvariance = VarianceFromRect((minX, minY), (maxX, maxY), image)
     return {
             'points' : component, 
             'variance' : variance, 
             'height' : maxY  - minY, 
             'width' : maxX - minX, 
-            'X' : minX, 'Y' : minY, 'X2' : maxX, 'Y2' : maxY
+            'X' : minX, 'Y' : minY, 'X2' : maxX, 'Y2' : maxY,
+            'bboxvariance' : bboxvariance,
         }
                     
 
@@ -205,32 +216,24 @@ def FindLetters(gray):
     return lettercandidats
     
 
-print 'loading image....'
-img = cv2.imread('img/cars/2.jpg')
-gr = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-orig = gr.copy()
-#img = cv2.imread('img/cars/3.jpg')
-#img = cv2.imread('img/pure/2.jpg')
-#img = cv2.imread('img/numbers/1.jpg')
-lettercandidats = FindLetters(gr)
+if __name__ == '__main__':
+    print 'loading image....'
+    img = cv2.imread('img/cars/2.jpg')
+    gr = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    orig = gr.copy()
+    #img = cv2.imread('img/cars/3.jpg')
+    #img = cv2.imread('img/pure/2.jpg')
+    #img = cv2.imread('img/numbers/1.jpg')
+    lettercandidats = FindLetters(gr)
 
-tmp = orig.copy()
-i = 0
-print 'writting letters'
-for c in lettercandidats:
-    i += 1
-    cv2.imwrite('out/' + str(i) + ".jpg", CutRect(orig, (c['X'], c['Y']), (c['X2'], c['Y2'])))
-    for p in c['points']:#Показываем компонент
-        tmp[p[0], p[1]] = 255                    
-#cv2.imshow('11111', tmp)
-cv2.imwrite('test.jpg', tmp)
-print 'Sum len of letters:', len(lettercandidats)
-#cv2.waitKey(1000000)
+    tmp = orig.copy()
+    print 'writting letters'
+    for i, c in enumerate(lettercandidats):
+        cv2.imwrite('result/' + str(i) + ".jpg", CutRect(orig, (c['X'], c['Y']), (c['X2'], c['Y2'])))
+        for p in c['points']:#Показываем компонент
+            tmp[p[0], p[1]] = 255                    
+    #cv2.imshow('11111', tmp)
+    cv2.imwrite('test.jpg', tmp)
+    print 'Sum len of letters:', len(lettercandidats)
+    #cv2.waitKey(1000000)
 
-
-#np.set_printoptions(threshold='nan')
-#print swimage
-#cv2.imshow('grljljkay', swimage)
-#cv2.imshow('gray', gray)
-#cv2.imshow('ext', angles_img)
-#cv2.waitKey(1000)
