@@ -37,8 +37,8 @@ def VarianceFromRect(p1, p2, image):
     if not tmp: return 0
     return Variance(tmp, image)
 
-def CutRect(image, p1, p2):
-    return image[p1[0]:p2[0], p1[1]:p2[1]]
+def CutRect(image, p1, p2, border=0):
+    return image[p1[0]-border:p2[0]+border, p1[1]-border:p2[1]+border]
 
 #Должен давать нам 1 штрих
 def Stroke(image, angles_img, point):
@@ -237,7 +237,7 @@ if __name__ == '__main__':
     tmp = orig.copy()
     print 'writting letters'
     for i, c in enumerate(lettercandidats):
-        cv2.imwrite('result/' + str(i) + ".jpg", CutRect(orig, (c['X'], c['Y']), (c['X2'], c['Y2'])))
+        cv2.imwrite('result/' + str(i) + ".tif", CutRect(orig, (c['X'], c['Y']), (c['X2'], c['Y2']), 3))
         #cv2.imshow('result/' + str(i) + ".jpg", CutRect(orig, (c['X'], c['Y']), (c['X2'], c['Y2'])))
         #print c['bboxvariance']
         #cv2.waitKey(10000)
