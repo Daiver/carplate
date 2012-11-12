@@ -6,7 +6,7 @@ import numpy as np
 from Queue import Queue
 
 from SWT_Support import *
-
+#
 from Bresenham import Selector
 
 
@@ -105,6 +105,10 @@ def SearchComponent(image, center, mask, cntrimg, original):
     #if len(component) < 2:
     #    return {}
     variance = Variance(component, image)
+    
+    swvalues = np.array([image[p[0], p[1]] for p in component])
+    mean = np.mean(swvalues)
+    deviation = np.std(swvalues)
     #beauty but weak
     minY = min((p[1] for p in component))
     maxY = max((p[1] for p in component))
@@ -120,74 +124,61 @@ def SearchComponent(image, center, mask, cntrimg, original):
             'width' : maxX - minX, 
             'X' : minX, 'Y' : minY, 'X2' : maxX, 'Y2' : maxY,
             'bboxvariance' : bboxvariance,
+            'mean' : mean,
+            'deviation' : deviation,
         }
                     
 
 #cv2.imshow('orig', img)
 
-
-def FindLetters(gray):
+def SWT_Operator(original, contour):#return sw_image
     print 'Finding counters...'
-    orig = gray.copy()
-    gray = cv2.Canny(gray, 10, 230)
     edges = []
     print 'Calc gradient\'s angle...'
-    #Название списка не совсем корректно. Тут мы получаем градиент (точнее угол) всех (ну почти) точек
-    angles_img = np.zeros(gray.shape)
+    #Тут мы получаем градиент (точнее угол) всех (ну почти) точек
+    angles_img = np.zeros(original.shape)
     angles_img[:] = float('nan')
-    for j in xrange(1, gray.shape[1]-1):
-        for i in xrange(1, gray.shape[0]-1):    
-            if gray[i, j] == 255:
+    for j in xrange(1, original.shape[1]-1):
+        for i in xrange(1, original.shape[0]-1):    
+            if contour[i, j] == 255:
                 edges.append((i, j))
-                angles_img[i, j] = gradient(orig, (i, j))
-            #angles_img[i, j] = gradient(gray, (i, j))
-
-    #stepmap = [ [dirselect(x) for x in vect] for vect in angles_img]
-
-    #Хранит "слепок" всех лучей, требуется по сути только для отладки
-    mask = np.zeros(gray.shape)
-
+                angles_img[i, j] = gradient(original, (i, j))
     print 'Tracing rays...'
     rays = []
-    #for i in xrange(1, gray.shape[1] - 1):#Бежим по всем точкам
-    #    for j in xrange(1, gray.shape[0] - 1):
     for e in edges:
-        if True:#=)
-            i = e[1]
-            j = e[0]
-            #Проверяем прошли ли мы эту точку
-            if mask[j, i] != 255:
-                res = Stroke(gray, angles_img, (j, i))            
-                if res :#len(res) > 0:
-                    #print res
-                    rays.append(res)
-                    #tmp = gray.copy()
-                    #for p in res:#Показываем луч
-                    #    tmp[p[0], p[1]] = 255
-                    #    mask[p[0], p[1]] = 255
-                    #cv2.imshow('77', tmp)
-                    #Для удобства просмотра
-                    #cv2.waitKey(5)
+        #Проверяем прошли ли мы эту точку
+        res = Stroke(contour, angles_img, e)            
+        if res :#len(res) > 0:
+            rays.append(res)
+            #tmp = gray.copy()
+            #for p in res:#Показываем луч
+            #    tmp[p[0], p[1]] = 255
+            #cv2.imshow('77', tmp)
+            #Для удобства просмотра
+            #cv2.waitKey(10)
             #exit()
-
     print 'Calc Stroke Width...'
-    swimage = np.zeros(gray.shape)
+    swimage = np.zeros(original.shape)
     swimage[:] = float('inf')
     for ray in rays:
-        for p in ray:
+        for p in ray:#Заполняем матрицу с ширинами штрихов
             if swimage[p[0], p[1]] > len(ray):
-                #print len(ray)
                 swimage[p[0], p[1]] = len(ray)
+    return swimage
 
-    #swimage %= 255#Криво, ну да ладно
 
+
+def FindLetters(gray):
+    orig = gray.copy()
+    contour = cv2.Canny(gray, 10, 230)
+    swimage = SWT_Operator(orig, contour)
     mask = np.zeros(gray.shape)
     components = []
     print 'Search Components'
     for j in xrange(gray.shape[1]):
         for i in xrange(gray.shape[0]):
             if (mask[i, j] == 0) and (swimage[i, j] < CC_B):#CC_B = inf - "барьер"
-                res = SearchComponent(swimage, (i, j), mask, gray, orig)
+                res = SearchComponent(swimage, (i, j), mask, contour, orig)
                 if (
                     len(res['points']) > 10
                     and (res['height'] > 10 and res['width'] > 3)
@@ -196,10 +187,12 @@ def FindLetters(gray):
                     and (0.1 < (float(len(res['points']))/(res['width']*res['height'])) < 1)
                     #and ((res['height'] > 9) and (res['width'] > 3)) 
                     and (1/2.5 < res['width'] / res['height'] < 2.5)
+                    and ((res['mean'] == 0) or (0 < (res['deviation']/res['mean']) < 1))
                     #and (0.25 < min(float(res['width'])/res['height'], float(res['height'])/res['width']) < 1)
                     ):
-                    if res['variance'] < 50:
+                    if res['variance'] < 30:
                         components.append(res)
+                        #print 'dev', res['deviation'], 'mean', res['mean']
                         #print  (len(res['points'])/(res['width']*res['height']))
                         #tmp = gray.copy()
                         #for p in res['points']:#Показываем компонент
@@ -228,7 +221,7 @@ if __name__ == '__main__':
     print 'loading image....'
     img = cv2.imread('img/cars/2.jpg')
     #img = cv2.imread('img/cars/3.jpg')
-    #img = cv2.imread('img/pure/3.jpg')
+    #img = cv2.imread('img/pure/2.jpg')
     #img = cv2.imread('img/numbers/1.jpg')
     gr = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     orig = gr.copy()
@@ -237,7 +230,7 @@ if __name__ == '__main__':
     tmp = orig.copy()
     print 'writting letters'
     for i, c in enumerate(lettercandidats):
-        cv2.imwrite('result/' + str(i) + ".tif", CutRect(orig, (c['X'], c['Y']), (c['X2'], c['Y2']), 3))
+        #cv2.imwrite('result/' + str(i) + ".tif", CutRect(orig, (c['X'], c['Y']), (c['X2'], c['Y2']), 3))
         #cv2.imshow('result/' + str(i) + ".jpg", CutRect(orig, (c['X'], c['Y']), (c['X2'], c['Y2'])))
         #print c['bboxvariance']
         #cv2.waitKey(10000)
