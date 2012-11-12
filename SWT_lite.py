@@ -131,7 +131,7 @@ def SearchComponent(image, center, mask, cntrimg, original):
 
 #cv2.imshow('orig', img)
 
-def SWT_Operator(original, contour):#return sw_image
+def SWT_Operator(original, contour, debug_rays=False, debug_swimage=False):#return sw_image
     print 'Finding counters...'
     edges = []
     print 'Calc gradient\'s angle...'
@@ -150,13 +150,14 @@ def SWT_Operator(original, contour):#return sw_image
         res = Stroke(contour, angles_img, e)            
         if res :#len(res) > 0:
             rays.append(res)
-            #tmp = gray.copy()
-            #for p in res:#Показываем луч
-            #    tmp[p[0], p[1]] = 255
-            #cv2.imshow('77', tmp)
-            #Для удобства просмотра
-            #cv2.waitKey(10)
-            #exit()
+            if debug_rays:
+                tmp = gray.copy()
+                for p in res:#Показываем луч
+                    tmp[p[0], p[1]] = 255
+                cv2.imshow('77', tmp)
+                #Для удобства просмотра
+                cv2.waitKey(10)
+
     print 'Calc Stroke Width...'
     swimage = np.zeros(original.shape)
     swimage[:] = float('inf')
@@ -164,21 +165,21 @@ def SWT_Operator(original, contour):#return sw_image
         for p in ray:#Заполняем матрицу с ширинами штрихов
             if swimage[p[0], p[1]] > len(ray):
                 swimage[p[0], p[1]] = len(ray)
+    if debug_swimage:
+        tmp = swimage.copy()
+        tmp[tmp > 255] = 255
+        cv2.imshow('swimage', tmp)
+        cv2.waitKey(10000)
     return swimage
 
-
-
-def FindLetters(gray):
-    orig = gray.copy()
-    contour = cv2.Canny(gray, 10, 230)
-    swimage = SWT_Operator(orig, contour)
+def FindComponents(gray, contour, swimage):
     mask = np.zeros(gray.shape)
     components = []
     print 'Search Components'
     for j in xrange(gray.shape[1]):
         for i in xrange(gray.shape[0]):
             if (mask[i, j] == 0) and (swimage[i, j] < CC_B):#CC_B = inf - "барьер"
-                res = SearchComponent(swimage, (i, j), mask, contour, orig)
+                res = SearchComponent(swimage, (i, j), mask, contour, gray)
                 if (
                     len(res['points']) > 10
                     and (res['height'] > 10 and res['width'] > 3)
@@ -199,6 +200,15 @@ def FindLetters(gray):
                         #    tmp[p[0], p[1]] = 255                    
                         #cv2.imshow('11111', tmp)
                         #cv2.waitKey(1000)
+    return components
+
+
+def FindLetters(gray):
+    #orig = gray.copy()
+    contour = cv2.Canny(gray, 10, 230)
+    swimage = SWT_Operator(gray, contour, debug_rays=False, debug_swimage=False)#set true for show image 
+    
+    components = FindComponents(gray, contour, swimage)
     print 'filtering letter candidats...'
     lettercandidats = []
     for c in components:
