@@ -172,7 +172,7 @@ def SWT_Operator(original, contour, debug_rays=False, debug_swimage=False):#retu
         cv2.waitKey(10000)
     return swimage
 
-def FindComponents(gray, contour, swimage):
+def FindComponents(gray, contour, swimage, debug_components=False, debug_components_after=False):
     mask = np.zeros(gray.shape)
     components = []
     print 'Search Components'
@@ -180,6 +180,12 @@ def FindComponents(gray, contour, swimage):
         for i in xrange(gray.shape[0]):
             if (mask[i, j] == 0) and (swimage[i, j] < CC_B):#CC_B = inf - "барьер"
                 res = SearchComponent(swimage, (i, j), mask, contour, gray)
+                if debug_components:
+                    tmp = contour.copy()
+                    for p in res['points']:#Показываем компонент
+                        tmp[p[0], p[1]] = 255                    
+                    cv2.imshow('11111', tmp)
+                    cv2.waitKey(1000)
                 if (
                     len(res['points']) > 10
                     and (res['height'] > 10 and res['width'] > 3)
@@ -193,24 +199,19 @@ def FindComponents(gray, contour, swimage):
                     ):
                     if res['variance'] < 30:
                         components.append(res)
-                        #print 'dev', res['deviation'], 'mean', res['mean']
-                        #print  (len(res['points'])/(res['width']*res['height']))
-                        #tmp = gray.copy()
-                        #for p in res['points']:#Показываем компонент
-                        #    tmp[p[0], p[1]] = 255                    
-                        #cv2.imshow('11111', tmp)
-                        #cv2.waitKey(1000)
+                        if debug_components_after:
+                            #print 'dev', res['deviation'], 'mean', res['mean']
+                            #print  (len(res['points'])/(res['width']*res['height']))
+                            tmp = contour.copy()
+                            for p in res['points']:#Показываем компонент
+                                tmp[p[0], p[1]] = 255                    
+                            cv2.imshow('11111', tmp)
+                            cv2.waitKey(1000)
     return components
 
-
-def FindLetters(gray):
-    #orig = gray.copy()
-    contour = cv2.Canny(gray, 10, 230)
-    swimage = SWT_Operator(gray, contour, debug_rays=False, debug_swimage=False)#set true for show image 
-    
-    components = FindComponents(gray, contour, swimage)
-    print 'filtering letter candidats...'
+def PairFilter(components):
     lettercandidats = []
+    print 'filtering letter candidats...'
     for c in components:
         for c2 in components:#
             if (
@@ -220,6 +221,15 @@ def FindLetters(gray):
                 ):
                 lettercandidats.append(c)
                 break
+    return lettercandidats
+
+def FindLetters(gray):
+    #orig = gray.copy()
+    contour = cv2.Canny(gray, 10, 230)
+    swimage = SWT_Operator(gray, contour, debug_rays=False, debug_swimage=False)#set true for show image 
+    
+    components = FindComponents(gray, contour, swimage, debug_components=False, debug_components_after=False)
+    lettercandidats = PairFilter(components)
     return lettercandidats
 
 def GetLetters(img):
