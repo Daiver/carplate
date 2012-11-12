@@ -131,8 +131,7 @@ def SearchComponent(image, center, mask, cntrimg, original):
 
 #cv2.imshow('orig', img)
 
-def SWT_Operator(original, contour, debug_rays=False, debug_swimage=False):#return sw_image
-    print 'Finding counters...'
+def GradientCalc(original, contour):
     edges = []
     print 'Calc gradient\'s angle...'
     #Тут мы получаем градиент (точнее угол) всех (ну почти) точек
@@ -143,6 +142,10 @@ def SWT_Operator(original, contour, debug_rays=False, debug_swimage=False):#retu
             if contour[i, j] == 255:
                 edges.append((i, j))
                 angles_img[i, j] = gradient(original, (i, j))
+    return angles_img, edges
+
+def Ray_Tracing(contour, angles_img, edges, debug_rays=False):#return sw_image
+    print 'Finding counters...'
     print 'Tracing rays...'
     rays = []
     for e in edges:
@@ -151,13 +154,15 @@ def SWT_Operator(original, contour, debug_rays=False, debug_swimage=False):#retu
         if res :#len(res) > 0:
             rays.append(res)
             if debug_rays:
-                tmp = gray.copy()
+                tmp = contour.copy()
                 for p in res:#Показываем луч
                     tmp[p[0], p[1]] = 255
                 cv2.imshow('77', tmp)
                 #Для удобства просмотра
                 cv2.waitKey(10)
+    return rays
 
+def SWT_Operator(original, rays, debug_swimage):
     print 'Calc Stroke Width...'
     swimage = np.zeros(original.shape)
     swimage[:] = float('inf')
@@ -226,7 +231,9 @@ def PairFilter(components):
 def FindLetters(gray):
     #orig = gray.copy()
     contour = cv2.Canny(gray, 10, 230)
-    swimage = SWT_Operator(gray, contour, debug_rays=False, debug_swimage=False)#set true for show image 
+    angles_img, edges = GradientCalc(gray, contour)
+    rays = Ray_Tracing(contour, angles_img, edges, debug_rays=False)#set true for show image     
+    swimage = SWT_Operator(gray, rays, debug_swimage=False)
     
     components = FindComponents(gray, contour, swimage, debug_components=False, debug_components_after=False)
     lettercandidats = PairFilter(components)
