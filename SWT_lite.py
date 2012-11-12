@@ -9,6 +9,7 @@ from SWT_Support import *
 #
 from Bresenham import Selector
 
+import pickle
 
 makestep = lambda point, step: (point[0] + step[0], point[1] + step[1])
 checkbound = lambda point, image: (
@@ -21,6 +22,11 @@ checkbound_sq = lambda point, image: (
 
 #barrier const for CC
 CC_B = float('inf')
+
+def dumpobj(obj, name):
+    f = open(name, 'w')
+    pickle.dump(obj, f)
+    f.close()
 
 def Variance(vec, image):
     avg = float(sum((image[p[0], p[1]] for p in vec))) / len(vec)
@@ -133,7 +139,6 @@ def SearchComponent(image, center, mask, cntrimg, original):
 
 def GradientCalc(original, contour):
     edges = []
-    print 'Calc gradient\'s angle...'
     #Тут мы получаем градиент (точнее угол) всех (ну почти) точек
     angles_img = np.zeros(original.shape)
     angles_img[:] = float('nan')
@@ -145,8 +150,6 @@ def GradientCalc(original, contour):
     return angles_img, edges
 
 def Ray_Tracing(contour, angles_img, edges, debug_rays=False):#return sw_image
-    print 'Finding counters...'
-    print 'Tracing rays...'
     rays = []
     for e in edges:
         #Проверяем прошли ли мы эту точку
@@ -163,7 +166,6 @@ def Ray_Tracing(contour, angles_img, edges, debug_rays=False):#return sw_image
     return rays
 
 def SWT_Operator(original, rays, debug_swimage):
-    print 'Calc Stroke Width...'
     swimage = np.zeros(original.shape)
     swimage[:] = float('inf')
     for ray in rays:
@@ -180,7 +182,6 @@ def SWT_Operator(original, rays, debug_swimage):
 def FindComponents(gray, contour, swimage, debug_components=False, debug_components_after=False):
     mask = np.zeros(gray.shape)
     components = []
-    print 'Search Components'
     for j in xrange(gray.shape[1]):
         for i in xrange(gray.shape[0]):
             if (mask[i, j] == 0) and (swimage[i, j] < CC_B):#CC_B = inf - "барьер"
@@ -216,7 +217,6 @@ def FindComponents(gray, contour, swimage, debug_components=False, debug_compone
 
 def PairFilter(components):
     lettercandidats = []
-    print 'filtering letter candidats...'
     for c in components:
         for c2 in components:#
             if (
@@ -229,14 +229,25 @@ def PairFilter(components):
     return lettercandidats
 
 def FindLetters(gray):
-    #orig = gray.copy()
+    print 'Finding counters...'
     contour = cv2.Canny(gray, 10, 230)
+    dumpobj(contour, 'contour.dump')
+    print 'Calc gradient\'s angle...'
     angles_img, edges = GradientCalc(gray, contour)
+    dumpobj(angles_img, 'angles_img.dump')
+    dumpobj(edges, 'edges.dump')
+    print 'Tracing rays...'
     rays = Ray_Tracing(contour, angles_img, edges, debug_rays=False)#set true for show image     
+    dumpobj(rays, 'rays.dump')
+    print 'Calc Stroke Width...'
     swimage = SWT_Operator(gray, rays, debug_swimage=False)
-    
+    dumpobj(swimage, 'swimage.dump')
+    print 'Search Components'
     components = FindComponents(gray, contour, swimage, debug_components=False, debug_components_after=False)
+    dumpobj(components, 'components.dump')
+    print 'filtering letter candidats...'
     lettercandidats = PairFilter(components)
+    dumpobj(lettercandidats, 'lettercandidats.dump')
     return lettercandidats
 
 def GetLetters(img):
