@@ -9,6 +9,7 @@ from SWT_Support import *
 
 from Bresenham import Selector
 
+
 makestep = lambda point, step: (point[0] + step[0], point[1] + step[1])
 checkbound = lambda point, image: (
             (point[0] < image.shape[0]) and (point[1] < image.shape[1]) and
@@ -20,9 +21,6 @@ checkbound_sq = lambda point, image: (
 
 #barrier const for CC
 CC_B = float('inf')
-#
-#CC_D = 3
-
 
 def Variance(vec, image):
     avg = float(sum((image[p[0], p[1]] for p in vec))) / len(vec)
@@ -47,7 +45,6 @@ def Stroke(image, angles_img, point):
     oldangle = angles_img[point[0], point[1]]#Получаем угол
     angle = oldangle
     if (oldangle == None) or (np.isnan(oldangle)): return 
-    #ds = DSelecter(point, angle):todo implement dselecter
 
     #Получаем шаг. Тут надо вставить брезенхейма. Ну мне так кажется
     #selector = Selector(point[0], point[1], (np.pi + angles_img[point[0], point[1]]) % (2*np.pi))
@@ -173,7 +170,6 @@ def FindLetters(gray):
                     #cv2.waitKey(5)
             #exit()
 
-    #Тут я хотел продолжить реализацию, но так и не понял что делать дальше =( (грустный смайлик)
     print 'Calc Stroke Width...'
     swimage = np.zeros(gray.shape)
     swimage[:] = float('inf')
@@ -190,17 +186,21 @@ def FindLetters(gray):
     print 'Search Components'
     for j in xrange(gray.shape[1]):
         for i in xrange(gray.shape[0]):
-            if (mask[i, j] == 0) and (swimage[i, j] < CC_B):#CC_B - "барьер"
+            if (mask[i, j] == 0) and (swimage[i, j] < CC_B):#CC_B = inf - "барьер"
                 res = SearchComponent(swimage, (i, j), mask, gray, orig)
                 if (
-                    len(res['points']) > 19
+                    len(res['points']) > 10
+                    and (res['height'] > 10 and res['width'] > 3)
                     and (res['bboxvariance'] > 2.5)
-                    and ((res['width'] * res['height']) * 0.17 < (len(res['points'])))
-                    and ((res['height'] > 10) and (res['width'] > 3) and (1/2.5 < res['width'] / res['height'] < 2.5))
+                    #and ((res['width'] * res['height']) * 0.15 < (len(res['points'])))
+                    and (0.1 < (float(len(res['points']))/(res['width']*res['height'])) < 1)
+                    #and ((res['height'] > 9) and (res['width'] > 3)) 
+                    and (1/2.5 < res['width'] / res['height'] < 2.5)
+                    #and (0.25 < min(float(res['width'])/res['height'], float(res['height'])/res['width']) < 1)
                     ):
-                    if res['variance'] < 30:
+                    if res['variance'] < 50:
                         components.append(res)
-                        #print res['variance']
+                        #print  (len(res['points'])/(res['width']*res['height']))
                         #tmp = gray.copy()
                         #for p in res['points']:#Показываем компонент
                         #    tmp[p[0], p[1]] = 255                    
@@ -209,7 +209,7 @@ def FindLetters(gray):
     print 'filtering letter candidats...'
     lettercandidats = []
     for c in components:
-        for c2 in components:
+        for c2 in components:#
             if (
                 (c != c2) #and (c['width'] != 0 and c['height'] != 0
                 and (2/3. < c2['width']/c['width'] < 1.5)
@@ -228,7 +228,7 @@ if __name__ == '__main__':
     print 'loading image....'
     img = cv2.imread('img/cars/2.jpg')
     #img = cv2.imread('img/cars/3.jpg')
-    #img = cv2.imread('img/pure/2.jpg')
+    #img = cv2.imread('img/pure/3.jpg')
     #img = cv2.imread('img/numbers/1.jpg')
     gr = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     orig = gr.copy()
@@ -245,6 +245,7 @@ if __name__ == '__main__':
             tmp[p[0], p[1]] = 255                    
         #cv2.imshow('11111', tmp)
     cv2.imwrite('test.jpg', tmp)
+    cv2.imshow('res', tmp)
     print 'Sum len of letters:', len(lettercandidats)
-    #cv2.waitKey(1000000)
-
+    cv2.waitKey(10000)
+    
