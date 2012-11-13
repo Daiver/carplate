@@ -140,34 +140,38 @@ def SearchComponent(image, center, mask, cntrimg, original):
 #cv2.imshow('orig', img)
 
 def GradientCalc(original, contour):
-    edges = []
     #Тут мы получаем градиент (точнее угол) всех (ну почти) точек
     angles_img = np.zeros(original.shape)
     angles_img[:] = float('nan')
     dx = cv2.Sobel(original, cv2.CV_32F, 1, 0)
     dy = cv2.Sobel(original, cv2.CV_32F, 0, 1)
     angles_img = np.arctan2(dy, dx)
+    '''
     for j in xrange(1, original.shape[1]-1):
         for i in xrange(1, original.shape[0]-1):    
             if contour[i, j] != 0:
                 edges.append((i, j))
                 #angles_img[i, j] = gradient(original, (i, j))
-    return angles_img, edges
+    '''
+    return angles_img
 
-def Ray_Tracing(contour, angles_img, edges, debug_rays=False):#return sw_image
+def Ray_Tracing(contour, angles_img, debug_rays=False):#return sw_image
     rays = []
-    for e in edges:
+    for j in xrange(1, contour.shape[1]-1):
+        for i in xrange(1, contour.shape[0]-1):    
+            if contour[i, j] != 0:
+    #for e in edges:
         #Проверяем прошли ли мы эту точку
-        res = Stroke(contour, angles_img, e)            
-        if res :#len(res) > 0:
-            rays.append(res)
-            if debug_rays:
-                tmp = contour.copy()
-                for p in res:#Показываем луч
-                    tmp[p[0], p[1]] = 255
-                cv2.imshow('77', tmp)
-                #Для удобства просмотра
-                cv2.waitKey(10)
+                res = Stroke(contour, angles_img, (i, j))            
+                if res :#len(res) > 0:
+                    rays.append(res)
+                    if debug_rays:
+                        tmp = contour.copy()
+                        for p in res:#Показываем луч
+                            tmp[p[0], p[1]] = 255
+                        cv2.imshow('77', tmp)
+                        #Для удобства просмотра
+                        cv2.waitKey(10)
     return rays
 
 def SWT_Operator(original, rays, debug_swimage):
@@ -238,11 +242,10 @@ def FindLetters(gray):
     contour = cv2.Canny(gray, 10, 230)
     dumpobj(contour, 'contour.dump')
     print 'Calc gradient\'s angle...'
-    angles_img, edges = GradientCalc(gray, contour)
+    angles_img = GradientCalc(gray, contour)
     dumpobj(angles_img, 'angles_img.dump')
-    dumpobj(edges, 'edges.dump')
     print 'Tracing rays...'
-    rays = Ray_Tracing(contour, angles_img, edges, debug_rays=False)#set true for show image     
+    rays = Ray_Tracing(contour, angles_img, debug_rays=False)#set true for show image     
     dumpobj(rays, 'rays.dump')
     print 'Calc Stroke Width...'
     swimage = SWT_Operator(gray, rays, debug_swimage=False)
