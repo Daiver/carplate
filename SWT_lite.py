@@ -122,16 +122,16 @@ def SearchComponent(image, center, mask, cntrimg, original):
     maxY = max((p[1] for p in component))
     minX = min((p[0] for p in component))
     maxX = max((p[0] for p in component))
-    bboxvariance = VarianceFromRect((minX, minY), (maxX, maxY), original)
-    if bboxvariance:
-        bboxvariance /= ((maxX-minX)*(maxY-minY))
+    #bboxvariance = VarianceFromRect((minX, minY), (maxX, maxY), original)
+    #if bboxvariance:
+    #    bboxvariance /= ((maxX-minX)*(maxY-minY))
     return {
             'points' : component, 
             'variance' : variance, 
             'height' : maxY  - minY, 
             'width' : maxX - minX, 
             'X' : minX, 'Y' : minY, 'X2' : maxX, 'Y2' : maxY,
-            'bboxvariance' : bboxvariance,
+            ##'bboxvariance' : bboxvariance,
             'mean' : mean,
             'deviation' : deviation,
         }
@@ -204,12 +204,13 @@ def FindComponents(gray, contour, swimage, debug_components=False, debug_compone
                 if (
                     len(res['points']) > 10
                     and (res['height'] > 10 and res['width'] > 3)
-                    and (res['bboxvariance'] > 2.5)
+                    #and (res['bboxvariance'] > 2.5)
                     #and ((res['width'] * res['height']) * 0.15 < (len(res['points'])))
                     and (0.1 < (float(len(res['points']))/(res['width']*res['height'])) < 1)
                     #and ((res['height'] > 9) and (res['width'] > 3)) 
                     and (1/2.5 < res['width'] / res['height'] < 2.5)
                     and ((res['mean'] == 0) or (0 < (res['deviation']/res['mean']) < 1))
+                    and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 2000)
                     #and (0.25 < min(float(res['width'])/res['height'], float(res['height'])/res['width']) < 1)
                     ):
                     if res['variance'] < 30:
