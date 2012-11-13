@@ -9,6 +9,8 @@ from SWT_Support import *
 #
 from Bresenham import Selector
 
+from time import time
+
 import pickle
 
 makestep = lambda point, step: (point[0] + step[0], point[1] + step[1])
@@ -142,11 +144,14 @@ def GradientCalc(original, contour):
     #Тут мы получаем градиент (точнее угол) всех (ну почти) точек
     angles_img = np.zeros(original.shape)
     angles_img[:] = float('nan')
+    dx = cv2.Sobel(original, cv2.CV_32F, 1, 0)
+    dy = cv2.Sobel(original, cv2.CV_32F, 0, 1)
+    angles_img = np.arctan2(dy, dx)
     for j in xrange(1, original.shape[1]-1):
         for i in xrange(1, original.shape[0]-1):    
-            if contour[i, j] == 255:
+            if contour[i, j] != 0:
                 edges.append((i, j))
-                angles_img[i, j] = gradient(original, (i, j))
+                #angles_img[i, j] = gradient(original, (i, j))
     return angles_img, edges
 
 def Ray_Tracing(contour, angles_img, edges, debug_rays=False):#return sw_image
