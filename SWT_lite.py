@@ -125,8 +125,8 @@ def SearchComponent(image, center, mask, cntrimg, original):
     variance = Variance(component, image)
     
     swvalues = np.array([image[p[0], p[1]] for p in component])
-    mean = np.mean(swvalues)
-    deviation = np.std(swvalues)
+    #mean = np.mean(swvalues)
+    #deviation = np.std(swvalues)
     #beauty but weak
     minY = min((p[1] for p in component))
     maxY = max((p[1] for p in component))
@@ -141,9 +141,10 @@ def SearchComponent(image, center, mask, cntrimg, original):
             'height' : maxY  - minY, 
             'width' : maxX - minX, 
             'X' : minX, 'Y' : minY, 'X2' : maxX, 'Y2' : maxY,
+            'swvalues' : swvalues,
             ##'bboxvariance' : bboxvariance,
-            'mean' : mean,
-            'deviation' : deviation,
+            #'mean' : mean,
+            #'deviation' : deviation,
         }
                     
 
@@ -219,7 +220,9 @@ def FindComponents(gray, contour, swimage, debug_components=False, debug_compone
                     and (0.1 < (float(len(res['points']))/(res['width']*res['height'])) < 1)
                     #and ((res['height'] > 9) and (res['width'] > 3)) 
                     and (1/2.5 < res['width'] / res['height'] < 2.5)
-                    and ((res['mean'] == 0) or (0 < (res['deviation']/res['mean']) < 1))
+
+                    #and ((res['mean'] == 0) or (0 < (res['deviation']/res['mean']) < 1))
+                    and (np.std(res['swvalues'])/np.mean(res['swvalues']) < 1)
                     and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 2000)
                     #and (0.25 < min(float(res['width'])/res['height'], float(res['height'])/res['width']) < 1)
                     ):
