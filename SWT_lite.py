@@ -226,8 +226,6 @@ def FindComponents(gray, contour, swimage, debug_components=False, debug_compone
                     if res['variance'] < 30:
                         components.append(res)
                         if debug_components_after:
-                            #print 'dev', res['deviation'], 'mean', res['mean']
-                            #print  (len(res['points'])/(res['width']*res['height']))
                             tmp = contour.copy()
                             for p in res['points']:#Показываем компонент
                                 tmp[p[0], p[1]] = 255                    
@@ -258,49 +256,55 @@ work_stages = {
         'lettercandidats' : 6,
     }
 
-def FindLetters(gray, stage=work_stages['no'], oldser=None):
+def FindLetters(gray, stage=work_stages['no'], oldser=None, dump_stages=False, new_ser=''):
     #init section. Just for simplify debug. delete this after debooooging
-    curser = time()#current ser of dump files
+    curser = new_ser#current ser of dump files
     contour = None;  angles_img = None; rays = None; swimage = None; components = None; lettercandidats = None
     if stage < work_stages['contour']:
         print 'Finding counters...'
         contour = cv2.Canny(gray, 10, 230)
-        dumpobj(contour, 'contour', curser)
+        if dump_stages:
+            dumpobj(contour, 'contour', curser)
     else:
         contour = loadobj('contour', oldser)
 
     if stage < work_stages['angles_img']:
         print 'Calc gradient\'s angle...'
         angles_img = GradientCalc(gray, contour)
-        dumpobj(angles_img, 'angles_img', curser)
+        if dump_stages:
+            dumpobj(angles_img, 'angles_img', curser)
     else:
         angles_img = loadobj('angles_img', oldser)
 
     if stage < work_stages['rays']:
         print 'Tracing rays...'
         rays = Ray_Tracing(contour, angles_img, debug_rays=False)#set true for show image     
-        dumpobj(rays, 'rays', curser)
+        if dump_stages:
+            dumpobj(rays, 'rays', curser)
     else:
         rays = loadobj('rays', oldser)
     
     if stage < work_stages['swimage']:
         print 'Calc Stroke Width...'
         swimage = SWT_Operator(gray, rays, debug_swimage=False)
-        dumpobj(swimage, 'swimage', curser)
+        if dump_stages:
+            dumpobj(swimage, 'swimage', curser)
     else:
         swimage = loadobj('swimage', oldser)
 
     if stage < work_stages['Components']:
         print 'Search Components'
         components = FindComponents(gray, contour, swimage, debug_components=False, debug_components_after=False)
-        dumpobj(components, 'components', curser)
+        if dump_stages:
+            dumpobj(components, 'components', curser)
     else:
         components = loadobj('components', oldser)
 
     if stage < work_stages['lettercandidats']:
         print 'filtering letter candidats...'
         lettercandidats = PairFilter(components)
-        dumpobj(lettercandidats, 'lettercandidats', curser)
+        if dump_stages:
+            dumpobj(lettercandidats, 'lettercandidats', curser)
     else:
         lettercandidats = loadobj('lettercandidats', oldser)
 
@@ -313,14 +317,14 @@ def GetLetters(img):
 
 if __name__ == '__main__':
     print 'loading image....'
-    img = cv2.imread('img/cars/4.jpg')
+    img = cv2.imread('img/cars/2.jpg')
     #img = cv2.imread('img/cars/3.jpg')
     #img = cv2.imread('img/pure/2.jpg')
     #img = cv2.imread('img/numbers/1.jpg')
     gr = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     orig = gr.copy()
     #USAGE FindLetters(gray_scale, <stage>, <ser of dumps>)
-    lettercandidats = FindLetters(gr)#, work_stages['lettercandidats'], '1352903799.13')
+    lettercandidats = FindLetters(gr, dump_stages=True, new_ser='ser_')#, work_stages['lettercandidats'], '1352903799.13')
     '''
 work_stages = {
         'no' : 0,
