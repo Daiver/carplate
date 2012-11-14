@@ -115,14 +115,14 @@ def SearchComponent(image, center, mask, cntrimg, original):
                         image[tmp[0], tmp[1]] < CC_B) and (
                    cntrimg[tmp[0], tmp[1]] == 0) and(
                    #abs(image[point[0], point[1]] - image[tmp[0], tmp[1]]) < CC_D) :
-                   1/4. < image[point[0], point[1]] / image[tmp[0], tmp[1]] < 4):
+                   1/3. < image[point[0], point[1]] / image[tmp[0], tmp[1]] < 3.):
 
                     q.put(tmp)
                     component.append(tmp)
                     mask[tmp[0], tmp[1]] = 255
     #if len(component) < 2:
     #    return {}
-    variance = Variance(component, image)
+    #variance = Variance(component, image)
     
     swvalues = np.array([image[p[0], p[1]] for p in component])
     #mean = np.mean(swvalues)
@@ -137,7 +137,7 @@ def SearchComponent(image, center, mask, cntrimg, original):
     #    bboxvariance /= ((maxX-minX)*(maxY-minY))
     return {
             'points' : component, 
-            'variance' : variance, 
+            #'variance' : variance, 
             'height' : maxY  - minY, 
             'width' : maxX - minX, 
             'X' : minX, 'Y' : minY, 'X2' : maxX, 'Y2' : maxY,
@@ -214,7 +214,7 @@ def FindComponents(gray, contour, swimage, debug_components=False, debug_compone
                     cv2.waitKey(1000)
                 if (
                     len(res['points']) > 10
-                    and (res['height'] > 10 and res['width'] > 3)
+                    and (res['height'] > 7 and res['width'] > 3)
                     #and (res['bboxvariance'] > 2.5)
                     #and ((res['width'] * res['height']) * 0.15 < (len(res['points'])))
                     and (0.1 < (float(len(res['points']))/(res['width']*res['height'])) < 1)
@@ -226,14 +226,14 @@ def FindComponents(gray, contour, swimage, debug_components=False, debug_compone
                     and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 2000)
                     #and (0.25 < min(float(res['width'])/res['height'], float(res['height'])/res['width']) < 1)
                     ):
-                    if res['variance'] < 30:
-                        components.append(res)
-                        if debug_components_after:
-                            tmp = contour.copy()
-                            for p in res['points']:#Показываем компонент
-                                tmp[p[0], p[1]] = 255                    
-                            cv2.imshow('11111', tmp)
-                            cv2.waitKey(1000)
+                    #if True:#res['variance'] < 40:
+                    components.append(res)
+                    if debug_components_after:
+                        tmp = contour.copy()
+                        for p in res['points']:#Показываем компонент
+                            tmp[p[0], p[1]] = 255                    
+                        cv2.imshow('11111', tmp)
+                        cv2.waitKey(1000)
     return components
 
 def PairFilter(components):
