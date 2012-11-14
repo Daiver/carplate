@@ -11,6 +11,8 @@ from Bresenham import Selector
 
 from time import time
 
+import cProfile
+
 import pickle
 
 makestep = lambda point, step: (point[0] + step[0], point[1] + step[1])
@@ -238,25 +240,61 @@ def PairFilter(components):
                 break
     return lettercandidats
 
-def FindLetters(gray):
-    print 'Finding counters...'
-    contour = cv2.Canny(gray, 10, 230)
-    dumpobj(contour, 'contour.dump')
-    print 'Calc gradient\'s angle...'
-    angles_img = GradientCalc(gray, contour)
-    dumpobj(angles_img, 'angles_img.dump')
-    print 'Tracing rays...'
-    rays = Ray_Tracing(contour, angles_img, debug_rays=False)#set true for show image     
-    dumpobj(rays, 'rays.dump')
-    print 'Calc Stroke Width...'
-    swimage = SWT_Operator(gray, rays, debug_swimage=False)
-    dumpobj(swimage, 'swimage.dump')
-    print 'Search Components'
-    components = FindComponents(gray, contour, swimage, debug_components=False, debug_components_after=False)
-    dumpobj(components, 'components.dump')
-    print 'filtering letter candidats...'
-    lettercandidats = PairFilter(components)
-    dumpobj(lettercandidats, 'lettercandidats.dump')
+work_stages = {
+        'no' : 0,
+        'contour' : 1,
+        'angles_img' : 2,
+        'rays' : 3,
+        'swimage' : 4,
+        'Components' : 5,
+        'lettercandidats' : 6,
+    }
+
+def FindLetters(gray, stage=work_stages['no']):
+    #init section. Just for simplify debug. delete this after debooooging
+    contour = None;  angles_img = None; rays = None; swimage = None; components = None; lettercandidats = None
+    if stage < work_stages['contour']:
+        print 'Finding counters...'
+        contour = cv2.Canny(gray, 10, 230)
+        dumpobj(contour, 'contour.dump')
+    else:
+        pass
+
+    if stage < work_stages['angles_img']:
+        print 'Calc gradient\'s angle...'
+        angles_img = GradientCalc(gray, contour)
+        dumpobj(angles_img, 'angles_img.dump')
+    else:
+        pass
+
+    if stage < work_stages['rays']:
+        print 'Tracing rays...'
+        rays = Ray_Tracing(contour, angles_img, debug_rays=False)#set true for show image     
+        dumpobj(rays, 'rays.dump')
+    else:
+        pass
+    
+    if stage < work_stages['swimage']:
+        print 'Calc Stroke Width...'
+        swimage = SWT_Operator(gray, rays, debug_swimage=False)
+        dumpobj(swimage, 'swimage.dump')
+    else:
+        pass
+
+    if stage < work_stages['Components']:
+        print 'Search Components'
+        components = FindComponents(gray, contour, swimage, debug_components=False, debug_components_after=False)
+        dumpobj(components, 'components.dump')
+    else:
+        pass
+
+    if stage < work_stages['lettercandidats']:
+        print 'filtering letter candidats...'
+        lettercandidats = PairFilter(components)
+        dumpobj(lettercandidats, 'lettercandidats.dump')
+    else:
+        pass
+
     return lettercandidats
 
 def GetLetters(img):
@@ -266,7 +304,7 @@ def GetLetters(img):
 
 if __name__ == '__main__':
     print 'loading image....'
-    img = cv2.imread('img/cars/2.jpg')
+    img = cv2.imread('img/cars/4.jpg')
     #img = cv2.imread('img/cars/3.jpg')
     #img = cv2.imread('img/pure/2.jpg')
     #img = cv2.imread('img/numbers/1.jpg')
