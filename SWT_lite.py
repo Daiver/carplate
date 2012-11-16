@@ -6,7 +6,7 @@ import numpy as np
 from Queue import Queue
 
 from SWT_Support import *
-#
+
 from Bresenham import Selector
 
 from time import time
@@ -28,6 +28,16 @@ checkbound_sq = lambda point, image: (
 CC_B = float('inf')
 
 DIR_TO_DUMP = 'dumps/'
+
+def SWViz(image):
+    tmp = np.zeros(image.shape, dtype=np.uint8)
+    tmp[:] = image[:]
+    Barrier = 20
+    tmp[tmp == np.inf] = Barrier
+    tmp[tmp > Barrier] = Barrier
+    tmp *= 10
+    cv2.imshow('swimage', tmp)
+    cv2.waitKey(100000)
 
 def loadobj(name, ser):
     f = open('%s%s-%s.dump' % (DIR_TO_DUMP, str(ser), name), 'r')
@@ -182,7 +192,7 @@ def Ray_Tracing(contour, angles_img, debug_rays=False):#return sw_image
                             tmp[p[0], p[1]] = 255
                         cv2.imshow('77', tmp)
                         #Для удобства просмотра
-                        cv2.waitKey(10)
+                        cv2.waitKey(1)
     return rays
 
 def SWT_Operator(original, rays, debug_swimage):
@@ -193,10 +203,7 @@ def SWT_Operator(original, rays, debug_swimage):
             if swimage[p[0], p[1]] > len(ray):
                 swimage[p[0], p[1]] = len(ray)
     if debug_swimage:
-        tmp = swimage.copy()
-        tmp[tmp > 255] = 255
-        cv2.imshow('swimage', tmp)
-        cv2.waitKey(10000)
+        SWViz(swimage)
     return swimage
 
 def FindComponents(gray, contour, swimage, debug_components=False, debug_components_after=False):
@@ -289,7 +296,7 @@ def FindLetters(gray, stage=work_stages['no'], oldser=None, dump_stages=False, n
     
     if stage < work_stages['swimage']:
         print 'Calc Stroke Width...'
-        swimage = SWT_Operator(gray, rays, debug_swimage=False)
+        swimage = SWT_Operator(gray, rays, debug_swimage=True)
         if dump_stages:
             dumpobj(swimage, 'swimage', curser)
     else:
@@ -320,7 +327,7 @@ def GetLetters(img):
 
 if __name__ == '__main__':
     print 'loading image....'
-    img = cv2.imread('img/cars/2.jpg')
+    img = cv2.imread('img/cars/4.jpg')
     #img = cv2.imread('img/cars/3.jpg')
     #img = cv2.imread('img/pure/2.jpg')
     #img = cv2.imread('img/numbers/1.jpg')
