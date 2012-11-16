@@ -266,8 +266,16 @@ work_stages = {
         'lettercandidats' : 6,
     }
 
-def FindLetters(gray, stage=work_stages['no'], oldser=None, dump_stages=False, new_ser=''):
+DEFAULT_DEBUG_FLAGS = {
+        'debug_rays' : False,
+        'debug_swimage' : False,
+        'debug_components' : False,
+        'debug_components_after' : False,
+    }
+
+def FindLetters(gray, stage=work_stages['no'], oldser=None, dump_stages=False, new_ser='', debug_flags=None):
     #init section. Just for simplify debug. delete this after debooooging
+    if not debug_flags: debug_flags = DEFAULT_DEBUG_FLAGS
     curser = new_ser#current ser of dump files
     contour = None;  angles_img = None; rays = None; swimage = None; components = None; lettercandidats = None
     if stage < work_stages['contour']:
@@ -288,7 +296,7 @@ def FindLetters(gray, stage=work_stages['no'], oldser=None, dump_stages=False, n
 
     if stage < work_stages['rays']:
         print 'Tracing rays...'
-        rays = Ray_Tracing(contour, angles_img, debug_rays=False)#set true for show image     
+        rays = Ray_Tracing(contour, angles_img, debug_rays=debug_flags['debug_rays'])#set true for show image     
         if dump_stages:
             dumpobj(rays, 'rays', curser)
     else:
@@ -296,7 +304,7 @@ def FindLetters(gray, stage=work_stages['no'], oldser=None, dump_stages=False, n
     
     if stage < work_stages['swimage']:
         print 'Calc Stroke Width...'
-        swimage = SWT_Operator(gray, rays, debug_swimage=True)
+        swimage = SWT_Operator(gray, rays, debug_swimage=debug_flags['debug_swimage'])
         if dump_stages:
             dumpobj(swimage, 'swimage', curser)
     else:
@@ -304,7 +312,7 @@ def FindLetters(gray, stage=work_stages['no'], oldser=None, dump_stages=False, n
 
     if stage < work_stages['Components']:
         print 'Search Components'
-        components = FindComponents(gray, contour, swimage, debug_components=False, debug_components_after=False)
+        components = FindComponents(gray, contour, swimage, debug_components=debug_flags['debug_components'], debug_components_after=debug_flags['debug_components_after'])
         if dump_stages:
             dumpobj(components, 'components', curser)
     else:
