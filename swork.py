@@ -9,9 +9,9 @@ import cv2
 import numpy as np
 
 CUR_DEBUG_FLAGS = {
-        'debug_rays' : True,
+        'debug_rays' : False,
         'debug_swimage' : True,
-        'debug_components' : True,
+        'debug_components' : False,
         'debug_components_after' : False,
     }
 
@@ -37,11 +37,11 @@ if __name__ == '__main__':
             oldser=ser_to_load, 
             dump_stages=dump_stages, 
             new_ser=new_ser, 
-            #debug_flags=CUR_DEBUG_FLAGS
-            debug_flags=DEFAULT_DEBUG_FLAGS
+            debug_flags=CUR_DEBUG_FLAGS
+            #debug_flags=DEFAULT_DEBUG_FLAGS
         )
     for l in letters:
         for p in l['points']:
-            image[p[0], p[1]] = (255, 200, 0)
+            image[p[0], p[1]] = (205, 200, 0)
     cv2.imshow('', image)
     cv2.waitKey(100000)

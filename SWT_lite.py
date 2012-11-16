@@ -32,10 +32,16 @@ DIR_TO_DUMP = 'dumps/'
 def SWViz(image):
     tmp = np.zeros(image.shape, dtype=np.uint8)
     tmp[:] = image[:]
-    Barrier = 20
+    Barrier = 50
     tmp[tmp == np.inf] = Barrier
     tmp[tmp > Barrier] = Barrier
     tmp *= 10
+    #res = np.zeros((image.shape[0], image.shape[1], 3), dtype=np.uint8)
+    #res[tmp > 10] = (200, 0, 0)
+    #res[tmp > 15] = (10, 50, 100)
+    #res[tmp > 30] = (0, 100, 100)
+    #res[tmp > 45] = (0, 0, 200)
+    
     cv2.imshow('swimage', tmp)
     cv2.waitKey(100000)
 
