@@ -41,7 +41,7 @@ def SWViz(image):
     #res[tmp > 15] = (10, 50, 100)
     #res[tmp > 30] = (0, 100, 100)
     #res[tmp > 45] = (0, 0, 200)
-    
+    #cv2.imwrite('swimageimprove1.jpg', tmp)
     cv2.imshow('swimage', tmp)
     cv2.waitKey(100000)
 
@@ -133,7 +133,7 @@ def SearchComponent(image, center, mask, cntrimg, original):
                         image[tmp[0], tmp[1]] < CC_B) and (
                    cntrimg[tmp[0], tmp[1]] == 0) and(
                    #abs(image[point[0], point[1]] - image[tmp[0], tmp[1]]) < CC_D) :
-                   1/4. < image[point[0], point[1]] / image[tmp[0], tmp[1]] < 4.):
+                   1/5. < image[point[0], point[1]] / image[tmp[0], tmp[1]] < 5.):
 
                     q.put(tmp)
                     component.append(tmp)
@@ -231,8 +231,8 @@ def FindComponents(gray, contour, swimage, debug_components=False, debug_compone
                     cv2.imshow('11111', tmp)
                     cv2.waitKey(1000)
                 if (
-                    len(res['points']) > 10
-                    and (res['height'] > 7 and res['width'] > 3)
+                    len(res['points']) > 7
+                    and (res['height'] > 5 and res['width'] > 3)
                     #and (res['bboxvariance'] > 2.5)
                     #and ((res['width'] * res['height']) * 0.15 < (len(res['points'])))
                     and (0.1 < (float(len(res['points']))/(res['width']*res['height'])) < 1)

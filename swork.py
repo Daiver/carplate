@@ -40,8 +40,9 @@ if __name__ == '__main__':
             debug_flags=CUR_DEBUG_FLAGS
             #debug_flags=DEFAULT_DEBUG_FLAGS
         )
+    print len(letters)
     for l in letters:
         for p in l['points']:
             image[p[0], p[1]] = (205, 200, 0)
-    cv2.imshow('', image)
+    cv2.imshow('1111111', image)
     cv2.waitKey(100000)
