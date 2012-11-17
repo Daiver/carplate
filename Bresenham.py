@@ -2,14 +2,9 @@ from math import *
 
 class Selector :
 
-    def __init__(self, x1, y1, alpha) :
-        self.alpha = alpha
-        self.step = 500
+    def __init__(self, x1, y1, x2, y2) :
         self.point1 = (x1, y1)
-        #self.point2 = self.TakeSecondPointForLine()
-        #self.point2 = (int(self.point2[0]), int(self.point2[1]))
-        #print self.point2
-        #print self.point1
+        self.point2 = (x2, y2)
         self.RayReset()
 
     def TakeSecondPointForLine(self) :
@@ -31,9 +26,6 @@ class Selector :
             return (self.point1[0] - self.step, self.point1[1])
 
     def RayReset(self) :
-        self.point2 = self.TakeSecondPointForLine()
-        self.point2 = (int(round(self.point2[0])), int(round(self.point2[1])))
-        #print self.point2
         self.adx = abs(self.point2[0] - self.point1[0])
         self.ady = abs(self.point2[1] - self.point1[0])
         if self.point2[0] > self.point1[0] :
@@ -59,7 +51,7 @@ class Selector :
             self.y0 += self.sy
         return (self.x0, self.y0)
 
-#cl = Selector(5, 4, pi)
-#for i in xrange(100) :
-#    print cl.GetPoint()
+cl = Selector(5, 4, 900, 18)
+for i in xrange(10) :
+    print cl.GetPoint()
 
