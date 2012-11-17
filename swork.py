@@ -11,8 +11,8 @@ import numpy as np
 CUR_DEBUG_FLAGS = {
         'debug_rays' : False,
         'debug_swimage' : True,
-        'debug_components' : False,
-        'debug_components_after' : False,
+        'debug_components' :False,
+        'debug_components_after' : True,
     }
 
 if __name__ == '__main__':

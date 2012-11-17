@@ -7,24 +7,6 @@ class Selector :
         self.point2 = (x2, y2)
         self.RayReset()
 
-    def TakeSecondPointForLine(self) :
-        #self.alpha += pi
-        #if self.alpha > 2*pi :
-        #    self.alpha -= 2*pi
-        print self.alpha
-        if  0 < self.alpha < pi and not self.alpha == pi/2 :
-            return (self.step * cos(self.alpha) + self.point1[0], self.step * sin(self.alpha) + self.point1[1])
-        elif pi < self.alpha < 2*pi and not self.alpha == 3*pi/2 :
-            return (self.step * cos(self.alpha) + self.point1[0], self.point1[1] + self.step * sin(self.alpha))
-        elif self.alpha == pi/2:
-            return (self.point1[0], self.point1[1] + self.step)
-        elif self.alpha == 3*pi/2 :
-            return (self.point1[0], self.point1[1] - self.step)
-        elif self.alpha == 0 or self.alpha == 2*pi :
-            return (self.point1[0] + self.step, self.point1[1])
-        elif self.alpha == pi :
-            return (self.point1[0] - self.step, self.point1[1])
-
     def RayReset(self) :
         self.adx = abs(self.point2[0] - self.point1[0])
         self.ady = abs(self.point2[1] - self.point1[0])
