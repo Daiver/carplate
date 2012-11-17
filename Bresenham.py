@@ -51,7 +51,7 @@ class Selector :
             self.y0 += self.sy
         return (self.x0, self.y0)
 
-cl = Selector(5, 4, 900, 18)
-for i in xrange(10) :
-    print cl.GetPoint()
+#cl = Selector(5, 4, 400, 418)
+#for i in xrange(10) :
+#    print cl.GetPoint()
 

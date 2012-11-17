@@ -9,8 +9,8 @@ import cv2
 import numpy as np
 
 CUR_DEBUG_FLAGS = {
-        'debug_rays' : True,
-        'debug_swimage' : False,
+        'debug_rays' : False,
+        'debug_swimage' : True,
         'debug_components' : False,
         'debug_components_after' : True,
     }

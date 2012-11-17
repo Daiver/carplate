@@ -61,7 +61,7 @@ def Variance(vec, image):
     res = 1.0 / len(vec) * sum(( (image[p[0], p[1]] - avg)**2 for p in vec))
     return res
 
-def VarianceFromRect(p1, p2, images):
+def VarianceFromRect(p1, p2, image):
     tmp = []
     for i in xrange(p1[0], p2[0]):
         for j in xrange(p1[1], p2[1]):
@@ -73,7 +73,7 @@ def CutRect(image, p1, p2, border=0):
     return image[p1[0]-border:p2[0]+border, p1[1]-border:p2[1]+border]
 
 #Должен давать нам 1 штрих
-def Stroke(image, angles_img, point):
+def Stroke(image, angles_img, point, dx, dy):
     stroke = []
     if not checkbound_sq(point, image): return 
     oldangle = angles_img[point[0], point[1]]#Получаем угол
@@ -81,14 +81,16 @@ def Stroke(image, angles_img, point):
     if (oldangle == None) or (np.isnan(oldangle)): return 
 
     #Получаем шаг. Тут надо вставить брезенхейма. Ну мне так кажется
-    #selector = Selector(point[0], point[1], (np.pi + angles_img[point[0], point[1]]) % (2*np.pi))
-    step = dirselect(angles_img[point[0], point[1]])#stepmap[point[0]][point[1]]
-    step = (step[1], step[0])
-    if not step:return 
+    selector = Selector(point[0], point[1], point[0]-dy[point[0], point[1]], point[1] - dx[point[0], point[1]])#(np.pi + angles_img[point[0], point[1]]) % (2*np.pi))
+    #step = dirselect(angles_img[point[0], point[1]])#stepmap[point[0]][point[1]]
+    #step = (step[1], step[0])
+    #if not step:return 
         
     diff = anglediff(oldangle, angle) 
-    #point = selector.GetPoint()
-    point = makestep(point, step)
+    new_point = selector.GetPoint()
+    if point == new_point: return
+    point = new_point
+    #point = makestep(point, step)
     if not checkbound_sq(point, image):# or mask[point[0], point[1]] == 255:
         return 
 
@@ -97,8 +99,8 @@ def Stroke(image, angles_img, point):
     while image[point[0], point[1]] == 0:
         #if (image[point[0], point[1]] != 0):
         stroke.append(point)        
-        point = makestep(point, step)
-        #point = selector.GetPoint()
+        #point = makestep(point, step)
+        point = selector.GetPoint()
         #Если уткнулись в край картинки - считаем луч ошибочным
         if not checkbound_sq(point, image):# or mask[point[0], point[1]] == 255:
             return 
@@ -189,17 +191,19 @@ def Ray_Tracing(contour, angles_img, debug_rays=False, dx=None, dy=None):#return
             if contour[i, j] != 0:
     #for e in edges:
         #Проверяем прошли ли мы эту точку
-                res = Stroke(contour, angles_img, (i, j))            
+                res = Stroke(contour, angles_img, (i, j), dx, dy)            
                 if res :#len(res) > 0:
-                    print dx[i, j], dy[i, j]
+                    print 'Start from', (i, j)
+                    print 'Grad', dx[i, j], dy[i, j]
                     rays.append(res)
+                    print res
                     if debug_rays:
                         tmp = contour.copy()
                         for p in res:#Показываем луч
                             tmp[p[0], p[1]] = 255
                         cv2.imshow('77', tmp)
                         #Для удобства просмотра
-                        cv2.waitKey(1000)
+                        cv2.waitKey(100000)
     return rays
 
 def SWT_Operator(original, rays, debug_swimage):
