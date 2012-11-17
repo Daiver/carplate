@@ -99,7 +99,7 @@ def Stroke(image, angles_img, point, dx, dy):
     while image[point[0], point[1]] == 0:
         #if (image[point[0], point[1]] != 0):
         stroke.append(point)        
-        #point = makestep(point, step)
+        #point = makesstep(point, step)
         point = selector.GetPoint()
         #Если уткнулись в край картинки - считаем луч ошибочным
         if not checkbound_sq(point, image):# or mask[point[0], point[1]] == 255:
@@ -193,10 +193,10 @@ def Ray_Tracing(contour, angles_img, debug_rays=False, dx=None, dy=None):#return
         #Проверяем прошли ли мы эту точку
                 res = Stroke(contour, angles_img, (i, j), dx, dy)            
                 if res :#len(res) > 0:
-                    print 'Start from', (i, j)
-                    print 'Grad', dx[i, j], dy[i, j]
+                    #print 'Start from', (i, j)
+                    #print 'Grad', dx[i, j], dy[i, j]
                     rays.append(res)
-                    print res
+                    #print res
                     if debug_rays:
                         tmp = contour.copy()
                         for p in res:#Показываем луч
