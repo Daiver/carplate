@@ -241,12 +241,12 @@ def FindComponents(gray, contour, swimage, debug_components=False, debug_compone
                     #and ((res['width'] * res['height']) * 0.15 < (len(res['points'])))
                     and (0.1 < (float(len(res['points']))/(res['width']*res['height'])) < 1)
                     #and ((res['height'] > 9) and (res['width'] > 3)) 
-                    and (1/2.5 < res['width'] / res['height'] < 2.5)
+                    #and (1/2.5 < res['width'] / res['height'] < 2.5)
 
                     #and ((res['mean'] == 0) or (0 < (res['deviation']/res['mean']) < 1))
                     and (np.std(res['swvalues'])/np.mean(res['swvalues']) < 1)
                     and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 2000)
-                    #and (0.25 < min(float(res['width'])/res['height'], float(res['height'])/res['width']) < 1)
+                    and (1/2.5 < min(float(res['width'])/res['height'], float(res['height'])/res['width']) < 2.5)
                     ):
                     #if True:#res['variance'] < 40:
                     components.append(res)
