@@ -61,7 +61,7 @@ def Variance(vec, image):
     res = 1.0 / len(vec) * sum(( (image[p[0], p[1]] - avg)**2 for p in vec))
     return res
 
-def VarianceFromRect(p1, p2, image):
+def VarianceFromRect(p1, p2, images):
     tmp = []
     for i in xrange(p1[0], p2[0]):
         for j in xrange(p1[1], p2[1]):
@@ -180,9 +180,9 @@ def GradientCalc(original, contour):
                 edges.append((i, j))
                 #angles_img[i, j] = gradient(original, (i, j))
     '''
-    return angles_img
+    return angles_img, dx, dy
 
-def Ray_Tracing(contour, angles_img, debug_rays=False):#return sw_image
+def Ray_Tracing(contour, angles_img, debug_rays=False, dx=None, dy=None):#return sw_image
     rays = []
     for j in xrange(1, contour.shape[1]-1):
         for i in xrange(1, contour.shape[0]-1):    
@@ -191,6 +191,7 @@ def Ray_Tracing(contour, angles_img, debug_rays=False):#return sw_image
         #Проверяем прошли ли мы эту точку
                 res = Stroke(contour, angles_img, (i, j))            
                 if res :#len(res) > 0:
+                    print dx[i, j], dy[i, j]
                     rays.append(res)
                     if debug_rays:
                         tmp = contour.copy()
@@ -198,7 +199,7 @@ def Ray_Tracing(contour, angles_img, debug_rays=False):#return sw_image
                             tmp[p[0], p[1]] = 255
                         cv2.imshow('77', tmp)
                         #Для удобства просмотра
-                        cv2.waitKey(1)
+                        cv2.waitKey(1000)
     return rays
 
 def SWT_Operator(original, rays, debug_swimage):
@@ -283,7 +284,8 @@ def FindLetters(gray, stage=work_stages['no'], oldser=None, dump_stages=False, n
     #init section. Just for simplify debug. delete this after debooooging
     if not debug_flags: debug_flags = DEFAULT_DEBUG_FLAGS
     curser = new_ser#current ser of dump files
-    contour = None;  angles_img = None; rays = None; swimage = None; components = None; lettercandidats = None
+    contour = None;  angles_img = None; rays = None; swimage = None; components = None; lettercandidats = None;
+    dx = None; dy = None
     if stage < work_stages['contour']:
         print 'Finding counters...'
         contour = cv2.Canny(gray, 10, 230)
@@ -294,7 +296,7 @@ def FindLetters(gray, stage=work_stages['no'], oldser=None, dump_stages=False, n
 
     if stage < work_stages['angles_img']:
         print 'Calc gradient\'s angle...'
-        angles_img = GradientCalc(gray, contour)
+        angles_img, dx, dy = GradientCalc(gray, contour)
         if dump_stages:
             dumpobj(angles_img, 'angles_img', curser)
     else:
@@ -302,7 +304,7 @@ def FindLetters(gray, stage=work_stages['no'], oldser=None, dump_stages=False, n
 
     if stage < work_stages['rays']:
         print 'Tracing rays...'
-        rays = Ray_Tracing(contour, angles_img, debug_rays=debug_flags['debug_rays'])#set true for show image     
+        rays = Ray_Tracing(contour, angles_img, debug_rays=debug_flags['debug_rays'], dx=dx, dy=dy)#set true for show image     
         if dump_stages:
             dumpobj(rays, 'rays', curser)
     else:
