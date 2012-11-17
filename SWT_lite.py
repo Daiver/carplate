@@ -72,7 +72,8 @@ def VarianceFromRect(p1, p2, image):
 def CutRect(image, p1, p2, border=0):
     return image[p1[0]-border:p2[0]+border, p1[1]-border:p2[1]+border]
 
-#Должен давать нам 1 штрих
+MAX_RAY_LEN = 100
+#Должен давать нам 1 луч 
 def Stroke(image, angles_img, point, dx, dy):
     stroke = []
     if not checkbound_sq(point, image): return 
@@ -94,6 +95,8 @@ def Stroke(image, angles_img, point, dx, dy):
     if not checkbound_sq(point, image):# or mask[point[0], point[1]] == 255:
         return 
 
+    i = 0
+
     #Пока не уткнемся в градиент различающийся с нашим более чем в 30* ползем в направлении step
     #Из-за кривого шага на больших расстояниях дает нехороший результат
     while image[point[0], point[1]] == 0:
@@ -101,8 +104,9 @@ def Stroke(image, angles_img, point, dx, dy):
         stroke.append(point)        
         #point = makesstep(point, step)
         point = selector.GetPoint()
+        i += 1
         #Если уткнулись в край картинки - считаем луч ошибочным
-        if not checkbound_sq(point, image):# or mask[point[0], point[1]] == 255:
+        if not checkbound_sq(point, image) or i > MAX_RAY_LEN:# or mask[point[0], point[1]] == 255:
             return 
         #if (image[point[0], point[1]] != 0):
     angle = angles_img[point[0], point[1]]
