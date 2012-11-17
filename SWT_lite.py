@@ -176,8 +176,8 @@ def GradientCalc(original, contour):
     #Тут мы получаем градиент (точнее угол) всех (ну почти) точек
     angles_img = np.zeros(original.shape)
     angles_img[:] = float('nan')
-    dx = cv2.Sobel(original, cv2.CV_32F, 1, 0)
-    dy = cv2.Sobel(original, cv2.CV_32F, 0, 1)
+    dx = cv2.Sobel(original, cv2.CV_32F, 1, 0, ksize=7)
+    dy = cv2.Sobel(original, cv2.CV_32F, 0, 1, ksize=7)
     angles_img = np.arctan2(dy, dx)
     '''
     for j in xrange(1, original.shape[1]-1):
