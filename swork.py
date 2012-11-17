@@ -10,7 +10,7 @@ import numpy as np
 
 CUR_DEBUG_FLAGS = {
         'debug_rays' : False,
-        'debug_swimage' : True,
+        'debug_swimage' : False,
         'debug_components' :False,
         'debug_components_after' : False,
     }
