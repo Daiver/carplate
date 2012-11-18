@@ -236,7 +236,7 @@ def ComponentFiltering(components, contour, gray, debug_components_after=False):
     for res in components:
         if (
             len(res['points']) > 7
-            and (res['height'] > 5 and res['width'] > 3)
+            and (res['height'] > 7 and res['width'] > 3)
             #and (res['bboxvariance'] > 2.5)
             #and ((res['width'] * res['height']) * 0.15 < (len(res['points'])))
             and (0.1 < (float(len(res['points']))/(res['width']*res['height'])) < 1)
@@ -244,7 +244,7 @@ def ComponentFiltering(components, contour, gray, debug_components_after=False):
             #and (1/2.5 < res['width'] / res['height'] < 2.5)
             #and ((res['mean'] == 0) or (0 < (res['deviation']/res['mean']) < 1))
             and (np.std(res['swvalues'])/np.mean(res['swvalues']) < 1)
-            and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 2000)
+            and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 2500)
             and (1/2.5 < min(float(res['width'])/res['height'], float(res['height'])/res['width']) < 2.5)
             ):
                     #if True:#res['variance'] < 40:
@@ -313,7 +313,7 @@ def FindLetters(gray, stage=work_stages['no'], oldser=None, dump_stages=False, n
             dumpobj(rays, 'rays', curser)
     else:
         rays = loadobj('rays', oldser)
-    
+
     if stage < work_stages['swimage']:
         print 'Calc Stroke Width...'
         swimage = SWT_Operator(gray, rays, debug_swimage=debug_flags['debug_swimage'])
