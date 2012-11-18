@@ -258,8 +258,9 @@ def PairFilter(components):
         for c2 in components:#
             if (
                 (c != c2) #and (c['width'] != 0 and c['height'] != 0
-                and (2/3. < c2['width']/c['width'] < 1.5)
-                and (2/3. < c2['height']/c['height'] < 1.5)
+                and (1/2.5 < c2['width']/c['width'] < 2.5)
+                and (1/2.5 < c2['height']/c['height'] < 2.5)
+                and (1/2 < np.mean(c['swvalues'])/np.mean(c2['swvalues']) < 2)
                 ):
                 lettercandidats.append(c)
                 break
