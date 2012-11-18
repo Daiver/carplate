@@ -221,6 +221,15 @@ def SWT_Operator(original, rays, debug_swimage):
         SWViz(swimage)
     return swimage
 
+def VizComponent(contour, components, text):
+    tmp = np.zeros(contour.shape)#contour.copy()
+    tmp[:] = 255
+    for res in components:
+        for p in res['points']:#Показываем компонент
+            tmp[p[0], p[1]] = 0                    
+    cv2.imshow(text, tmp)
+    cv2.waitKey(1000)
+
 def FindComponents(gray, contour, swimage, debug_components=False, debug_components_after=False):
     mask = np.zeros(gray.shape)
     components = []
@@ -230,14 +239,7 @@ def FindComponents(gray, contour, swimage, debug_components=False, debug_compone
                 res = SearchComponent(swimage, (i, j), mask, contour, gray)
                 components.append(res)
 
-    if debug_components:
-        tmp = np.zeros(contour.shape)#contour.copy()
-        tmp[:] = 255
-        for res in components:
-            for p in res['points']:#Показываем компонент
-                tmp[p[0], p[1]] = 0                    
-        cv2.imshow('Asociation', tmp)
-        cv2.waitKey(1000)
+    if debug_components: VizComponent(contour, components, 'Association')
 
     final_components = []
     for res in components:
@@ -256,14 +258,7 @@ def FindComponents(gray, contour, swimage, debug_components=False, debug_compone
             ):
                     #if True:#res['variance'] < 40:
             final_components.append(res)
-    if debug_components_after:
-        tmp = np.zeros(contour.shape)#contour.copy()
-        tmp[:] = 255
-        for res in final_components:
-            for p in res['points']:#Показываем компонент
-                tmp[p[0], p[1]] = 0#255                    
-        cv2.imshow('11111', tmp)
-        cv2.waitKey(10000)
+    if debug_components_after: VizComponent(contour, final_components, 'Component Filter')
     return final_components
 
 def PairFilter(components):
