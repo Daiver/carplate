@@ -244,8 +244,8 @@ def ComponentFiltering(components, contour, gray, debug_components_after=False):
             #and (1/2.5 < res['width'] / res['height'] < 2.5)
             #and ((res['mean'] == 0) or (0 < (res['deviation']/res['mean']) < 1))
             and (np.std(res['swvalues'])/np.mean(res['swvalues']) < 1)
-            and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 2500)
-            and (1/2.5 < min(float(res['width'])/res['height'], float(res['height'])/res['width']) < 2.5)
+            and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 3000)
+            and (1/10 < min(float(res['width'])/res['height'], float(res['height'])/res['width']) < 1.001)
             ):
                     #if True:#res['variance'] < 40:
             final_components.append(res)
