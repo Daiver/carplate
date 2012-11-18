@@ -253,12 +253,13 @@ def FindComponents(gray, contour, swimage, debug_components=False, debug_compone
             ):
                     #if True:#res['variance'] < 40:
             final_components.append(res)
-            if debug_components_after:
-                tmp = contour.copy()
-                for p in res['points']:#Показываем компонент
-                    tmp[p[0], p[1]] = 255                    
-                cv2.imshow('11111', tmp)
-                cv2.waitKey(1000)
+    if debug_components_after:
+        tmp = contour.copy()
+        for res in final_components:
+            for p in res['points']:#Показываем компонент
+                tmp[p[0], p[1]] = 255                    
+        cv2.imshow('11111', tmp)
+        cv2.waitKey(1000)
     return final_components
 
 def PairFilter(components):
