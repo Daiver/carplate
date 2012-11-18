@@ -228,35 +228,38 @@ def FindComponents(gray, contour, swimage, debug_components=False, debug_compone
         for i in xrange(gray.shape[0]):
             if (mask[i, j] == 0) and (swimage[i, j] < CC_B):#CC_B = inf - "барьер"
                 res = SearchComponent(swimage, (i, j), mask, contour, gray)
+                components.append(res)
                 if debug_components:
                     tmp = contour.copy()
                     for p in res['points']:#Показываем компонент
                         tmp[p[0], p[1]] = 255                    
                     cv2.imshow('11111', tmp)
                     cv2.waitKey(1000)
-                if (
-                    len(res['points']) > 7
-                    and (res['height'] > 5 and res['width'] > 3)
-                    #and (res['bboxvariance'] > 2.5)
-                    #and ((res['width'] * res['height']) * 0.15 < (len(res['points'])))
-                    and (0.1 < (float(len(res['points']))/(res['width']*res['height'])) < 1)
-                    #and ((res['height'] > 9) and (res['width'] > 3)) 
-                    #and (1/2.5 < res['width'] / res['height'] < 2.5)
 
-                    #and ((res['mean'] == 0) or (0 < (res['deviation']/res['mean']) < 1))
-                    and (np.std(res['swvalues'])/np.mean(res['swvalues']) < 1)
-                    and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 2000)
-                    and (1/2.5 < min(float(res['width'])/res['height'], float(res['height'])/res['width']) < 2.5)
-                    ):
+    final_components = []
+    for res in components:
+        if (
+            len(res['points']) > 7
+            and (res['height'] > 5 and res['width'] > 3)
+            #and (res['bboxvariance'] > 2.5)
+            #and ((res['width'] * res['height']) * 0.15 < (len(res['points'])))
+            and (0.1 < (float(len(res['points']))/(res['width']*res['height'])) < 1)
+            #and ((res['height'] > 9) and (res['width'] > 3)) 
+            #and (1/2.5 < res['width'] / res['height'] < 2.5)
+            #and ((res['mean'] == 0) or (0 < (res['deviation']/res['mean']) < 1))
+            and (np.std(res['swvalues'])/np.mean(res['swvalues']) < 1)
+            and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 2000)
+            and (1/2.5 < min(float(res['width'])/res['height'], float(res['height'])/res['width']) < 2.5)
+            ):
                     #if True:#res['variance'] < 40:
-                    components.append(res)
-                    if debug_components_after:
-                        tmp = contour.copy()
-                        for p in res['points']:#Показываем компонент
-                            tmp[p[0], p[1]] = 255                    
-                        cv2.imshow('11111', tmp)
-                        cv2.waitKey(1000)
-    return components
+            final_components.append(res)
+            if debug_components_after:
+                tmp = contour.copy()
+                for p in res['points']:#Показываем компонент
+                    tmp[p[0], p[1]] = 255                    
+                cv2.imshow('11111', tmp)
+                cv2.waitKey(1000)
+    return final_components
 
 def PairFilter(components):
     lettercandidats = []
