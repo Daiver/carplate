@@ -179,13 +179,6 @@ def GradientCalc(original, contour):
     dx = cv2.Sobel(original, cv2.CV_32F, 1, 0, ksize=7)
     dy = cv2.Sobel(original, cv2.CV_32F, 0, 1, ksize=7)
     angles_img = np.arctan2(dy, dx)
-    '''
-    for j in xrange(1, original.shape[1]-1):
-        for i in xrange(1, original.shape[0]-1):    
-            if contour[i, j] != 0:
-                edges.append((i, j))
-                #angles_img[i, j] = gradient(original, (i, j))
-    '''
     return angles_img, dx, dy
 
 def Ray_Tracing(contour, angles_img, debug_rays=False, dx=None, dy=None):#return sw_image
@@ -193,14 +186,9 @@ def Ray_Tracing(contour, angles_img, debug_rays=False, dx=None, dy=None):#return
     for j in xrange(1, contour.shape[1]-1):
         for i in xrange(1, contour.shape[0]-1):    
             if contour[i, j] != 0:
-    #for e in edges:
-        #Проверяем прошли ли мы эту точку
                 res = Stroke(contour, angles_img, (i, j), dx, dy)            
                 if res :#len(res) > 0:
-                    #print 'Start from', (i, j)
-                    #print 'Grad', dx[i, j], dy[i, j]
                     rays.append(res)
-                    #print res
                     if debug_rays:
                         tmp = contour.copy()
                         for p in res:#Показываем луч
@@ -283,8 +271,9 @@ work_stages = {
         'angles_img' : 2,
         'rays' : 3,
         'swimage' : 4,
-        'Components' : 5,
-        'lettercandidats' : 6,
+        'association' : 5,
+        'components' : 6,
+        'lettercandidats' : 7,
     }
 
 DEFAULT_DEBUG_FLAGS = {
@@ -332,9 +321,16 @@ def FindLetters(gray, stage=work_stages['no'], oldser=None, dump_stages=False, n
     else:
         swimage = loadobj('swimage', oldser)
 
-    if stage < work_stages['Components']:
-        print 'Search Components'
+    if stage < work_stages['association']:
+        print 'Association...'
         components = Association(gray, contour, swimage, debug_components=debug_flags['debug_components'])
+        if dump_stages:
+            dumpobj(components, 'association', curser)
+    else:
+        components = loadobj('association', oldser)
+    
+    if stage < work_stages['components']:
+        print 'Component Filtering...'
         components = ComponentFiltering(components, contour, gray, debug_components_after=debug_flags['debug_components_after'])
         if dump_stages:
             dumpobj(components, 'components', curser)
@@ -342,7 +338,7 @@ def FindLetters(gray, stage=work_stages['no'], oldser=None, dump_stages=False, n
         components = loadobj('components', oldser)
 
     if stage < work_stages['lettercandidats']:
-        print 'filtering letter candidats...'
+        print 'Pair Filter...'
         lettercandidats = PairFilter(components)
         if dump_stages:
             dumpobj(lettercandidats, 'lettercandidats', curser)
@@ -355,36 +351,18 @@ def GetLetters(img):
     lettercandidats = FindLetters(img)
     return [CutRect(img, (c['X'], c['Y']), (c['X2'], c['Y2'])) for c in lettercandidats]
 
-
 if __name__ == '__main__':
     print 'loading image....'
     img = cv2.imread('img/cars/4.jpg')
-    #img = cv2.imread('img/cars/3.jpg')
-    #img = cv2.imread('img/pure/2.jpg')
-    #img = cv2.imread('img/numbers/1.jpg')
     gr = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     orig = gr.copy()
     #USAGE FindLetters(gray_scale, <stage>, <ser of dumps>)
     lettercandidats = FindLetters(gr, dump_stages=True, new_ser='ser_')#, work_stages['lettercandidats'], '1352903799.13')
-    '''
-work_stages = {
-        'no' : 0,
-        'contour' : 1,
-        'angles_img' : 2,
-        'rays' : 3,
-        'swimage' : 4,
-        'Components' : 5,
-        'lettercandidats' : 6,
-    }
-    '''
 
     tmp = orig.copy()
     print 'writting letters'
     for i, c in enumerate(lettercandidats):
         #cv2.imwrite('result/' + str(i) + ".tif", CutRect(orig, (c['X'], c['Y']), (c['X2'], c['Y2']), 3))
-        #cv2.imshow('result/' + str(i) + ".jpg", CutRect(orig, (c['X'], c['Y']), (c['X2'], c['Y2'])))
-        #print c['bboxvariance']
-        #cv2.waitKey(10000)
         for p in c['points']:#Показываем компонент
             tmp[p[0], p[1]] = 255                    
         #cv2.imshow('11111', tmp)
