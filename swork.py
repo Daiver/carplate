@@ -17,7 +17,22 @@ CUR_DEBUG_FLAGS = {
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print 'USAGE swork.py <image_name> [stage] [ser] [newser]'
+        help = '''
+            USAGE swork.py <image_name> [stage] [ser] [newser]
+            python swork.py img/cars/2.jpg 
+            python swork.py img/cars/2.jpg association ser2 
+            python swork.py img/cars/2.jpg association ser2 ser3
+            stage : [
+                        'no',
+                        'contour',
+                        'rays',
+                        'swimage',
+                        'association',
+                        'components',
+                        'lettercandidats',
+                    ]
+            see SWT_light for more detail
+        '''
         exit()
 
     if not os.path.exists(sys.argv[1]):
