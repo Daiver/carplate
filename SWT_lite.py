@@ -228,9 +228,10 @@ def VizComponent(contour, components, text):
         for p in res['points']:#Показываем компонент
             tmp[p[0], p[1]] = 0                    
     cv2.imshow(text, tmp)
+    cv2.imwrite(text+'.jpg', tmp)
     cv2.waitKey(1000)
 
-def FindComponents(gray, contour, swimage, debug_components=False, debug_components_after=False):
+def Association(gray, contour, swimage, debug_components=False):
     mask = np.zeros(gray.shape)
     components = []
     for j in xrange(gray.shape[1]):
@@ -240,7 +241,9 @@ def FindComponents(gray, contour, swimage, debug_components=False, debug_compone
                 components.append(res)
 
     if debug_components: VizComponent(contour, components, 'Association')
+    return components
 
+def ComponentFiltering(components, contour, gray, debug_components_after=False):
     final_components = []
     for res in components:
         if (
@@ -331,7 +334,8 @@ def FindLetters(gray, stage=work_stages['no'], oldser=None, dump_stages=False, n
 
     if stage < work_stages['Components']:
         print 'Search Components'
-        components = FindComponents(gray, contour, swimage, debug_components=debug_flags['debug_components'], debug_components_after=debug_flags['debug_components_after'])
+        components = Association(gray, contour, swimage, debug_components=debug_flags['debug_components'])
+        components = ComponentFiltering(components, contour, gray, debug_components_after=debug_flags['debug_components_after'])
         if dump_stages:
             dumpobj(components, 'components', curser)
     else:
