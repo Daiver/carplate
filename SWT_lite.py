@@ -229,12 +229,15 @@ def FindComponents(gray, contour, swimage, debug_components=False, debug_compone
             if (mask[i, j] == 0) and (swimage[i, j] < CC_B):#CC_B = inf - "барьер"
                 res = SearchComponent(swimage, (i, j), mask, contour, gray)
                 components.append(res)
-                if debug_components:
-                    tmp = contour.copy()
-                    for p in res['points']:#Показываем компонент
-                        tmp[p[0], p[1]] = 255                    
-                    cv2.imshow('11111', tmp)
-                    cv2.waitKey(1000)
+
+    if debug_components:
+        tmp = np.zeros(contour.shape)#contour.copy()
+        tmp[:] = 255
+        for res in components:
+            for p in res['points']:#Показываем компонент
+                tmp[p[0], p[1]] = 0                    
+        cv2.imshow('Asociation', tmp)
+        cv2.waitKey(1000)
 
     final_components = []
     for res in components:
@@ -254,12 +257,13 @@ def FindComponents(gray, contour, swimage, debug_components=False, debug_compone
                     #if True:#res['variance'] < 40:
             final_components.append(res)
     if debug_components_after:
-        tmp = contour.copy()
+        tmp = np.zeros(contour.shape)#contour.copy()
+        tmp[:] = 255
         for res in final_components:
             for p in res['points']:#Показываем компонент
-                tmp[p[0], p[1]] = 255                    
+                tmp[p[0], p[1]] = 0#255                    
         cv2.imshow('11111', tmp)
-        cv2.waitKey(1000)
+        cv2.waitKey(10000)
     return final_components
 
 def PairFilter(components):
