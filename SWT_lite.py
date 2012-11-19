@@ -247,6 +247,8 @@ def ComponentFiltering(components, contour, gray, debug_components_after=False):
                     and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 2800)
                 ):
                     #if True:#res['variance'] < 40:
+                    res['centerX'] = res['X'] + res['width']/2.
+                    res['centerY'] = res['Y'] + res['height']/2.
                     final_components.append(res)
     if debug_components_after: VizComponent(contour, final_components, 'Component Filter')
     return final_components
