@@ -82,7 +82,6 @@ def Stroke(image, angles_img, point, dx, dy):
     angle = oldangle
     if (oldangle == None) or (np.isnan(oldangle)): return 
 
-    #Получаем шаг. Тут надо вставить брезенхейма. Ну мне так кажется
     selector = Selector(point[0], point[1], point[0]-dy[point[0], point[1]], point[1] - dx[point[0], point[1]])#(np.pi + angles_img[point[0], point[1]]) % (2*np.pi))
     #step = dirselect(angles_img[point[0], point[1]])#stepmap[point[0]][point[1]]
     #step = (step[1], step[0])
@@ -97,7 +96,6 @@ def Stroke(image, angles_img, point, dx, dy):
         return 
 
     i = 0
-
     #Пока не уткнемся в градиент различающийся с нашим более чем в 30* ползем в направлении step
     #Из-за кривого шага на больших расстояниях дает нехороший результат
     while image[point[0], point[1]] == 0:
@@ -116,10 +114,8 @@ def Stroke(image, angles_img, point, dx, dy):
         return stroke
     else:
         return 
-    #print 'step:', step, 'point', point, 'angle', oldangle
-    #return stroke
 
-#Поиск компонент. Наверно :)
+#Поиск компонент. 
 def SearchComponent(image, center, mask, cntrimg, original):
     component = [center]
     q = Queue()
@@ -131,7 +127,6 @@ def SearchComponent(image, center, mask, cntrimg, original):
         for i in xrange(-1, 2):
             for j in xrange(-1, 2):
                 if i == 0 and j == 0: continue
-                #print 'i', i, 'j', j
                 tmp = makestep(point, (i, j))
                 if checkbound(tmp, image) and (
                     mask[tmp[0], tmp[1]] == 0) and (
@@ -265,7 +260,7 @@ def PairFilter(components):
                 and (1/2.5 < c2['width']/c['width'] < 2.5)
                 and (1/2.5 < c2['height']/c['height'] < 2.5)
                 and (1/2 < c['mean']/c2['mean'] < 2)
-                #and ()
+                #and ((c['width'] + c['height'] + c2['width'] + c2['Width'])*2 >  )
                 ):
                 lettercandidats.append(c)
                 break
