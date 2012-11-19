@@ -355,7 +355,7 @@ def FindLetters(gray, stage=work_stages['no'], oldser=None, dump_stages=False, n
 
 def GetLetters(img):
     lettercandidats = FindLetters(img)
-    return [CutRect(img, (c['X'], c['Y']), (c['X2'], c['Y2'])) for c in lettercandidats]
+    return [CutRect(img, (c['X'], c['Y']), (c['X2'], c['Y2']), 2) for c in lettercandidats]
 
 if __name__ == '__main__':
     print 'loading image....'

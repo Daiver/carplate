@@ -3,14 +3,18 @@ from socket import socket, AF_INET, SOCK_STREAM
 from threading import Thread
 
 import numpy as np
+
 import cv2
 
 import simplejson as json
 
+from time import time
 
 from ImageConverter import *
 
 from ANNClassifier import ANNCFromFile
+
+from PyTesseract import RecFromFile
 
 image_size = (30, 40)
 
@@ -54,7 +58,10 @@ class ClientHandlerRecognizer(Thread):
             if not data: break
             if request['method'] == 'reciev_image':
                 img = self.RecievImage(request['args'])
-                ans = json.dumps({'ans' : int(classifier.recognize(img))})
+                tmp_name = str(time()) + '.tif'
+                cv2.imwrite('lettersstorage/' + tmp_name, img)
+                #ans = json.dumps({'ans' : int(classifier.recognize(img))})
+                ans = json.dumps({'ans' : RecFromFile(tmp_name)})
                 self.clientsock.send(ans)
                 #print int(classifier.recognize(img))
             else:

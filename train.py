@@ -5,8 +5,8 @@ import numpy as np
 
 from time import time
 
-#from PyBrainANN import ANN
-from SimpleANN import ANN
+from PyBrainANN import ANN
+#from SimpleANN import ANN
 
 from letterselect import CutLetters
 
