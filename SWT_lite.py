@@ -42,8 +42,9 @@ def SWViz(image):
     #res[tmp > 30] = (0, 100, 100)
     #res[tmp > 45] = (0, 0, 200)
     #cv2.imwrite('swimageimprove1.jpg', tmp)
+    cv2.imwrite('swimage.jpg', tmp)
     cv2.imshow('swimage', tmp)
-    cv2.waitKey(100000)
+    cv2.waitKey(1000)
 
 def loadobj(name, ser):
     f = open('%s%s-%s.dump' % (DIR_TO_DUMP, str(ser), name), 'r')
