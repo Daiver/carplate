@@ -243,12 +243,15 @@ def ComponentFiltering(components, contour, gray, debug_components_after=False):
             #and ((res['height'] > 9) and (res['width'] > 3)) 
             #and (1/2.5 < res['width'] / res['height'] < 2.5)
             #and ((res['mean'] == 0) or (0 < (res['deviation']/res['mean']) < 1))
-            and (np.std(res['swvalues'])/np.mean(res['swvalues']) < 1)
-            and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 3000)
             and (1/10 < min(float(res['width'])/res['height'], float(res['height'])/res['width']) < 1.001)
             ):
+                res['mean'] = np.mean(res['swvalues'])
+                res['std'] = np.std(res['swvalues'])
+                if ((res['std']/res['mean'] < 1)
+                    and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 2800)
+                ):
                     #if True:#res['variance'] < 40:
-            final_components.append(res)
+                    final_components.append(res)
     if debug_components_after: VizComponent(contour, final_components, 'Component Filter')
     return final_components
 
@@ -260,7 +263,8 @@ def PairFilter(components):
                 (c != c2) #and (c['width'] != 0 and c['height'] != 0
                 and (1/2.5 < c2['width']/c['width'] < 2.5)
                 and (1/2.5 < c2['height']/c['height'] < 2.5)
-                and (1/2 < np.mean(c['swvalues'])/np.mean(c2['swvalues']) < 2)
+                and (1/2 < c['mean']/c2['mean'] < 2)
+                #and ()
                 ):
                 lettercandidats.append(c)
                 break
