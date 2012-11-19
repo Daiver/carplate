@@ -253,6 +253,9 @@ def ComponentFiltering(components, contour, gray, debug_components_after=False):
     if debug_components_after: VizComponent(contour, final_components, 'Component Filter')
     return final_components
 
+def DistanceBetween(c1, c2):
+    return np.sqrt((c1['centerX'] - c2['centerX'])**2 + (c1['centerY'] - c2['centerY'])**2)
+
 def PairFilter(components):
     lettercandidats = []
     for c in components:
@@ -262,7 +265,7 @@ def PairFilter(components):
                 and (1/2.5 < c2['width']/c['width'] < 2.5)
                 and (1/2.5 < c2['height']/c['height'] < 2.5)
                 and (1/2 < c['mean']/c2['mean'] < 2)
-                #and ((c['width'] + c['height'] + c2['width'] + c2['Width'])*2 >  )
+                #and (DistanceBetween(c, c2) < 3 * (c['width'] + c['height'] + c2['width'] + c2['height']))
                 ):
                 lettercandidats.append(c)
                 break
