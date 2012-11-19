@@ -195,7 +195,7 @@ def Ray_Tracing(contour, angles_img, debug_rays=False, dx=None, dy=None):#return
                             tmp[p[0], p[1]] = 255
                         cv2.imshow('77', tmp)
                         #Для удобства просмотра
-                        cv2.waitKey(100000)
+                        cv2.waitKey(1000)
     return rays
 
 def SWT_Operator(original, rays, debug_swimage):
