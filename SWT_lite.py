@@ -262,10 +262,10 @@ def PairFilter(components):
         for c2 in components:#
             if (
                 (c != c2) #and (c['width'] != 0 and c['height'] != 0
-                and (1/2.5 < c2['width']/c['width'] < 2.5)
-                and (1/2.5 < c2['height']/c['height'] < 2.5)
+                and (1/3 < c2['width']/c['width'] < 3)
+                and (1/3 < c2['height']/c['height'] < 3)
                 and (1/2 < c['mean']/c2['mean'] < 2)
-                #and (DistanceBetween(c, c2) < 3 * (c['width'] + c['height'] + c2['width'] + c2['height']))
+                and (DistanceBetween(c, c2) < 5 * (c['width'] + c['height'] + c2['width'] + c2['height']))
                 ):
                 lettercandidats.append(c)
                 break
