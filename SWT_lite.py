@@ -288,6 +288,7 @@ DEFAULT_DEBUG_FLAGS = {
         'debug_swimage' : False,
         'debug_components' : False,
         'debug_components_after' : False,
+        'debug_pairs' : False,
     }
 
 def FindLetters(gray, stage=work_stages['no'], oldser=None, dump_stages=False, new_ser='', debug_flags=None):
@@ -348,6 +349,8 @@ def FindLetters(gray, stage=work_stages['no'], oldser=None, dump_stages=False, n
     if stage < work_stages['lettercandidats']:
         print 'Pair Filter...'
         lettercandidats = PairFilter(components)
+        if debug_flags['debug_pairs']:
+            VizComponent(contour, lettercandidats, 'pairs', curser)
         if dump_stages:
             dumpobj(lettercandidats, 'lettercandidats', curser)
     else:

@@ -13,6 +13,7 @@ CUR_DEBUG_FLAGS = {
         'debug_swimage' : True,
         'debug_components' : True,
         'debug_components_after' : True,
+        'debug_pairs' : True,
     }
 
 if __name__ == '__main__':
