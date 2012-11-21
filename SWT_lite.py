@@ -10,7 +10,6 @@ from SWT_Support import *
 from Bresenham import Selector
 
 from time import time
-
 import cProfile
 
 import pickle
@@ -29,7 +28,7 @@ CC_B = float('inf')
 
 DIR_TO_DUMP = 'dumps/'
 
-def SWViz(image):
+def SWViz(image, ser):
     tmp = np.zeros(image.shape, dtype=np.uint8)
     tmp[:] = image[:]
     Barrier = 50
@@ -42,7 +41,7 @@ def SWViz(image):
     #res[tmp > 30] = (0, 100, 100)
     #res[tmp > 45] = (0, 0, 200)
     #cv2.imwrite('swimageimprove1.jpg', tmp)
-    cv2.imwrite('swimage.jpg', tmp)
+    cv2.imwrite(DIR_TO_DUMP + ser + '-swimage.jpg', tmp)
     cv2.imshow('swimage', tmp)
     cv2.waitKey(1000)
 
@@ -194,7 +193,7 @@ def Ray_Tracing(contour, angles_img, debug_rays=False, dx=None, dy=None):#return
                         cv2.waitKey(1000)
     return rays
 
-def SWT_Operator(original, rays, debug_swimage):
+def SWT_Operator(original, rays, debug_swimage, ser=''):
     swimage = np.zeros(original.shape)
     swimage[:] = float('inf')
     for ray in rays:
@@ -202,20 +201,22 @@ def SWT_Operator(original, rays, debug_swimage):
             if swimage[p[0], p[1]] > len(ray):
                 swimage[p[0], p[1]] = len(ray)
     if debug_swimage:
-        SWViz(swimage)
+        SWViz(swimage, ser)
     return swimage
 
-def VizComponent(contour, components, text):
-    tmp = np.zeros(contour.shape)#contour.copy()
-    tmp[:] = 255
+def VizComponent(contour, components, text, ser):
+    tmp = np.zeros((contour.shape[0], contour.shape[1], 3))#contour.copy()
+    tmp[:] = 255#(255, 255, 255)
     for res in components:
         for p in res['points']:#Показываем компонент
-            tmp[p[0], p[1]] = 0                    
+            tmp[p[0], p[1]] = (0, 0, 0)
+        cv2.rectangle(tmp, (res['Y'], res['X']), (res['Y2'], res['X2']), (255, 0, 0))
+    cv2.imwrite(DIR_TO_DUMP + ser + '-' + text + '.jpg', tmp)
     cv2.imshow(text, tmp)
-    cv2.imwrite(text+'.jpg', tmp)
-    cv2.waitKey(1000)
+    #cv2.imwrite(text+'.jpg', tmp)
+    cv2.waitKey(100)
 
-def Association(gray, contour, swimage, debug_components=False):
+def Association(gray, contour, swimage, debug_components=False, ser=''):
     mask = np.zeros(gray.shape)
     components = []
     for j in xrange(gray.shape[1]):
@@ -224,10 +225,10 @@ def Association(gray, contour, swimage, debug_components=False):
                 res = SearchComponent(swimage, (i, j), mask, contour, gray)
                 components.append(res)
 
-    if debug_components: VizComponent(contour, components, 'Association')
+    if debug_components: VizComponent(contour, components, 'Association', ser)
     return components
 
-def ComponentFiltering(components, contour, gray, debug_components_after=False):
+def ComponentFiltering(components, contour, gray, debug_components_after=False, ser=''):
     final_components = []
     for res in components:
         if (
@@ -250,7 +251,7 @@ def ComponentFiltering(components, contour, gray, debug_components_after=False):
                     res['centerX'] = res['X'] + res['width']/2.
                     res['centerY'] = res['Y'] + res['height']/2.
                     final_components.append(res)
-    if debug_components_after: VizComponent(contour, final_components, 'Component Filter')
+    if debug_components_after: VizComponent(contour, final_components, 'Component Filter', ser)
     return final_components
 
 def DistanceBetween(c1, c2):
@@ -293,6 +294,7 @@ def FindLetters(gray, stage=work_stages['no'], oldser=None, dump_stages=False, n
     #init section. Just for simplify debug. delete this after debooooging
     if not debug_flags: debug_flags = DEFAULT_DEBUG_FLAGS
     curser = new_ser#current ser of dump files
+    if not curser: curser = 'none'
     contour = None;  angles_img = None; rays = None; swimage = None; components = None; lettercandidats = None;
     dx = None; dy = None
     if stage < work_stages['contour']:
@@ -321,7 +323,7 @@ def FindLetters(gray, stage=work_stages['no'], oldser=None, dump_stages=False, n
 
     if stage < work_stages['swimage']:
         print 'Calc Stroke Width...'
-        swimage = SWT_Operator(gray, rays, debug_swimage=debug_flags['debug_swimage'])
+        swimage = SWT_Operator(gray, rays, debug_swimage=debug_flags['debug_swimage'], ser=curser)
         if dump_stages:
             dumpobj(swimage, 'swimage', curser)
     else:
@@ -329,7 +331,7 @@ def FindLetters(gray, stage=work_stages['no'], oldser=None, dump_stages=False, n
 
     if stage < work_stages['association']:
         print 'Association...'
-        components = Association(gray, contour, swimage, debug_components=debug_flags['debug_components'])
+        components = Association(gray, contour, swimage, debug_components=debug_flags['debug_components'], ser=curser)
         if dump_stages:
             dumpobj(components, 'association', curser)
     else:
@@ -337,7 +339,7 @@ def FindLetters(gray, stage=work_stages['no'], oldser=None, dump_stages=False, n
     
     if stage < work_stages['components']:
         print 'Component Filtering...'
-        components = ComponentFiltering(components, contour, gray, debug_components_after=debug_flags['debug_components_after'])
+        components = ComponentFiltering(components, contour, gray, debug_components_after=debug_flags['debug_components_after'], ser=curser)
         if dump_stages:
             dumpobj(components, 'components', curser)
     else:
