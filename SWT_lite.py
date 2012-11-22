@@ -110,15 +110,15 @@ def Stroke(image, angles_img, point, dx, dy):
     #if not step:return 
         
     diff = anglediff(oldangle, angle) 
-    new_point = selector.GetPoint()
-    new_point = selector.GetPoint()
     stroke.append(point)
+    new_point = selector.GetPoint()
+    stroke.append(new_point)
+    new_point = selector.GetPoint()
     if point == new_point: return
     point = new_point
     #point = makestep(point, step)
     if not checkbound_sq(point, image):# or mask[point[0], point[1]] == 255:
         return 
-
     i = 0
     #Пока не уткнемся в градиент различающийся с нашим более чем в 30* ползем в направлении step
     #Из-за кривого шага на больших расстояниях дает нехороший результат
