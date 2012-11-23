@@ -288,10 +288,15 @@ def DistanceBetween(c1, c2):
 
 def PairFilter(components):
     lettercandidats = []
-    for c in components:
-        for c2 in components:#
+    #for c in components:
+    #    for c2 in components:#
+    for i in xrange(len(components)):
+        for j in xrange(len(components)):#
+            c = components[i]
+            c2 = components[j]
             if (
-                (c != c2) #and (c['width'] != 0 and c['height'] != 0
+                (i != j)
+                #(c != c2) #and (c['width'] != 0 and c['height'] != 0
                 and (1/3 < c2['width']/c['width'] < 3)
                 and (1/3 < c2['height']/c['height'] < 3)
                 and (1/2 < c['mean']/c2['mean'] < 2)
