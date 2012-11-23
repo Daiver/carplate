@@ -62,7 +62,7 @@ if __name__ == '__main__':
     for l in letters:
         for p in l['points']:
             image[p[0], p[1]] = (205, 100, 0)
-        cv2.rectangle(image, (l['Y'], l['X']), (l['Y2'], l['X2']), (0, 200, 0))
+        cv2.rectangle(image, (l['Y'], l['X']), (l['Y2'], l['X2']), (0, 20, 200))
     #writing final result
     cv2.imwrite('result/' + sys.argv[1].replace('/', '-'), image)
     cv2.imshow('after all ...', image)

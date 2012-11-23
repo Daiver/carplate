@@ -165,7 +165,7 @@ def SearchComponent(image, center, mask, cntrimg, original):
                         image[tmp[0], tmp[1]] < CC_B) and (
                    cntrimg[tmp[0], tmp[1]] == 0) and(
                    #abs(image[point[0], point[1]] - image[tmp[0], tmp[1]]) < CC_D) :
-                   1/4. < image[point[0], point[1]] / image[tmp[0], tmp[1]] < 4.):
+                   1/3. < image[point[0], point[1]] / image[tmp[0], tmp[1]] < 3.):
 
                     q.put(tmp)
                     component.append(tmp)
@@ -266,7 +266,7 @@ def ComponentFiltering(components, contour, gray, debug_components_after=False, 
     for res in components:
         if (
             len(res['points']) > 7
-            and (res['height'] > 7 and res['width'] > 3)
+            and (res['height'] > 5 and res['width'] > 3)
             #and (res['bboxvariance'] > 2.5)
             #and ((res['width'] * res['height']) * 0.15 < (len(res['points'])))
             and (0.1 < (float(len(res['points']))/(res['width']*res['height'])) < 1)

@@ -1,13 +1,14 @@
-python swork.py img/pure/1.jpg p1 
-python swork.py img/pure/2.jpg p2 
-python swork.py img/pure/3.jpg p3 
-python swork.py img/numbers/1.jpg n1 
-python swork.py img/numbers/2.jpg n2 
-python swork.py img/numbers/3.jpg n3 
-python swork.py img/cars/vin.jpg v1
-python swork.py img/cars/1.jpg c1 
-python swork.py img/cars/2.jpg c2
-python swork.py img/cars/3.jpg c3
-python swork.py img/cars/4.jpg c4
-python swork.py img/cars/5.jpg c5
-python swork.py img/cars/6.jpg c6
+python swork.py img/pure/1.jpg p1 & 
+python swork.py img/pure/2.jpg p2 &
+python swork.py img/pure/3.jpg p3 &
+python swork.py img/numbers/1.jpg n1 &
+python swork.py img/numbers/2.jpg n2 &
+python swork.py img/numbers/3.jpg n3 &
+python swork.py img/cars/vin.jpg v1 &
+python swork.py img/cars/1.jpg c1 &
+python swork.py img/cars/2.jpg c2 &
+python swork.py img/cars/3.jpg c3 &
+python swork.py img/cars/4.jpg c4 &
+python swork.py img/cars/5.jpg c5 &
+python swork.py img/cars/6.jpg c6 &
+python swork.py img/cars/7.jpg c7 &
