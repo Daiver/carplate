@@ -97,14 +97,18 @@ def CheckAngleNear(angles_img, point, border_angle, oldangle):
 
 MAX_RAY_LEN = 100
 #Должен давать нам 1 луч 
-def Stroke(image, angles_img, point, dx, dy):
+def Stroke(image, angles_img, point, dx, dy, search_direction=-1):
     stroke = []
     if not checkbound_sq(point, image): return 
     oldangle = angles_img[point[0], point[1]]#Получаем угол
     angle = oldangle
     if (oldangle == None) or (np.isnan(oldangle)): return 
 
-    selector = Selector(point[0], point[1], point[0]-dy[point[0], point[1]], point[1] - dx[point[0], point[1]])#(np.pi + angles_img[point[0], point[1]]) % (2*np.pi))
+    selector = Selector(
+        point[0], point[1], 
+        point[0] + search_direction*dy[point[0], 
+        point[1]], point[1] + search_direction*dx[point[0], point[1]]
+    )#(np.pi + angles_img[point[0], point[1]]) % (2*np.pi))
     #step = dirselect(angles_img[point[0], point[1]])#stepmap[point[0]][point[1]]
     #step = (step[1], step[0])
     #if not step:return 
