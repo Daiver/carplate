@@ -19,10 +19,10 @@ CUR_DEBUG_FLAGS = {
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         help = '''
-            USAGE swork.py <image_name> [stage] [ser] [newser]
+            USAGE swork.py <image_name> [newser] [stage] [ser]
             python swork.py img/cars/2.jpg 
-            python swork.py img/cars/2.jpg association ser2 
-            python swork.py img/cars/2.jpg association ser2 ser3
+            python swork.py img/cars/2.jpg ser3
+            python swork.py img/cars/2.jpg ser3 association ser2 
             stage : [
                         'no',
                         'contour',
