@@ -42,11 +42,12 @@ if __name__ == '__main__':
     
     image = cv2.imread(sys.argv[1])
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    wstage = sys.argv[2] if len(sys.argv) > 3 else 'no'
-    ser_to_load = sys.argv[3] if len(sys.argv) > 3 else None
 
-    dump_stages = len(sys.argv) > 4 
-    new_ser = sys.argv[4] if dump_stages else None
+    dump_stages = len(sys.argv) > 2 
+    new_ser = sys.argv[2] if dump_stages else None
+
+    wstage = sys.argv[3] if len(sys.argv) > 4 else 'no'
+    ser_to_load = sys.argv[4] if len(sys.argv) > 4 else None
 
     letters = FindLetters(gray, 
             stage=work_stages[wstage], 
