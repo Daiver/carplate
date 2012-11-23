@@ -214,7 +214,7 @@ def Ray_Tracing(contour, angles_img, debug_rays=False, dx=None, dy=None):#return
     for j in xrange(1, contour.shape[1]-1):
         for i in xrange(1, contour.shape[0]-1):    
             if contour[i, j] != 0:
-                res = Stroke(contour, angles_img, (i, j), dx, dy)            
+                res = Stroke(contour, angles_img, (i, j), dx, dy, -1) 
                 if res :#len(res) > 0:
                     rays.append(res)
                     if debug_rays:
