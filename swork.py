@@ -66,4 +66,4 @@ if __name__ == '__main__':
     #writing final result
     cv2.imwrite('result/' + sys.argv[1].replace('/', '-'), image)
     cv2.imshow('after all ...', image)
-    cv2.waitKey(100)
+    cv2.waitKey(10000)
