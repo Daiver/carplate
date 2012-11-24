@@ -105,8 +105,8 @@ def Stroke(image, angles_img, point, dx, dy, search_direction=-1):
     if (oldangle == None) or (np.isnan(oldangle)): return 
 
     selector = Selector(
-        point[0], point[1], 
-        point[0] + search_direction*dy[point[0], 
+        point[0], point[1],
+        point[0] + search_direction*dy[point[0],
         point[1]], point[1] + search_direction*dx[point[0], point[1]]
     )#(np.pi + angles_img[point[0], point[1]]) % (2*np.pi))
     #step = dirselect(angles_img[point[0], point[1]])#stepmap[point[0]][point[1]]
@@ -163,7 +163,7 @@ def SearchComponent(image, center, mask, cntrimg, original):
                 if checkbound(tmp, image) and (
                     mask[tmp[0], tmp[1]] == 0) and (
                         image[tmp[0], tmp[1]] < CC_B) and (
-                   cntrimg[tmp[0], tmp[1]] == 0) and(
+                   #cntrimg[tmp[0], tmp[1]] == 0) and(
                    #abs(image[point[0], point[1]] - image[tmp[0], tmp[1]]) < CC_D) :
                    1/3. < image[point[0], point[1]] / image[tmp[0], tmp[1]] < 3.):
 
