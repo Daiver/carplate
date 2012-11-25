@@ -73,7 +73,9 @@ def CutRect(image, p1, p2, border=0):
     return image[p1[0]-border:p2[0]+border, p1[1]-border:p2[1]+border]
 
 def ContourNear(contour, point):
-    for i in [-1, 0, 1]:
+    tmp = contour[point[0]-1:point[0]+1, point[1]-1:point[1]+1]
+    return sum(sum(tmp)) > 0
+    '''for i in [-1, 0, 1]:
         new_p = (point[0] + i, point[1])
         if checkbound(new_p, contour) and contour[new_p[0], new_p[1]] != 0:
             return True
@@ -81,7 +83,7 @@ def ContourNear(contour, point):
         new_p = (point[0], point[1] + i)
         if checkbound(new_p, contour) and contour[new_p[0], new_p[1]] != 0:
             return True
-    return False
+    return False'''
 
 def CheckAngleNear(angles_img, point, border_angle, oldangle):
     for i in [-1, 0, 1]:
