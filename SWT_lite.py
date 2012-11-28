@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+#import cython
+
 import cv2
 
 import numpy as np
