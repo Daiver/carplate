@@ -132,7 +132,7 @@ def Stroke(image, angles_img, point, dx, dy, search_direction=-1):
     i = 0
     #Пока не уткнемся в градиент различающийся с нашим более чем в 30* ползем в направлении step
     #Из-за кривого шага на больших расстояниях дает нехороший результат
-    while not ContourNear(image, point):# image[point[0], point[1]] == 0:
+    while image[point[0], point[1]] == 0:#not ContourNear(image, point):# image[point[0], point[1]] == 0:
         #if (image[point[0], point[1]] != 0):
         stroke.append(point)        
         #point = makesstep(point, step)
@@ -217,10 +217,26 @@ def GradientCalc(original, contour):
 
 def Ray_Tracing(contour, angles_img, debug_rays=False, dx=None, dy=None):#return sw_image
     rays = []
+    c = np.array([
+                    [1, 10, 1],
+                    [10, 10, 10],
+                    [1, 10, 1],
+                ])
+    st = time()
+    n_contour = np.zeros(contour.shape)#contour * c#cv2.filter2D(contour, -1, c)
+    for j in xrange(1, contour.shape[1] -1):
+        for i in xrange(1, contour.shape[0] - 1):
+            a = SquareSelect(contour, (i, j))
+            n_contour[i, j] = convolution(a, c)
+    #print sum(sum(n_contour))
+    #cv2.imshow('hgjsdbvjsh', n_contour)
+    #cv2.imshow('hgjsdbvj', contour)
+    #cv2.waitKey()
+    print 't:', time() - st
     for j in xrange(1, contour.shape[1]-1):
         for i in xrange(1, contour.shape[0]-1):    
             if contour[i, j] != 0:
-                res = Stroke(contour, angles_img, (i, j), dx, dy, -1) 
+                res = Stroke(n_contour, angles_img, (i, j), dx, dy, -1) 
                 if res :#len(res) > 0:
                     rays.append(res)
                     if debug_rays:
@@ -283,8 +299,8 @@ def ComponentFiltering(components, contour, gray, debug_components_after=False, 
             ):
                 res['mean'] = np.mean(res['swvalues'])
                 res['std'] = np.std(res['swvalues'])
-                if ((res['std']/res['mean'] < 1)
-                    and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 2800)
+                if ((res['std']/res['mean'] <= 1)
+                    and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 2500)
                 ):
                     #if True:#res['variance'] < 40:
                     res['centerX'] = res['X'] + res['width']/2.
