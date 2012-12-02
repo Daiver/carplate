@@ -3,10 +3,11 @@ import numpy as np
 
 class DjForest(object):
 
-    def __init__(self, point, label):
+    def __init__(self,  label):
         self.parent = self
-        self.point = point
+        #self.point = point
         self.label = label
+        self.points = []
 
     def Union(self, y):
         xRoot = self.Find()
@@ -21,23 +22,22 @@ class DjForest(object):
 def TwoPass(data):
     Background = 0
     linked = []
-    labels = np.zeros(data.shape, dtype=np.uint8)
+    labels = np.zeros(data.shape, dtype=np.int32)
     labels[:] = -1
     NextLabel = 0
+    lowborder = 1/3
     for i in xrange(data.shape[0]):
         for j in xrange(data.shape[1]):
             if data[i, j] == Background: continue
             neighbors = []
-            if j > 0 and (data[i, j-1] == data[i, j]):
+            if j > 0 and (lowborder <= (data[i, j-1] / data[i, j]) >= 3):
                 neighbors.append((i, j-1))
-            if i > 0 and (data[i-1, j] == data[i, j]):
-                neighbors.append((i-1, j))
-            if j > 0 and i > 0 and (data[i-1, j-1] == data[i, j]):
-                neighbors.append((i-1, j-1))
-            #print neighbors, i, j
-            #raw_input()
+            if i > 0 and  (lowborder <= (data[i-1, j] / data[i, j]) >= 3):
+               neighbors.append((i-1, j))
+            #if j > 0 and i > 0 and (data[i-1, j-1] == data[i, j]):
+            #    neighbors.append((i-1, j-1))
             if not neighbors:
-                linked.append(DjForest((i, j), NextLabel))
+                linked.append(DjForest(NextLabel))
                 labels[i, j] = NextLabel
                 NextLabel += 1
             else:
@@ -45,19 +45,27 @@ def TwoPass(data):
                 ml = min(L)
                 labels[i, j] = ml#min(L)
                 for lbl in L:
-                    #linked[lbl] = linked[lbl].Union(linked[ml])
-                    print lbl, ml
                     linked[lbl].Union(linked[ml])
-                #raw_input()
 
+    res = []
     for i in xrange(data.shape[0]):
         for j in xrange(data.shape[1]):
             if data[i, j] == Background: continue
-            labels[i, j] = linked[labels[i, j]].Find().label
+            linked[labels[i, j]] = linked[labels[i, j]].Find()
+            labels[i, j] = linked[labels[i, j]].label
+            linked[labels[i, j]].points.append((i, j))
     print labels
+    for x in linked:
+        if x.parent == x:res.append(x)
+    return res
+
 
 if __name__ == '__main__':
-    data = np.array(
+    from random import random
+    from time import time
+    for j in xrange(12):
+
+        data = np.array(
                         [
                             [0, 0, 0, 1, 0, 0, 1, 1],
                             [0, 0, 0, 1, 1, 0, 0, 0],
@@ -67,9 +75,12 @@ if __name__ == '__main__':
                             [1, 0, 0, 0, 1, 0, 1, 0],
                             [1, 0, 0, 1, 1, 0, 1, 1],
                         ]
-                    )
-    print data
-    TwoPass(data)
+                        )
+        data = np.array([int(random() * 15) for i in xrange(1200000)]).reshape(1000, 1200)
+        #print data
+        st = time()
+        TwoPass(data)
+        print 't', time() - st
 '''
 algorithm TwoPass(data)
    linked = []

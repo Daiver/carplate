@@ -407,7 +407,9 @@ def FindLetters(gray, stage=work_stages['no'], oldser=None, dump_stages=False, n
 
     if stage < work_stages['association']:
         print 'Association...'
+        st = time()
         components = Association(gray, contour, swimage, debug_components=debug_flags['debug_components'], ser=curser)
+        print 'ass time', time() - st
         if dump_stages:
             dumpobj(components, 'association', curser)
     else:
