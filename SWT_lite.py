@@ -215,21 +215,26 @@ def GradientCalc(original, contour):
     angles_img = np.arctan2(dy, dx)
     return angles_img, dx, dy
 
-def Ray_Tracing(contour, angles_img, debug_rays=False, dx=None, dy=None):#return sw_image
-    rays = []
+def GetBold(contour):
     kernel = np.array([
                     [0, 1, 0],
                     [1, 1, 1],
                     [0, 1, 0],
                 ])
-    st = time()
-    n_contour = cv2.filter2D(contour, 0, kernel)
+    #n_contour = cv2.filter2D(contour, -1, kernel)
+    
     n_contour = np.zeros(contour.shape)#contour * c#cv2.filter2D(contour, -1, c)
     for j in xrange(1, contour.shape[1] -1):
         for i in xrange(1, contour.shape[0] - 1):
             a = SquareSelect(contour, (i, j))
             n_contour[i, j] = convolution(a, kernel)
-    print sum(sum(n_contour))
+    return n_contour
+
+def Ray_Tracing(contour, angles_img, debug_rays=False, dx=None, dy=None):#return sw_image
+    rays = []
+    st = time()
+    n_contour = GetBold(contour)
+    #print sum(sum(n_contour))
     cv2.imshow('hgjsdbvjsh', n_contour)
     #cv2.imshow('hgjsdbvj', contour)
     cv2.waitKey()
