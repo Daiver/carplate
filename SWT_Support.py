@@ -1,53 +1,5 @@
 # -*- coding: utf-8 -*-
-
-
 import numpy as np
-
-#Класс, в котором я собирался реализовать некое потобие алгоритма брезенхейма (для прохода по лучу)
-#пока как бы в разработке
-'''
-class DSelecter:
-    def __init__(self, point, angle):
-        X = point[0]
-        Y = point[1]
-        dx = 10 * np.cos(angle)
-        dy = 10 * np.cos(angle)
-        incx = np.sign(dx)
-        incy = np.sign(dy);
-        dx = abs(dx)
-        dy = abs(dy) 
-        if (dx > dy):
-            pdx = incx
-            pdy = 0
-            es = dy
-            self.el = dx
-        else:
-            pdx = 0
-            pdy = incy
-            es = dx
-            self.el = dy
-        self.x = X
-        self.y = Y
-        self.err = self.el/2
-        self.t = 0
-        self.incx = incx
-        self.incy = incy
-        self.pdx = pdx
-        self.pdy = pdy
-        self.es = es
-        
-    def GetNext(self):        
-        self.err -= self.es;
-        if (self.err < 0) :       
-            self.err += self.el;
-            self.x += self.incx
-            self.y += self.incy
-        else:
-            self.x += self.pdx
-            self.y += self.pdy
-        self.t += 1
-        return (self.x, self.y)
-'''
 
 #Матрицы для поиска градиента по свертке (с вики)
 Gy = np.array([
@@ -103,8 +55,20 @@ def dirselect(angle):
 
 #Дает разницу между 2 углами. Наверно
 def anglediff(f, s):
-    if (s == None)or (np.isnan(s)):return 0.
+    #if (s == None) or (np.isnan(s)): return 0.
+    r1 = 0. 
+    r2 = 0.
+    if (f > s):  
+        r1 = f-s
+        r2 = f - s + 2*np.pi  
+    else:  
+        r1 = s-f
+        r2 = f - s + 2*np.pi 
+    return r2 if(r1 > r2) else r1
+    '''
     tmpangle = min([abs(f - s),
         abs(np.pi*2 + f - s),
         abs(np.pi*2 - f + s)])
     return tmpangle
+    '''
+    

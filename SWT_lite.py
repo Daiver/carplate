@@ -241,8 +241,8 @@ def GetBoldOCV(contour):
 def Ray_Tracing(contour, angles_img, debug_rays=False, dx=None, dy=None):#return sw_image
     rays = []
     st = time()
-    #n_contour = GetBold(contour)
-    n_contour = GetBoldOCV(contour)
+    n_contour = GetBold(contour)
+    #n_contour = GetBoldOCV(contour)
     #print sum(sum(n_contour))
     cv2.imwrite('BoldFromOCV.jpg', n_contour)
     #cv2.imshow('hgjsdbvj', contour)
