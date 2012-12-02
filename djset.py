@@ -15,7 +15,7 @@ class DjForest(object):
 
     def Find(self):
         if self.parent != self:
-            self.parent = self.parent.Find
+            self.parent = self.parent.Find()
         return self.parent
 
 def TwoPass(data):
@@ -42,14 +42,19 @@ def TwoPass(data):
                 NextLabel += 1
             else:
                 L = [labels[p[0], p[1]] for p in neighbors]
-                labels[i, j] = min(L)
+                ml = min(L)
+                labels[i, j] = ml#min(L)
                 for lbl in L:
-                    pass
-                    #linked[lbl] = linked[lbl].Union(
+                    #linked[lbl] = linked[lbl].Union(linked[ml])
+                    print lbl, ml
+                    linked[lbl].Union(linked[ml])
+                #raw_input()
+
     for i in xrange(data.shape[0]):
         for j in xrange(data.shape[1]):
             if data[i, j] == Background: continue
-            labels[i, j] = linked[labels[i, j]].Find()
+            labels[i, j] = linked[labels[i, j]].Find().label
+    print labels
 
 if __name__ == '__main__':
     data = np.array(
