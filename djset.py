@@ -20,7 +20,7 @@ class DjForest(object):
         return self.parent
 
 def TwoPass(data):
-    Background = 0
+    Background = float('inf') 
     linked = []
     labels = np.zeros(data.shape, dtype=np.int32)
     labels[:] = -1
@@ -28,11 +28,13 @@ def TwoPass(data):
     lowborder = 1/3
     for i in xrange(data.shape[0]):
         for j in xrange(data.shape[1]):
-            if data[i, j] == Background: continue
+            #if data[i, j] == Background: continue
+            if (data[i, j] == np.inf) or np.isnan( data[i, j] ) or (data[i, j] == 0): continue
+                
             neighbors = []
-            if j > 0 and (lowborder <= (data[i, j-1] / data[i, j]) >= 3):
+            if j > 0 and (not np.isnan(data[i, j-1])) and (lowborder < (data[i, j-1] / float(data[i, j])) < 3.):
                 neighbors.append((i, j-1))
-            if i > 0 and  (lowborder <= (data[i-1, j] / data[i, j]) >= 3):
+            if i > 0 and (not np.isnan(data[i-1, j])) and (lowborder < (data[i-1, j] / float(data[i, j])) < 3.):
                neighbors.append((i-1, j))
             #if j > 0 and i > 0 and (data[i-1, j-1] == data[i, j]):
             #    neighbors.append((i-1, j-1))
@@ -47,23 +49,29 @@ def TwoPass(data):
                 for lbl in L:
                     linked[lbl].Union(linked[ml])
 
-    res = []
     for i in xrange(data.shape[0]):
         for j in xrange(data.shape[1]):
-            if data[i, j] == Background: continue
+            #if data[i, j] == Background: continue
+            if  (data[i, j] == np.inf) or np.isnan( data[i, j] ): continue
             linked[labels[i, j]] = linked[labels[i, j]].Find()
             labels[i, j] = linked[labels[i, j]].label
             linked[labels[i, j]].points.append((i, j))
-    print labels
-    for x in linked:
-        if x.parent == x:res.append(x)
+    #print labels
+    res = []
+    #for x in linked:
+    #    if x.parent == x:res.append(x)
+    tmp = {}
+    for i in xrange(data.shape[0]):
+        for j in xrange(data.shape[1]):
+            if labels[i, j] > -1:tmp[labels[i, j]] = 1
+    for x in tmp: res.append(linked[x])
     return res
 
 
 if __name__ == '__main__':
     from random import random
     from time import time
-    for j in xrange(12):
+    for j in xrange(1):
 
         data = np.array(
                         [
@@ -74,12 +82,16 @@ if __name__ == '__main__':
                             [0, 0, 0, 0, 0, 0, 0, 0],
                             [1, 0, 0, 0, 1, 0, 1, 0],
                             [1, 0, 0, 1, 1, 0, 1, 1],
-                        ]
+                        ], dtype=np.float
                         )
-        data = np.array([int(random() * 15) for i in xrange(1200000)]).reshape(1000, 1200)
-        #print data
+        data *= 100
+        data [data == 0] = np.inf 
+        #data = np.array([int(random() * 15) for i in xrange(1200000)]).reshape(1000, 1200)
+        print data
         st = time()
-        TwoPass(data)
+        res = TwoPass(data)
+        for x in res:
+            print x.points
         print 't', time() - st
 '''
 algorithm TwoPass(data)

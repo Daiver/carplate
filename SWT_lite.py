@@ -16,6 +16,8 @@ import cProfile
 
 import pickle
 
+from djset import *
+
 makestep = lambda point, step: (point[0] + step[0], point[1] + step[1])
 checkbound = lambda point, image: (
             (point[0] < image.shape[0]) and (point[1] < image.shape[1]) and
@@ -280,11 +282,19 @@ def VizComponent(contour, components, text, ser):
     for res in components:
         for p in res['points']:#Показываем компонент
             tmp[p[0], p[1]] = (0, 0, 0)
-        cv2.rectangle(tmp, (res['Y'], res['X']), (res['Y2'], res['X2']), (255, 0, 0))
+        #cv2.rectangle(tmp, (res['Y'], res['X']), (res['Y2'], res['X2']), (255, 0, 0))
     cv2.imwrite(DIR_TO_DUMP + ser + '-' + text + '.jpg', tmp)
     cv2.imshow(text, tmp)
     #cv2.imwrite(text+'.jpg', tmp)
     cv2.waitKey(100)
+
+def FastAssociation(gray, contour, swimage, debug_components=False, ser=''):
+    st = time()
+    tmp = TwoPass(swimage)
+    print 'ass t', time() - st
+    components = [{"points": x.points} for x in tmp]
+    if debug_components: VizComponent(contour, components, 'Association', ser)
+    return components
 
 def Association(gray, contour, swimage, debug_components=False, ser=''):
     mask = np.zeros(gray.shape)
@@ -407,9 +417,8 @@ def FindLetters(gray, stage=work_stages['no'], oldser=None, dump_stages=False, n
 
     if stage < work_stages['association']:
         print 'Association...'
-        st = time()
-        components = Association(gray, contour, swimage, debug_components=debug_flags['debug_components'], ser=curser)
-        print 'ass time', time() - st
+        #components = Association(gray, contour, swimage, debug_components=debug_flags['debug_components'], ser=curser)
+        components = FastAssociation(gray, contour, swimage, debug_components=debug_flags['debug_components'], ser=curser)
         if dump_stages:
             dumpobj(components, 'association', curser)
     else:
