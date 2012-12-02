@@ -282,7 +282,7 @@ def VizComponent(contour, components, text, ser):
     for res in components:
         for p in res['points']:#Показываем компонент
             tmp[p[0], p[1]] = (0, 0, 0)
-        #cv2.rectangle(tmp, (res['Y'], res['X']), (res['Y2'], res['X2']), (255, 0, 0))
+        cv2.rectangle(tmp, (res['Y'], res['X']), (res['Y2'], res['X2']), (255, 0, 0))
     cv2.imwrite(DIR_TO_DUMP + ser + '-' + text + '.jpg', tmp)
     cv2.imshow(text, tmp)
     #cv2.imwrite(text+'.jpg', tmp)
@@ -293,6 +293,27 @@ def FastAssociation(gray, contour, swimage, debug_components=False, ser=''):
     tmp = TwoPass(swimage)
     print 'ass t', time() - st
     components = [{"points": x.points} for x in tmp]
+    for component in components:
+        swvalues = np.array([swimage[p[0], p[1]] for p in component['points']])
+        #mean = np.mean(swvalues)
+        #deviation = np.std(swvalues)
+        #beauty but weak
+        minY = min((p[1] for p in component['points']))
+        maxY = max((p[1] for p in component['points']))
+        minX = min((p[0] for p in component['points']))
+        maxX = max((p[0] for p in component['points']))
+        
+        component['height'] = maxY  - minY
+        component['width'] = maxX - minX 
+        component['X'] = minX 
+        component['Y'] = minY
+        component['X2'] = maxX
+        component['Y2'] = maxY
+        component['swvalues'] = swvalues
+       
+
+        #bboxvariance = VarianceFromRect((minX, minY), (maxX, maxY), original)
+        #if bboxvariance:
     if debug_components: VizComponent(contour, components, 'Association', ser)
     return components
 
