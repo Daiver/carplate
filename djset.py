@@ -1,29 +1,70 @@
 
+import numpy as np
+
 class DjForest(object):
 
-    def __init__(self, point):
+    def __init__(self, point, label):
         self.parent = self
         self.point = point
-        self.rank = 0
+        self.label = label
 
     def Union(self, y):
         xRoot = self.Find()
         yRoot = y.Find()
-        if xRoot == yRoot:
-            return
-        # x and y are not already in same set. Merge them.
-        if xRoot.rank < yRoot.rank:
-            xRoot.parent = yRoot
-        elif xRoot.rank > yRoot.rank:
-            yRoot.parent = xRoot
-        else:
-            yRoot.parent = xRoot
-            xRoot.rank = xRoot.rank + 1
+        xRoot.parent = yRoot
 
     def Find(self):
         if self.parent != self:
             self.parent = self.parent.Find
         return self.parent
+
+def TwoPass(data):
+    Background = 0
+    linked = []
+    labels = np.zeros(data.shape, dtype=np.uint8)
+    labels[:] = -1
+    NextLabel = 0
+    for i in xrange(data.shape[0]):
+        for j in xrange(data.shape[1]):
+            if data[i, j] == Background: continue
+            neighbors = []
+            if j > 0 and (data[i, j-1] == data[i, j]):
+                neighbors.append((i, j-1))
+            if i > 0 and (data[i-1, j] == data[i, j]):
+                neighbors.append((i-1, j))
+            if j > 0 and i > 0 and (data[i-1, j-1] == data[i, j]):
+                neighbors.append((i-1, j-1))
+            #print neighbors, i, j
+            #raw_input()
+            if not neighbors:
+                linked.append(DjForest((i, j), NextLabel))
+                labels[i, j] = NextLabel
+                NextLabel += 1
+            else:
+                L = [labels[p[0], p[1]] for p in neighbors]
+                labels[i, j] = min(L)
+                for lbl in L:
+                    pass
+                    #linked[lbl] = linked[lbl].Union(
+    for i in xrange(data.shape[0]):
+        for j in xrange(data.shape[1]):
+            if data[i, j] == Background: continue
+            labels[i, j] = linked[labels[i, j]].Find()
+
+if __name__ == '__main__':
+    data = np.array(
+                        [
+                            [0, 0, 0, 1, 0, 0, 1, 1],
+                            [0, 0, 0, 1, 1, 0, 0, 0],
+                            [0, 0, 1, 1, 0, 0, 0, 0],
+                            [0, 0, 0, 1, 1, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0, 0],
+                            [1, 0, 0, 0, 1, 0, 1, 0],
+                            [1, 0, 0, 1, 1, 0, 1, 1],
+                        ]
+                    )
+    print data
+    TwoPass(data)
 '''
 algorithm TwoPass(data)
    linked = []
