@@ -1,3 +1,4 @@
+from time import time
 
 import numpy as np
 
@@ -13,6 +14,7 @@ class DjForest(object):
         xRoot = self.Find()
         yRoot = y.Find()
         xRoot.parent = yRoot
+        #xRoot.parent = y.parent
 
     def Find(self):
         if self.parent != self:
@@ -26,6 +28,7 @@ def TwoPass(data):
     labels[:] = -1
     NextLabel = 0
     lowborder = 1/3
+    st = time()
     for i in xrange(data.shape[0]):
         for j in xrange(data.shape[1]):
             #if data[i, j] == Background: continue
@@ -59,6 +62,7 @@ def TwoPass(data):
             labels[i, j] = linked[labels[i, j]].label
             linked[labels[i, j]].points.append((i, j))
     #print labels
+    print 'inner', time() - st
     res = []
     #for x in linked:
     #    if x.parent == x:res.append(x)

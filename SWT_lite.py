@@ -405,6 +405,8 @@ def FindLetters(gray, stage=work_stages['no'], oldser=None, dump_stages=False, n
     if stage < work_stages['contour']:
         print 'Finding counters...'
         contour = cv2.Canny(gray, 10, 230)
+        #cv2.imshow('cntr', contour)
+        #cv2.waitKey()
         if dump_stages:
             dumpobj(contour, 'contour', curser)
     else:
