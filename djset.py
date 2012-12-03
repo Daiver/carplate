@@ -32,10 +32,12 @@ def TwoPass(data):
             if (data[i, j] == np.inf) or np.isnan( data[i, j] ) or (data[i, j] == 0): continue
                 
             neighbors = []
-            if j > 0 and (not np.isnan(data[i, j-1])) and (lowborder < (data[i, j-1] / float(data[i, j])) < 3.):
+            if j > 0 and   (lowborder < (data[i, j-1] / float(data[i, j])) < 3.):
                 neighbors.append((i, j-1))
-            if i > 0 and (not np.isnan(data[i-1, j])) and (lowborder < (data[i-1, j] / float(data[i, j])) < 3.):
+            if i > 0 and   (lowborder < (data[i-1, j] / float(data[i, j])) < 3.):
                neighbors.append((i-1, j))
+            #if j > 0 and i > 0  and (lowborder < (data[i-1, j-1] / float(data[i, j])) < 3.):
+            #   neighbors.append((i-1, j-1))
             #if j > 0 and i > 0 and (data[i-1, j-1] == data[i, j]):
             #    neighbors.append((i-1, j-1))
             if not neighbors:

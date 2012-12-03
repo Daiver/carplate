@@ -289,9 +289,7 @@ def VizComponent(contour, components, text, ser):
     cv2.waitKey(100)
 
 def FastAssociation(gray, contour, swimage, debug_components=False, ser=''):
-    st = time()
     tmp = TwoPass(swimage)
-    print 'ass t', time() - st
     components = [{"points": x.points} for x in tmp]
     for component in components:
         swvalues = np.array([swimage[p[0], p[1]] for p in component['points']])
@@ -438,8 +436,10 @@ def FindLetters(gray, stage=work_stages['no'], oldser=None, dump_stages=False, n
 
     if stage < work_stages['association']:
         print 'Association...'
+        st = time()
         #components = Association(gray, contour, swimage, debug_components=debug_flags['debug_components'], ser=curser)
         components = FastAssociation(gray, contour, swimage, debug_components=debug_flags['debug_components'], ser=curser)
+        print 'as t', time() - st
         if dump_stages:
             dumpobj(components, 'association', curser)
     else:

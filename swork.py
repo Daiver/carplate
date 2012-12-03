@@ -32,7 +32,7 @@ if __name__ == '__main__':
                         'components',
                         'lettercandidats',
                     ]
-            see SWT_light for more detail
+            see SWT_lite for more detail
         '''
         exit()
 
