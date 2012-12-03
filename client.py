@@ -1,12 +1,12 @@
 from socket import socket, AF_INET, SOCK_STREAM
 
-import cv2
-import numpy as np
+#import cv2
+#import numpy as np
 import simplejson as json
 
 from ImageConverter import *
 
-from letterselect import CutLetters
+#from letterselect import CutLetters
 
 BUFSIZ = 1000000000
 

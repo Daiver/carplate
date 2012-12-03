@@ -6,11 +6,11 @@ import ctypes
 from PyQt4 import QtGui, QtCore
 import sip
 
-from test import processimage
+#from test import processimage
 
 from client import Client
 
-from letterselect import CutLetters
+#from letterselect import CutLetters
 
 import cv2
 

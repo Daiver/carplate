@@ -12,13 +12,13 @@ from time import time
 
 from ImageConverter import *
 
-from ANNClassifier import ANNCFromFile
+#from ANNClassifier import ANNCFromFile
 
 from PyTesseract import RecFromFile
 
 image_size = (30, 40)
 
-classifier = ANNCFromFile('learned3', image_size)
+#classifier = ANNCFromFile('learned3', image_size)
 
 class ClientHandlerRecognizer(Thread):
     def __init__(self, clientsock, addr):

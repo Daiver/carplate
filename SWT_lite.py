@@ -245,10 +245,10 @@ def Ray_Tracing(contour, angles_img, debug_rays=False, dx=None, dy=None):#return
     st = time()
     #n_contour = GetBold(contour)
     n_contour = GetBoldOCV(contour)
-    print sum(sum(n_contour))
+    #print sum(sum(n_contour))
     #cv2.imwrite('BoldFromOCV.jpg', n_contour)
-    cv2.imshow('hgjsdbvj', n_contour)
-    cv2.waitKey()
+    #cv2.imshow('hgjsdbvj', n_contour)
+    #cv2.waitKey()
     print 't:', time() - st
     for j in xrange(1, contour.shape[1]-1):
         for i in xrange(1, contour.shape[0]-1):    
