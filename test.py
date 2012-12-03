@@ -21,6 +21,16 @@ class Test_DistanceBetween(unittest.TestCase):
         c2 = {'centerX': 0, 'centerY' : 0}
         self.assertEqual(DistanceBetween(c1, c2), 2.)
 
+    def test_4(self):
+        c1 = {'centerX': 2, 'centerY' : 2}
+        c2 = {'centerX': 2, 'centerY' : 6}
+        self.assertEqual(DistanceBetween(c1, c2), 4.)
+
+    def test_5(self):
+        c1 = {'centerX': 3, 'centerY' : 4}
+        c2 = {'centerX': 6, 'centerY' : 0}
+        self.assertEqual(DistanceBetween(c1, c2), 5.)
+
 class Test_anglediff(unittest.TestCase):
     def test_1(self):
         self.assertEqual(anglediff(np.pi, np.pi), 0.)
