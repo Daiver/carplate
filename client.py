@@ -1,3 +1,8 @@
+import cv2
+import sys
+
+from SWT_lite import *
+
 from socket import socket, AF_INET, SOCK_STREAM
 
 #import cv2
@@ -45,26 +50,31 @@ class Client:
 
     def Close(self):
         self.tcpCliSock.close()
-'''
-HOST = 'localhost'
-PORT = 21572
 
-ADDR = (HOST, PORT)
 
-img = cv2.imread('img/pure/3.jpg')
-gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-letters = CutLetters(gray)
+if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        print '\nusage:\npython client.py <image>\n'
+        exit()
+    HOST = 'localhost'
+    PORT = 21572
+    ADDR = (HOST, PORT)
 
-cl = Client(ADDR)
-cl.Connect()
-for x in letters:
-    cl.SendImage(x)
-    print cl.Receiv()
-cl.Close()
+    img = cv2.imread(sys.argv[1])
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    letters = GetLetters(gray)
+
+    cl = Client(ADDR)
+    cl.Connect()
+    for x in letters:
+        cl.SendImage(x)
+        print cl.Receiv()
+    cl.Close()
+
 '''
 #cv2.imshow('', letters[0])
 #cv2.waitKey(10000)
-'''
+
 
 
 tcpCliSock = socket(AF_INET, SOCK_STREAM)

@@ -70,7 +70,8 @@ class Window(QtGui.QWidget):
         self.label.setPixmap(QtGui.QPixmap.fromImage(self.images[0]))
  
     def createImage0(self):
-        '''Create an QImage object, the copy data from other buffer to the image buffer.
+        '''
+            Create an QImage object, the copy data from other buffer to the image buffer.
         '''
         self.buff = ctypes.create_string_buffer('\x7F'*512*512)
         image = QtGui.QImage(sip.voidptr(ctypes.addressof(self.buff)), 512, 512,  QtGui.QImage.Format_Indexed8)
