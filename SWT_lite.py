@@ -331,8 +331,8 @@ def ComponentFiltering(components, contour, gray, debug_components_after=False, 
     final_components = []
     for res in components:
         if (
-            len(res['points']) > 7
-            and (res['height'] > 5 and res['width'] > 3)
+            len(res['points']) > 10 
+            and (res['height'] > 7 and res['width'] > 3)
             #and (res['bboxvariance'] > 2.5)
             #and ((res['width'] * res['height']) * 0.15 < (len(res['points'])))
             and (0.1 < (float(len(res['points']))/(res['width']*res['height'])) < 1)
@@ -344,7 +344,7 @@ def ComponentFiltering(components, contour, gray, debug_components_after=False, 
                 res['mean'] = np.mean(res['swvalues'])
                 res['std'] = np.std(res['swvalues'])
                 if ((res['std']/res['mean'] <= 1)
-                    and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 2500)
+                    and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 2400)
                 ):
                     #if True:#res['variance'] < 40:
                     res['centerX'] = res['X'] + res['width']/2.
@@ -370,7 +370,7 @@ def PairFilter(components):
                 and (1/3 < c2['width']/c['width'] < 3)
                 and (1/3 < c2['height']/c['height'] < 3)
                 and (1/2 < c['mean']/c2['mean'] < 2)
-                and (DistanceBetween(c, c2) < 5 * (c['width'] + c['height'] + c2['width'] + c2['height']))
+                and (DistanceBetween(c, c2) < 4 * (c['width'] + c['height'] + c2['width'] + c2['height']))
                 ):
                 lettercandidats.append(c)
                 break

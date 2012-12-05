@@ -51,6 +51,19 @@ class Client:
     def Close(self):
         self.tcpCliSock.close()
 
+    def RecImage(self, image):
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        letters = GetLetters(gray)
+        
+        res = []
+        for x in letters:
+            try:
+                self.SendImage(x)
+                ans = self.Receiv()
+                res.append(ans['ans'])
+            except Exception as e:
+                print 'error ', e  
+        return res
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
@@ -61,14 +74,9 @@ if __name__ == '__main__':
     ADDR = (HOST, PORT)
 
     img = cv2.imread(sys.argv[1])
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    letters = GetLetters(gray)
-
     cl = Client(ADDR)
+    cl.RecImage(img)
     cl.Connect()
-    for x in letters:
-        cl.SendImage(x)
-        print cl.Receiv()
     cl.Close()
 
 '''
