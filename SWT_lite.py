@@ -246,7 +246,7 @@ def Ray_Tracing(contour, angles_img, debug_rays=False, dx=None, dy=None):#return
     #n_contour = GetBold(contour)
     n_contour = GetBoldOCV(contour)
     #print sum(sum(n_contour))
-    #cv2.imwrite('BoldFromOCV.jpg', n_contour)
+    cv2.imwrite('BoldFromOCV.jpg', n_contour)
     #cv2.imshow('hgjsdbvj', n_contour)
     #cv2.waitKey()
     print 't:', time() - st
@@ -344,7 +344,7 @@ def ComponentFiltering(components, contour, gray, debug_components_after=False, 
                 res['mean'] = np.mean(res['swvalues'])
                 res['std'] = np.std(res['swvalues'])
                 if ((res['std']/res['mean'] <= 1)
-                    and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 2600)
+                    and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 2500)
                 ):
                     #if True:#res['variance'] < 40:
                     res['centerX'] = res['X'] + res['width']/2.
@@ -425,7 +425,7 @@ def FindLetters(gray, stage=work_stages['no'], oldser=None, dump_stages=False, n
     if stage < work_stages['contour']:
         print 'Finding counters...'
         contour = cv2.Canny(gray, 10, 230)
-        #cv2.imshow('cntr', contour)
+        #cv2.imwrite('cntr.jpg', contour)
         #cv2.waitKey()
         if dump_stages:
             dumpobj(contour, 'contour', curser)
