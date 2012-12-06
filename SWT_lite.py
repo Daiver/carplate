@@ -246,7 +246,7 @@ def Ray_Tracing(contour, angles_img, debug_rays=False, dx=None, dy=None):#return
     #n_contour = GetBold(contour)
     n_contour = GetBoldOCV(contour)
     #print sum(sum(n_contour))
-    cv2.imwrite('BoldFromOCV.jpg', n_contour)
+    #cv2.imwrite('BoldFromOCV.jpg', n_contour)
     #cv2.imshow('hgjsdbvj', n_contour)
     #cv2.waitKey()
     print 't:', time() - st
@@ -335,7 +335,7 @@ def ComponentFiltering(components, contour, gray, debug_components_after=False, 
             and (res['height'] > 7 and res['width'] > 3)
             #and (res['bboxvariance'] > 2.5)
             #and ((res['width'] * res['height']) * 0.15 < (len(res['points'])))
-            and (0.1 < (float(len(res['points']))/(res['width']*res['height'])) < 0.8)
+            and (0.1 < (float(len(res['points']))/(res['width']*res['height'])) < 0.75)
             #and ((res['height'] > 9) and (res['width'] > 3)) 
             #and (1/2.5 < res['width'] / res['height'] < 2.5)
             #and ((res['mean'] == 0) or (0 < (res['deviation']/res['mean']) < 1))
@@ -358,10 +358,10 @@ def DistanceBetween(c1, c2):
 
 def PairFilter(components, contour=None):
     lettercandidats = []
-    BBH_L = 1/3#1/2.5#low barier for height of component
-    BBH_H = 3#2.5#low barier for height of component
-    BBW_L = 1/3#1/2.5#low barier for height of component
-    BBW_H = 3#2.5#low barier for height of component
+    BBH_L = 1/2.5#low barier for height of component
+    BBH_H = 2.5#low barier for height of component
+    BBW_L = 1/2.5#low barier for height of component
+    BBW_H = 2.5#low barier for height of component
     #for c in components:
     #    for c2 in components:#
     marks = [True for i in xrange(len(components))]
