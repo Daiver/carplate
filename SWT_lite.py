@@ -335,7 +335,7 @@ def ComponentFiltering(components, contour, gray, debug_components_after=False, 
             and (res['height'] > 7 and res['width'] > 3)
             #and (res['bboxvariance'] > 2.5)
             #and ((res['width'] * res['height']) * 0.15 < (len(res['points'])))
-            and (0.1 < (float(len(res['points']))/(res['width']*res['height'])) < 0.9)
+            and (0.1 < (float(len(res['points']))/(res['width']*res['height'])) < 0.8)
             #and ((res['height'] > 9) and (res['width'] > 3)) 
             #and (1/2.5 < res['width'] / res['height'] < 2.5)
             #and ((res['mean'] == 0) or (0 < (res['deviation']/res['mean']) < 1))
@@ -344,7 +344,7 @@ def ComponentFiltering(components, contour, gray, debug_components_after=False, 
                 res['mean'] = np.mean(res['swvalues'])
                 res['std'] = np.std(res['swvalues'])
                 if ((res['std']/res['mean'] <= 1)
-                    and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 2300)
+                    and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 2500)
                 ):
                     #if True:#res['variance'] < 40:
                     res['centerX'] = res['X'] + res['width']/2.
@@ -459,8 +459,8 @@ def FindLetters(gray, stage=work_stages['no'], oldser=None, dump_stages=False, n
     if stage < work_stages['association']:
         print 'Association...'
         st = time()
-        components = Association(gray, contour, swimage, debug_components=debug_flags['debug_components'], ser=curser)
-        #components = FastAssociation(gray, contour, swimage, debug_components=debug_flags['debug_components'], ser=curser)
+        #components = Association(gray, contour, swimage, debug_components=debug_flags['debug_components'], ser=curser)
+        components = FastAssociation(gray, contour, swimage, debug_components=debug_flags['debug_components'], ser=curser)
         print 'as t', time() - st
         if dump_stages:
             dumpobj(components, 'association', curser)
