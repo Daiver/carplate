@@ -54,8 +54,8 @@ if __name__ == '__main__':
             oldser=ser_to_load, 
             dump_stages=dump_stages, 
             new_ser=new_ser, 
-            #debug_flags=CUR_DEBUG_FLAGS
-            debug_flags=DEFAULT_DEBUG_FLAGS
+            debug_flags=CUR_DEBUG_FLAGS
+            #debug_flags=DEFAULT_DEBUG_FLAGS
         )
 
     print len(letters)

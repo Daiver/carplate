@@ -335,7 +335,7 @@ def ComponentFiltering(components, contour, gray, debug_components_after=False, 
             and (res['height'] > 7 and res['width'] > 3)
             #and (res['bboxvariance'] > 2.5)
             #and ((res['width'] * res['height']) * 0.15 < (len(res['points'])))
-            and (0.1 < (float(len(res['points']))/(res['width']*res['height'])) < 0.9)
+            and (0.1 < (float(len(res['points']))/(res['width']*res['height'])) < 1)
             #and ((res['height'] > 9) and (res['width'] > 3)) 
             #and (1/2.5 < res['width'] / res['height'] < 2.5)
             #and ((res['mean'] == 0) or (0 < (res['deviation']/res['mean']) < 1))
@@ -344,7 +344,7 @@ def ComponentFiltering(components, contour, gray, debug_components_after=False, 
                 res['mean'] = np.mean(res['swvalues'])
                 res['std'] = np.std(res['swvalues'])
                 if ((res['std']/res['mean'] <= 1)
-                    and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 2000)
+                    and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 2400)
                 ):
                     #if True:#res['variance'] < 40:
                     res['centerX'] = res['X'] + res['width']/2.
@@ -356,44 +356,24 @@ def ComponentFiltering(components, contour, gray, debug_components_after=False, 
 def DistanceBetween(c1, c2):
     return np.sqrt((c1['centerX'] - c2['centerX'])**2 + (c1['centerY'] - c2['centerY'])**2)
 
-def PairFilter(components, contour=None):
+def PairFilter(components):
     lettercandidats = []
-    BBH_L = 1/3#1/2.5#low barier for height of component
-    BBH_H = 3#2.5#low barier for height of component
-    BBW_L = 1/3#1/2.5#low barier for height of component
-    BBW_H = 3#2.5#low barier for height of component
     #for c in components:
     #    for c2 in components:#
-    marks = [True for i in xrange(len(components))]
     for i in xrange(len(components)):
-        q = False 
-        c = components[i]
         for j in xrange(len(components)):#
+            c = components[i]
             c2 = components[j]
             if (
-                (marks[j] and(i != j))
+                (i != j)
                 #(c != c2) #and (c['width'] != 0 and c['height'] != 0
-                and (BBW_L < c2['width']/c['width'] < BBW_H)
-                and (BBH_L < c2['height']/c['height'] < BBH_H)
+                and (1/3 < c2['width']/c['width'] < 3)
+                and (1/3 < c2['height']/c['height'] < 3)
                 and (1/2 < c['mean']/c2['mean'] < 2)
-                and (DistanceBetween(c, c2) < 3.5 * (c['width'] + c['height'] + c2['width'] + c2['height']))
+                and (DistanceBetween(c, c2) < 4 * (c['width'] + c['height'] + c2['width'] + c2['height']))
                 ):
                 lettercandidats.append(c)
-                q = True
-                #print i, '1:', c['centerX'], c['centerY'], c['width'], c['height'], DistanceBetween(c, c2)
-                #print j, '2:', c2['centerX'], c2['centerY'], c2['width'], c2['height'], DistanceBetween(c, c2)
-                #tmp = np.zeros(contour.shape)
-                #tmp[:] = 255
-                #for p in c['points']:
-                #    tmp[p[0], p[1]] = 0
-                #for p in c2['points']:
-                #    tmp[p[0], p[1]] = 0
-                #VizComponent(contour, lettercandidats, 'pairs', '')
-                #cv2.imshow('', tmp)
-                #cv2.waitKey()
                 break
-        if not q:
-            marks[i] = False
     return lettercandidats
 
 work_stages = {
@@ -459,8 +439,8 @@ def FindLetters(gray, stage=work_stages['no'], oldser=None, dump_stages=False, n
     if stage < work_stages['association']:
         print 'Association...'
         st = time()
-        components = Association(gray, contour, swimage, debug_components=debug_flags['debug_components'], ser=curser)
-        #components = FastAssociation(gray, contour, swimage, debug_components=debug_flags['debug_components'], ser=curser)
+        #components = Association(gray, contour, swimage, debug_components=debug_flags['debug_components'], ser=curser)
+        components = FastAssociation(gray, contour, swimage, debug_components=debug_flags['debug_components'], ser=curser)
         print 'as t', time() - st
         if dump_stages:
             dumpobj(components, 'association', curser)
@@ -477,7 +457,7 @@ def FindLetters(gray, stage=work_stages['no'], oldser=None, dump_stages=False, n
 
     if stage < work_stages['lettercandidats']:
         print 'Pair Filter...'
-        lettercandidats = PairFilter(components, contour)
+        lettercandidats = PairFilter(components)
         if debug_flags['debug_pairs']:
             VizComponent(contour, lettercandidats, 'pairs', curser)
         if dump_stages:
