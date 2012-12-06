@@ -344,7 +344,7 @@ def ComponentFiltering(components, contour, gray, debug_components_after=False, 
                 res['mean'] = np.mean(res['swvalues'])
                 res['std'] = np.std(res['swvalues'])
                 if ((res['std']/res['mean'] <= 1)
-                    and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 2500)
+                    and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 2400)
                 ):
                     #if True:#res['variance'] < 40:
                     res['centerX'] = res['X'] + res['width']/2.
