@@ -54,8 +54,8 @@ if __name__ == '__main__':
             oldser=ser_to_load, 
             dump_stages=dump_stages, 
             new_ser=new_ser, 
-            debug_flags=CUR_DEBUG_FLAGS
-            #debug_flags=DEFAULT_DEBUG_FLAGS
+            #debug_flags=CUR_DEBUG_FLAGS
+            debug_flags=DEFAULT_DEBUG_FLAGS
         )
 
     print len(letters)
@@ -66,4 +66,4 @@ if __name__ == '__main__':
     #writing final result
     cv2.imwrite('result/' + sys.argv[1].replace('/', '-'), image)
     #cv2.imshow('after all ...', image)
-    cv2.waitKey(10000)
+    #cv2.waitKey(10000)
