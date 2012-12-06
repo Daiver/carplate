@@ -331,11 +331,11 @@ def ComponentFiltering(components, contour, gray, debug_components_after=False, 
     final_components = []
     for res in components:
         if (
-            len(res['points']) > 10 
-            and (res['height'] > 7 and res['width'] > 3)
+            len(res['points']) > 14 
+            and (res['height'] > 8 and res['width'] > 4)
             #and (res['bboxvariance'] > 2.5)
             #and ((res['width'] * res['height']) * 0.15 < (len(res['points'])))
-            and (0.1 < (float(len(res['points']))/(res['width']*res['height'])) < 0.75)
+            and (0.1 < (float(len(res['points']))/(res['width']*res['height'])) < 0.70)
             #and ((res['height'] > 9) and (res['width'] > 3)) 
             #and (1/2.5 < res['width'] / res['height'] < 2.5)
             #and ((res['mean'] == 0) or (0 < (res['deviation']/res['mean']) < 1))
@@ -376,7 +376,7 @@ def PairFilter(components, contour=None):
                 and (BBW_L < c2['width']/c['width'] < BBW_H)
                 and (BBH_L < c2['height']/c['height'] < BBH_H)
                 and (1/2 < c['mean']/c2['mean'] < 2)
-                and (DistanceBetween(c, c2) < 3.5 * (c['width'] + c['height'] + c2['width'] + c2['height']))
+                and (DistanceBetween(c, c2) < 3.6 * (c['width'] + c['height'] + c2['width'] + c2['height']))
                 ):
                 lettercandidats.append(c)
                 q = True
