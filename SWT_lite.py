@@ -11,7 +11,10 @@ from SWT_Support import *
 
 from Bresenham import Selector
 
+from multiprocessing.pool import ThreadPool
+
 from time import time
+
 import cProfile
 
 import pickle
@@ -250,10 +253,34 @@ def Ray_Tracing(contour, angles_img, debug_rays=False, dx=None, dy=None):#return
     #cv2.imshow('hgjsdbvj', n_contour)
     #cv2.waitKey()
     print 't:', time() - st
+    p = ThreadPool(2)
+
+    worker = lambda point: Stroke(n_contour, angles_img, point, dx, dy, -1)
+
+    li = []
+    for j in xrange(1, contour.shape[1]-1):
+        for i in xrange(1, contour.shape[0]-1):    
+            if contour[i, j] != 0:li.append((i, j))
+    st = time()
+    print 'start tracking'
+    tmp = p.map(worker, li)
+    print 'rt t', time() - st
+    for res in tmp:
+        if res :#len(res) > 0:
+            rays.append(res)
+            if debug_rays:
+                tmp = contour.copy()
+                for p in res:#Показываем луч
+                    tmp[p[0], p[1]] = 255
+                cv2.imshow('77', tmp)
+    #Для удобства просмотра
+    '''
+    st = time()
     for j in xrange(1, contour.shape[1]-1):
         for i in xrange(1, contour.shape[0]-1):    
             if contour[i, j] != 0:
                 res = Stroke(n_contour, angles_img, (i, j), dx, dy, -1) 
+                #xs = p.map(Stroke, )
                 if res :#len(res) > 0:
                     rays.append(res)
                     if debug_rays:
@@ -263,6 +290,8 @@ def Ray_Tracing(contour, angles_img, debug_rays=False, dx=None, dy=None):#return
                         cv2.imshow('77', tmp)
                         #Для удобства просмотра
                         cv2.waitKey(1000)
+    print 'rt t', time() - st
+    '''
     return rays
 
 def SWT_Operator(original, rays, debug_swimage, ser=''):
