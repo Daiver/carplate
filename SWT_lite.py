@@ -119,11 +119,8 @@ def Stroke(image, angles_img, point, dx, dy, search_direction=-1):
         point[0], point[1],
         point[0] + search_direction*dy[point[0],
         point[1]], point[1] + search_direction*dx[point[0], point[1]]
-    )#(np.pi + angles_img[point[0], point[1]]) % (2*np.pi))
-    #step = dirselect(angles_img[point[0], point[1]])#stepmap[point[0]][point[1]]
-    #step = (step[1], step[0])
-    #if not step:return 
-        
+    )
+
     diff = anglediff(oldangle, angle) 
     stroke.append(point)
     new_point = selector.GetPoint()
@@ -131,32 +128,22 @@ def Stroke(image, angles_img, point, dx, dy, search_direction=-1):
     new_point = selector.GetPoint()
     if point == new_point: return
     point = new_point
-    #point = makestep(point, step)
     if not checkbound_sq(point, image):# or mask[point[0], point[1]] == 255:
         return 
     i = 0
     #Пока не уткнемся в градиент различающийся с нашим более чем в 30* ползем в направлении step
     #Из-за кривого шага на больших расстояниях дает нехороший результат
     while image[point[0], point[1]] == 0:#not ContourNear(image, point):# image[point[0], point[1]] == 0:
-        #if (image[point[0], point[1]] != 0):
-        stroke.append(point)        
-        #point = makesstep(point, step)
+        stroke.append(point)
         point = selector.GetPoint()
         i += 1
         #Если уткнулись в край картинки - считаем луч ошибочным
         if not checkbound_sq(point, image) or i > MAX_RAY_LEN:# or mask[point[0], point[1]] == 255:
             return 
-        #if (image[point[0], point[1]] != 0):
     if CheckAngleNear(angles_img, point, np.pi / 3, oldangle):
         return stroke
     else:
         return
-    #angle = angles_img[point[0], point[1]]
-    #diff = anglediff(oldangle, angle)
-    #if abs(diff) > (np.pi / 3):
-    #    return stroke
-    #else:
-    #    return 
 
 #Поиск компонент. 
 def SearchComponent(image, center, mask, cntrimg, original):
@@ -254,25 +241,32 @@ def Ray_Tracing(contour, angles_img, debug_rays=False, dx=None, dy=None):#return
     #cv2.waitKey()
     print 't:', time() - st
     p = ThreadPool(2)
-
-    worker = lambda point: Stroke(n_contour, angles_img, point, dx, dy, -1)
+    
+    #worker = lambda point: Stroke(n_contour, angles_img, point, dx, dy, -1)
+    def worker(points):
+        for point in points:
+            tmp = Stroke(n_contour, angles_img, point, dx, dy, -1)
+            if tmp:rays.append(tmp)
 
     li = []
     for j in xrange(1, contour.shape[1]-1):
         for i in xrange(1, contour.shape[0]-1):    
             if contour[i, j] != 0:li.append((i, j))
+
+    rng = 8
+    block_len = len(li)/rng
+    li2 = [li[block_len*(i-1) : block_len*i]  for i in xrange(1, int(rng)+1)]    
+    print len(li2)
     st = time()
     print 'start tracking'
-    tmp = p.map(worker, li)
+    p.map(worker, li2)
     print 'rt t', time() - st
-    for res in tmp:
-        if res :#len(res) > 0:
-            rays.append(res)
-            if debug_rays:
-                tmp = contour.copy()
-                for p in res:#Показываем луч
-                    tmp[p[0], p[1]] = 255
-                cv2.imshow('77', tmp)
+    if debug_rays:
+        for res in rays:
+            tmp = contour.copy()
+            for p in res:#Показываем луч
+                tmp[p[0], p[1]] = 255
+            cv2.imshow('77', tmp)
     #Для удобства просмотра
     '''
     st = time()
