@@ -4,12 +4,13 @@
 import cv2
 
 import numpy as np
+import numpy#madness 
 
 from Queue import Queue
 
-from SWT_Support import *
+import SWT_Support# import *
 
-from Bresenham import Selector
+import Bresenham #import Selector
 
 from multiprocessing.pool import ThreadPool
 
@@ -20,6 +21,8 @@ import cProfile
 import pickle
 
 from djset import *
+
+import pp
 
 makestep = lambda point, step: (point[0] + step[0], point[1] + step[1])
 checkbound = lambda point, image: (
@@ -100,28 +103,28 @@ def CheckAngleNear(angles_img, point, border_angle, oldangle):
             new_p = (point[0] + i, point[1] + j)
             if checkbound(new_p, angles_img):
                 angle = angles_img[new_p[0], new_p[1]]
-                diff = anglediff(oldangle, angle)
+                diff = SWT_Support.anglediff(oldangle, angle)
                 if abs(diff) > (border_angle):
                     return True 
     
     return False
 
-MAX_RAY_LEN = 100
 #Должен давать нам 1 луч 
 def Stroke(image, angles_img, point, dx, dy, search_direction=-1):
+    MAX_RAY_LEN = 100
     stroke = []
     if not checkbound_sq(point, image): return 
     oldangle = angles_img[point[0], point[1]]#Получаем угол
     angle = oldangle
-    if (oldangle == None) or (np.isnan(oldangle)): return 
+    if (oldangle == None) or (numpy.isnan(oldangle)): return 
 
-    selector = Selector(
+    selector = Bresenham.Selector(
         point[0], point[1],
         point[0] + search_direction*dy[point[0],
         point[1]], point[1] + search_direction*dx[point[0], point[1]]
     )
 
-    diff = anglediff(oldangle, angle) 
+    diff = SWT_Support.anglediff(oldangle, angle) 
     stroke.append(point)
     new_point = selector.GetPoint()
     stroke.append(new_point)
@@ -140,7 +143,7 @@ def Stroke(image, angles_img, point, dx, dy, search_direction=-1):
         #Если уткнулись в край картинки - считаем луч ошибочным
         if not checkbound_sq(point, image) or i > MAX_RAY_LEN:# or mask[point[0], point[1]] == 255:
             return 
-    if CheckAngleNear(angles_img, point, np.pi / 3, oldangle):
+    if CheckAngleNear(angles_img, point, numpy.pi / 3, oldangle):
         return stroke
     else:
         return
@@ -240,7 +243,7 @@ def Ray_Tracing(contour, angles_img, debug_rays=False, dx=None, dy=None):#return
     #cv2.imshow('hgjsdbvj', n_contour)
     #cv2.waitKey()
     print 't:', time() - st
-    p = ThreadPool(2)
+    #p = ThreadPool(2)
     
     worker2 = lambda point: Stroke(n_contour, angles_img, point, dx, dy, -1)
     def worker(points):
@@ -248,6 +251,12 @@ def Ray_Tracing(contour, angles_img, debug_rays=False, dx=None, dy=None):#return
             tmp = Stroke(n_contour, angles_img, point, dx, dy, -1)
             if tmp:rays.append(tmp)
 
+    def worker3(n_contour, angles_img, points, dx, dy ):
+        result = []
+        for point in points:
+            tmp = Stroke(n_contour, angles_img, point, dx, dy, -1)
+            if tmp:result.append(tmp)
+        return result
     
     st = time()
     li = []
@@ -255,20 +264,26 @@ def Ray_Tracing(contour, angles_img, debug_rays=False, dx=None, dy=None):#return
         for i in xrange(1, contour.shape[0]-1):    
             if contour[i, j] != 0:li.append((i, j))
 
-    '''
     rng = 4 
     block_len = len(li)/rng
     li2 = [li[block_len*(i-1) : block_len*i]  for i in xrange(1, int(rng)+1)]    
-    print len(li2)
+    job_server = pp.Server(2, ppservers=())
+
+    jobs = [(points, job_server.submit(worker3, (n_contour, angles_img, points, dx, dy), (Stroke, CheckAngleNear, checkbound, makestep, checkbound_sq), ("math", 'numpy', 'Bresenham', 'SWT_Support'))) for points in li2]
+    for input, job in jobs:
+        tmp = job()
+        if tmp:rays.extend(tmp)
+    '''
     st = time()
     print 'start tracking'
     p.map(worker, li2)
     print 'rt t', time() - st
     '''
+    '''
     tmp = map(worker2, li)
     for t in tmp:
         if t:rays.append(t)
-
+    '''
     if debug_rays:
         for res in rays:
             tmp = contour.copy()
