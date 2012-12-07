@@ -254,9 +254,6 @@ def Ray_Tracing(contour, angles_img, debug_rays=False, dx=None, dy=None):#return
     for j in xrange(1, contour.shape[1]-1):
         for i in xrange(1, contour.shape[0]-1):    
             if contour[i, j] != 0:li.append((i, j))
-    tmp = map(worker2, li)
-    for t in tmp:
-        if t:rays.append(t)
 
     '''
     rng = 4 
@@ -267,6 +264,11 @@ def Ray_Tracing(contour, angles_img, debug_rays=False, dx=None, dy=None):#return
     print 'start tracking'
     p.map(worker, li2)
     print 'rt t', time() - st
+    '''
+    tmp = map(worker2, li)
+    for t in tmp:
+        if t:rays.append(t)
+
     if debug_rays:
         for res in rays:
             tmp = contour.copy()
@@ -274,7 +276,8 @@ def Ray_Tracing(contour, angles_img, debug_rays=False, dx=None, dy=None):#return
                 tmp[p[0], p[1]] = 255
             cv2.imshow('77', tmp)
     #Для удобства просмотра
-    '''
+    print 'rt t', time() - st
+    return rays
     '''
     for j in xrange(1, contour.shape[1]-1):
         for i in xrange(1, contour.shape[0]-1):    
@@ -291,8 +294,6 @@ def Ray_Tracing(contour, angles_img, debug_rays=False, dx=None, dy=None):#return
                         #Для удобства просмотра
                         cv2.waitKey(1000)
     '''
-    print 'rt t', time() - st
-    return rays
 
 def SWT_Operator(original, rays, debug_swimage, ser=''):
     swimage = np.zeros(original.shape)
