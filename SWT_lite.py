@@ -376,7 +376,7 @@ def PairFilter(components, contour=None):
                 and (BBW_L < c2['width']/c['width'] < BBW_H)
                 and (BBH_L < c2['height']/c['height'] < BBH_H)
                 and (1/2 < c['mean']/c2['mean'] < 2)
-                and (DistanceBetween(c, c2) < 3.6 * (c['width'] + c['height'] + c2['width'] + c2['height']))
+                and (DistanceBetween(c, c2) < 3.5 * (c['width'] + c['height'] + c2['width'] + c2['height']))
                 ):
                 lettercandidats.append(c)
                 q = True
