@@ -242,18 +242,24 @@ def Ray_Tracing(contour, angles_img, debug_rays=False, dx=None, dy=None):#return
     print 't:', time() - st
     p = ThreadPool(2)
     
-    #worker = lambda point: Stroke(n_contour, angles_img, point, dx, dy, -1)
+    worker2 = lambda point: Stroke(n_contour, angles_img, point, dx, dy, -1)
     def worker(points):
         for point in points:
             tmp = Stroke(n_contour, angles_img, point, dx, dy, -1)
             if tmp:rays.append(tmp)
 
+    
+    st = time()
     li = []
     for j in xrange(1, contour.shape[1]-1):
         for i in xrange(1, contour.shape[0]-1):    
             if contour[i, j] != 0:li.append((i, j))
+    tmp = map(worker2, li)
+    for t in tmp:
+        if t:rays.append(t)
 
-    rng = 8
+    '''
+    rng = 4 
     block_len = len(li)/rng
     li2 = [li[block_len*(i-1) : block_len*i]  for i in xrange(1, int(rng)+1)]    
     print len(li2)
@@ -269,7 +275,7 @@ def Ray_Tracing(contour, angles_img, debug_rays=False, dx=None, dy=None):#return
             cv2.imshow('77', tmp)
     #Для удобства просмотра
     '''
-    st = time()
+    '''
     for j in xrange(1, contour.shape[1]-1):
         for i in xrange(1, contour.shape[0]-1):    
             if contour[i, j] != 0:
@@ -284,8 +290,8 @@ def Ray_Tracing(contour, angles_img, debug_rays=False, dx=None, dy=None):#return
                         cv2.imshow('77', tmp)
                         #Для удобства просмотра
                         cv2.waitKey(1000)
-    print 'rt t', time() - st
     '''
+    print 'rt t', time() - st
     return rays
 
 def SWT_Operator(original, rays, debug_swimage, ser=''):

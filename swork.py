@@ -65,5 +65,5 @@ if __name__ == '__main__':
         cv2.rectangle(image, (l['Y'], l['X']), (l['Y2'], l['X2']), (0, 20, 200))
     #writing final result
     cv2.imwrite('result/' + sys.argv[1].replace('/', '-'), image)
-    cv2.imshow('after all ...', image)
-    cv2.waitKey(10000)
+    #cv2.imshow('after all ...', image)
+    #cv2.waitKey(10000)
