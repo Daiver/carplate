@@ -372,7 +372,15 @@ def Association(gray, contour, swimage, debug_components=False, ser=''):
     if debug_components: VizComponent(contour, components, 'Association', ser)
     return components
 
-def ComponentFiltering(components, contour, gray, debug_components_after=False, ser=''):
+def GetAvgColor(c, image):
+    summ = np.array([0., 0., 0.])
+    for p in c['points']:
+        for i in xrange(3):
+            summ[i] += image[p[0], p[1], i]
+    summ /= len(c['points'])
+    return summ
+
+def ComponentFiltering(components, contour, gray, image, debug_components_after=False, ser=''):
     final_components = []
     for res in components:
         if (
@@ -380,20 +388,21 @@ def ComponentFiltering(components, contour, gray, debug_components_after=False, 
             and (res['height'] > 8 and res['width'] > 4)
             #and (res['bboxvariance'] > 2.5)
             #and ((res['width'] * res['height']) * 0.15 < (len(res['points'])))
-            and (0.1 < (float(len(res['points']))/(res['width']*res['height'])) < 0.70)
+            and (0.1 < (float(len(res['points']))/(res['width']*res['height'])) < 0.90)
             #and ((res['height'] > 9) and (res['width'] > 3)) 
             #and (1/2.5 < res['width'] / res['height'] < 2.5)
             #and ((res['mean'] == 0) or (0 < (res['deviation']/res['mean']) < 1))
-            and (1/10 < min(float(res['width'])/res['height'], float(res['height'])/res['width']) < 1.001)
+            and (1./10 < min(float(res['width'])/res['height'], float(res['height'])/res['width']) < 1.001)
             ):
                 res['mean'] = np.mean(res['swvalues'])
                 res['std'] = np.std(res['swvalues'])
                 if ((res['std']/res['mean'] <= 1)
-                    and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 2400)
+                    #and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 2000)
                 ):
                     #if True:#res['variance'] < 40:
                     res['centerX'] = res['X'] + res['width']/2.
                     res['centerY'] = res['Y'] + res['height']/2.
+                    res['avgcolor'] = GetAvgColor(res, image)
                     final_components.append(res)
     if debug_components_after: VizComponent(contour, final_components, 'Component Filter', ser)
     return final_components
@@ -401,7 +410,7 @@ def ComponentFiltering(components, contour, gray, debug_components_after=False, 
 def DistanceBetween(c1, c2):
     return np.sqrt((c1['centerX'] - c2['centerX'])**2 + (c1['centerY'] - c2['centerY'])**2)
 
-def PairFilter(components, contour=None):
+def PairFilter(components, image):
     lettercandidats = []
     BBH_L = 1/2.5#low barier for height of component
     BBH_H = 2.5#low barier for height of component
@@ -422,6 +431,7 @@ def PairFilter(components, contour=None):
                 and (BBH_L < c2['height']/c['height'] < BBH_H)
                 and (1/2 < c['mean']/c2['mean'] < 2)
                 and (DistanceBetween(c, c2) < 3.5 * (c['width'] + c['height'] + c2['width'] + c2['height']))
+                and (sum(abs(c['avgcolor'] - c2['avgcolor'])) < 70)
                 ):
                 lettercandidats.append(c)
                 q = True
@@ -460,9 +470,10 @@ DEFAULT_DEBUG_FLAGS = {
         'debug_pairs' : False,
     }
 
-def FindLetters(gray, stage=work_stages['no'], oldser=None, dump_stages=False, new_ser='', debug_flags=None):
+def FindLetters(image, stage=work_stages['no'], oldser=None, dump_stages=False, new_ser='', debug_flags=None):
     #init section. Just for simplify debug. delete this after debooooging
     if not debug_flags: debug_flags = DEFAULT_DEBUG_FLAGS
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     curser = new_ser#current ser of dump files
     if not curser: curser = 'none'
     contour = None;  angles_img = None; rays = None; swimage = None; components = None; lettercandidats = None;
@@ -514,7 +525,7 @@ def FindLetters(gray, stage=work_stages['no'], oldser=None, dump_stages=False, n
     
     if stage < work_stages['components']:
         print 'Component Filtering...'
-        components = ComponentFiltering(components, contour, gray, debug_components_after=debug_flags['debug_components_after'], ser=curser)
+        components = ComponentFiltering(components, contour, gray, image, debug_components_after=debug_flags['debug_components_after'], ser=curser)
         if dump_stages:
             dumpobj(components, 'components', curser)
     else:
@@ -522,7 +533,7 @@ def FindLetters(gray, stage=work_stages['no'], oldser=None, dump_stages=False, n
 
     if stage < work_stages['lettercandidats']:
         print 'Pair Filter...'
-        lettercandidats = PairFilter(components, contour)
+        lettercandidats = PairFilter(components, image)
         if debug_flags['debug_pairs']:
             VizComponent(contour, lettercandidats, 'pairs', curser)
         if dump_stages:

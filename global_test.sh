@@ -12,3 +12,4 @@ python swork.py img/cars/4.jpg c4 #&
 python swork.py img/cars/5.jpg c5 #&
 python swork.py img/cars/6.jpg c6 #&
 python swork.py img/cars/7.jpg c7 #&
+python swork.py img/cars/8.jpg c8 #&

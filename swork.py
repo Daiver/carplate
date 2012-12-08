@@ -41,7 +41,7 @@ if __name__ == '__main__':
         exit()
     
     image = cv2.imread(sys.argv[1])
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    #gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
     dump_stages = len(sys.argv) > 2 
     new_ser = sys.argv[2] if dump_stages else None
@@ -49,7 +49,7 @@ if __name__ == '__main__':
     wstage = sys.argv[3] if len(sys.argv) > 4 else 'no'
     ser_to_load = sys.argv[4] if len(sys.argv) > 4 else None
 
-    letters = FindLetters(gray, 
+    letters = FindLetters(image, 
             stage=work_stages[wstage], 
             oldser=ser_to_load, 
             dump_stages=dump_stages, 
