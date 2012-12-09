@@ -125,7 +125,7 @@ class Server:
 if __name__=='__main__': 
     #HOST = 'localhost'
     HOST = '91.219.160.217'
-    PORT = 21576
+    PORT = 21577
     ADDR = (HOST, PORT)
     server = Server(ADDR, ClientHandlerRecognizer)
     server.run()

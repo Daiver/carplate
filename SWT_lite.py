@@ -404,7 +404,7 @@ def ComponentFiltering(components, contour, gray, image, debug_components_after=
                 res['mean'] = np.mean(res['swvalues'])
                 res['std'] = np.std(res['swvalues'])
                 if ((res['std']/res['mean'] <= 1)
-                    #and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 2000)
+                    and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 2000)
                 ):
                     #if True:#res['variance'] < 40:
                     res['centerX'] = res['X'] + res['width']/2.
@@ -437,11 +437,11 @@ def PairFilter(components, image):
                 and (BBW_L < c2['width']/c['width'] < BBW_H)
                 and (BBH_L < c2['height']/c['height'] < BBH_H)
                 and (1/2 < c['mean']/c2['mean'] < 2)
-                and (DistanceBetween(c, c2) < 4.5 * (c['width'] + c['height'] + c2['width'] + c2['height']))
+                and (DistanceBetween(c, c2) < 3.5 * (c['width'] + c['height'] + c2['width'] + c2['height']))
                 #and (sum(abs(c['avgcolor'] - c2['avgcolor'])) < 70)
-                and (cv2.compareHist(c['avgcolor'][0], c2['avgcolor'][0], cv2.cv.CV_COMP_CORREL) > 0.1)
-                and (cv2.compareHist(c['avgcolor'][1], c2['avgcolor'][1], cv2.cv.CV_COMP_CORREL) > 0.1)
-                and (cv2.compareHist(c['avgcolor'][2], c2['avgcolor'][2], cv2.cv.CV_COMP_CORREL) > 0.1)
+                #and (cv2.compareHist(c['avgcolor'][0], c2['avgcolor'][0], cv2.cv.CV_COMP_CORREL) > 0.1)
+                #and (cv2.compareHist(c['avgcolor'][1], c2['avgcolor'][1], cv2.cv.CV_COMP_CORREL) > 0.1)
+                #and (cv2.compareHist(c['avgcolor'][2], c2['avgcolor'][2], cv2.cv.CV_COMP_CORREL) > 0.1)
                 #and (not (c['X'] > c2['X'] and c['Y'] > c2['Y'] and c['X2'] < c2['X2'] and c['Y2'] < c2['Y2']))
                 ):
                 lettercandidats.append(c)
