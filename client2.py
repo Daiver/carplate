@@ -51,7 +51,8 @@ class Client:
         while len(tmp) < size:
             data = self.Receiv()
             if not data: raise Exception('failed to reciev image')
-            tmp += data                    
+            tmp += data              
+        #print tmp
         image = imgFromStr(tmp, shape)
         return image
         
@@ -84,7 +85,7 @@ if __name__ == '__main__':
         print '\nusage:\npython client.py <image>\n'
         exit()
     HOST = 'localhost'
-    PORT = 21572
+    PORT = 21575
     ADDR = (HOST, PORT)
 
     img = cv2.imread(sys.argv[1])

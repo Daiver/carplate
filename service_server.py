@@ -6,13 +6,15 @@ import numpy as np
 
 import cv2
 
+import os
+
 import simplejson as json
 
 from time import time
 
 from ImageConverter import *
 
-#from SWT_lite import *
+from SWT_lite import *
 
 class ClientHandlerRecognizer(Thread):
     def __init__(self, clientsock, addr):
@@ -75,10 +77,20 @@ class ClientHandlerRecognizer(Thread):
                 img = self.RecievImage(request['args'])
                 cv2.rectangle(img, (20, 30), (300, 300), (255, 0, 255))
                 self.SendImage(img)
-                #ans = json.dumps({'ans' : int(classifier.recognize(img))})
-                #ans = json.dumps({'ans' : RecFromFile(tmp_name)})
-                #self.clientsock.send(ans)
-                #print int(classifier.recognize(img))
+            ans = []
+            if request['method'] == 'load_image':
+                data = request['path']
+                if os.path.exists(data):
+                    img = cv2.imread(data)#self.RecievImage(request['args'])p
+                    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                    letters = GetLetters(gray)
+                    for l in letters:
+                        tmp_name = str(time()) + '.tif'
+                        cv2.imwrite('lettersstorage/' + tmp_name, l)
+                        ans.append(RecFromFile(tmp_name))
+                    self.clientsock.send(str(ans))
+                else:
+                    self.clientsock.send('bad_path')
             else:
                 self.clientsock.send('bad_request')
         print 'close conn', self.addr
@@ -108,7 +120,7 @@ class Server:
 
 if __name__=='__main__': 
     HOST = 'localhost'
-    PORT = 21572
+    PORT = 21575
     ADDR = (HOST, PORT)
     server = Server(ADDR, ClientHandlerRecognizer)
     server.run()

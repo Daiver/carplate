@@ -1,6 +1,7 @@
 
 from client import *
 
+import simplejson as json
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
@@ -12,7 +13,8 @@ if __name__ == '__main__':
 
     cl = Client(ADDR)
     cl.Connect()
-    cl.Send(sys.argv[1])
+    request = json.dumps({'method' : 'load_image', 'path' : sys.argv[1]})
+    cl.Send(str(request))
     print cl.Receiv()
     cl.Close()
 
