@@ -373,12 +373,19 @@ def Association(gray, contour, swimage, debug_components=False, ser=''):
     return components
 
 def GetAvgColor(c, image):
+    hist = [np.zeros((256), dtype=np.float32) for i in xrange(3)]
+    for p in c['points']:
+        for i in xrange(3):
+            hist[i][image[p[0], p[1], i]] += 1
+    return hist
+    '''
     summ = np.array([0., 0., 0.])
     for p in c['points']:
         for i in xrange(3):
             summ[i] += image[p[0], p[1], i]
     summ /= len(c['points'])
     return summ
+    '''
 
 def ComponentFiltering(components, contour, gray, image, debug_components_after=False, ser=''):
     final_components = []
@@ -408,7 +415,7 @@ def ComponentFiltering(components, contour, gray, image, debug_components_after=
     return final_components
 
 def DistanceBetween(c1, c2):
-    return np.sqrt((c1['centerX'] - c2['centerX'])**2 + (c1['centerY'] - c2['centerY'])**2)
+    return np.sqrt(((c1['centerX'] - c2['centerX'])**2) + ((c1['centerY'] - c2['centerY'])**2))
 
 def PairFilter(components, image):
     lettercandidats = []
@@ -430,8 +437,12 @@ def PairFilter(components, image):
                 and (BBW_L < c2['width']/c['width'] < BBW_H)
                 and (BBH_L < c2['height']/c['height'] < BBH_H)
                 and (1/2 < c['mean']/c2['mean'] < 2)
-                and (DistanceBetween(c, c2) < 3.5 * (c['width'] + c['height'] + c2['width'] + c2['height']))
-                and (sum(abs(c['avgcolor'] - c2['avgcolor'])) < 70)
+                and (DistanceBetween(c, c2) < 4.5 * (c['width'] + c['height'] + c2['width'] + c2['height']))
+                #and (sum(abs(c['avgcolor'] - c2['avgcolor'])) < 70)
+                and (cv2.compareHist(c['avgcolor'][0], c2['avgcolor'][0], cv2.cv.CV_COMP_CORREL) > 0.12)
+                and (cv2.compareHist(c['avgcolor'][1], c2['avgcolor'][1], cv2.cv.CV_COMP_CORREL) > 0.12)
+                and (cv2.compareHist(c['avgcolor'][2], c2['avgcolor'][2], cv2.cv.CV_COMP_CORREL) > 0.12)
+                #and (not (c['X'] > c2['X'] and c['Y'] > c2['Y'] and c['X2'] < c2['X2'] and c['Y2'] < c2['Y2']))
                 ):
                 lettercandidats.append(c)
                 q = True
