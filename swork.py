@@ -43,6 +43,7 @@ if __name__ == '__main__':
     image = cv2.imread(sys.argv[1])
     #gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
+    print 'image shape', image.shape
     dump_stages = len(sys.argv) > 2 
     new_ser = sys.argv[2] if dump_stages else None
 

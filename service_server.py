@@ -77,6 +77,8 @@ class ClientHandlerRecognizer(Thread):
             if not data: break
             if request['method'] == 'recimage':
                 img = self.RecievImage(request['args'])
+                cv2.imwrite('1.jpg', img)
+                #cv2.imread(1)
                 cv2.rectangle(img, (20, 30), (300, 300), (255, 0, 255))
                 self.SendImage(img)
             ans = []
@@ -121,8 +123,9 @@ class Server:
             t.start()
 
 if __name__=='__main__': 
-    HOST = 'localhost'
-    PORT = 21575
+    #HOST = 'localhost'
+    HOST = '91.219.160.217'
+    PORT = 21576
     ADDR = (HOST, PORT)
     server = Server(ADDR, ClientHandlerRecognizer)
     server.run()

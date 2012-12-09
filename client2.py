@@ -84,8 +84,8 @@ if __name__ == '__main__':
     if len(sys.argv) < 2:
         print '\nusage:\npython client.py <image>\n'
         exit()
-    HOST = 'localhost'
-    PORT = 21575
+    HOST = '91.219.160.217'
+    PORT = 21576
     ADDR = (HOST, PORT)
 
     img = cv2.imread(sys.argv[1])
