@@ -16,6 +16,8 @@ from ImageConverter import *
 
 from SWT_lite import *
 
+from PyTesseract import RecFromFile
+
 class ClientHandlerRecognizer(Thread):
     def __init__(self, clientsock, addr):
         super(ClientHandlerRecognizer, self).__init__()

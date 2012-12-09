@@ -484,7 +484,12 @@ DEFAULT_DEBUG_FLAGS = {
 def FindLetters(image, stage=work_stages['no'], oldser=None, dump_stages=False, new_ser='', debug_flags=None):
     #init section. Just for simplify debug. delete this after debooooging
     if not debug_flags: debug_flags = DEFAULT_DEBUG_FLAGS
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    gray = None
+    try:
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    except :
+        gray = image
+        image = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
     curser = new_ser#current ser of dump files
     if not curser: curser = 'none'
     contour = None;  angles_img = None; rays = None; swimage = None; components = None; lettercandidats = None;
