@@ -372,52 +372,36 @@ def Association(gray, contour, swimage, debug_components=False, ser=''):
     if debug_components: VizComponent(contour, components, 'Association', ser)
     return components
 
-def GetAvgColor(c, image):
-    hist = [np.zeros((256), dtype=np.float32) for i in xrange(3)]
-    for p in c['points']:
-        for i in xrange(3):
-            hist[i][image[p[0], p[1], i]] += 1
-    return hist
-    '''
-    summ = np.array([0., 0., 0.])
-    for p in c['points']:
-        for i in xrange(3):
-            summ[i] += image[p[0], p[1], i]
-    summ /= len(c['points'])
-    return summ
-    '''
-
-def ComponentFiltering(components, contour, gray, image, debug_components_after=False, ser=''):
+def ComponentFiltering(components, contour, gray, debug_components_after=False, ser=''):
     final_components = []
     for res in components:
         if (
             len(res['points']) > 14 
-            and (res['height'] > 10 and res['width'] > 8)
+            and (res['height'] > 8 and res['width'] > 4)
             #and (res['bboxvariance'] > 2.5)
             #and ((res['width'] * res['height']) * 0.15 < (len(res['points'])))
             and (0.1 < (float(len(res['points']))/(res['width']*res['height'])) < 0.90)
             #and ((res['height'] > 9) and (res['width'] > 3)) 
             #and (1/2.5 < res['width'] / res['height'] < 2.5)
             #and ((res['mean'] == 0) or (0 < (res['deviation']/res['mean']) < 1))
-            and (1./10 < min(float(res['width'])/res['height'], float(res['height'])/res['width']) < 1.001)
+            and (1./10 < min(float(res['width'])/res['height'], float(res['height'])/res['width']) <= 1.0)
             ):
                 res['mean'] = np.mean(res['swvalues'])
                 res['std'] = np.std(res['swvalues'])
                 if ((res['std']/res['mean'] <= 1)
-                    and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 2000)
+                    and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 2300)
                 ):
                     #if True:#res['variance'] < 40:
                     res['centerX'] = res['X'] + res['width']/2.
                     res['centerY'] = res['Y'] + res['height']/2.
-                    res['avgcolor'] = GetAvgColor(res, image)
                     final_components.append(res)
     if debug_components_after: VizComponent(contour, final_components, 'Component Filter', ser)
     return final_components
 
 def DistanceBetween(c1, c2):
-    return np.sqrt(((c1['centerX'] - c2['centerX'])**2) + ((c1['centerY'] - c2['centerY'])**2))
+    return np.sqrt((c1['centerX'] - c2['centerX'])**2 + (c1['centerY'] - c2['centerY'])**2)
 
-def PairFilter(components, image):
+def PairFilter(components, contour=None):
     lettercandidats = []
     BBH_L = 1/2.5#low barier for height of component
     BBH_H = 2.5#low barier for height of component
@@ -438,11 +422,6 @@ def PairFilter(components, image):
                 and (BBH_L < c2['height']/c['height'] < BBH_H)
                 and (1/2 < c['mean']/c2['mean'] < 2)
                 and (DistanceBetween(c, c2) < 3.5 * (c['width'] + c['height'] + c2['width'] + c2['height']))
-                #and (sum(abs(c['avgcolor'] - c2['avgcolor'])) < 70)
-                #and (cv2.compareHist(c['avgcolor'][0], c2['avgcolor'][0], cv2.cv.CV_COMP_CORREL) > 0.1)
-                #and (cv2.compareHist(c['avgcolor'][1], c2['avgcolor'][1], cv2.cv.CV_COMP_CORREL) > 0.1)
-                #and (cv2.compareHist(c['avgcolor'][2], c2['avgcolor'][2], cv2.cv.CV_COMP_CORREL) > 0.1)
-                #and (not (c['X'] > c2['X'] and c['Y'] > c2['Y'] and c['X2'] < c2['X2'] and c['Y2'] < c2['Y2']))
                 ):
                 lettercandidats.append(c)
                 q = True
@@ -541,7 +520,7 @@ def FindLetters(image, stage=work_stages['no'], oldser=None, dump_stages=False, 
     
     if stage < work_stages['components']:
         print 'Component Filtering...'
-        components = ComponentFiltering(components, contour, gray, image, debug_components_after=debug_flags['debug_components_after'], ser=curser)
+        components = ComponentFiltering(components, contour, gray, debug_components_after=debug_flags['debug_components_after'], ser=curser)
         if dump_stages:
             dumpobj(components, 'components', curser)
     else:
@@ -549,7 +528,7 @@ def FindLetters(image, stage=work_stages['no'], oldser=None, dump_stages=False, 
 
     if stage < work_stages['lettercandidats']:
         print 'Pair Filter...'
-        lettercandidats = PairFilter(components, image)
+        lettercandidats = PairFilter(components, contour)
         if debug_flags['debug_pairs']:
             VizComponent(contour, lettercandidats, 'pairs', curser)
         if dump_stages:
