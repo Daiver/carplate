@@ -25,6 +25,7 @@ import struct
 def ReceivJSON(sock):
     psize = sock.recv(4)
     size = struct.unpack('I', psize)[0]
+    print 'sizes', psize, size
     data = sock.recv(size)
     data = json.loads(data)
     return data
@@ -57,17 +58,17 @@ class ClientHandlerRecognizer(Thread):
     def SendImage(self, img):
         tmp = imgToStr(img)
         request = {
-                    'method' : 'reciev_image',
+                    'method' : 'recimage',
                     'args':{
                             'shape' : img.shape,
                             'size' : len(tmp)
                         }
                 }
         jreq = json.dumps(request)
-        self.Send(jreq)
-        ans = self.Receiv()
+        #self.Send(jreq)
+        SendJSON(self.clientsock, jreq)
+        ans = ReceivJSON(self.clientsock)#self.Receiv()
         if not ans:raise Exception('Conection is down')
-        ans = json.loads(ans)
         if ans['ans'] != 'ready': raise Exception('Sending refused')
         #print len(tmp)
         self.Send(tmp)
@@ -76,7 +77,10 @@ class ClientHandlerRecognizer(Thread):
         shape = arg['shape']
         size = arg['size']
         ans = json.dumps({'ans' : 'ready'})
-        self.clientsock.send(ans)
+        
+        SendJSON(self.clientsock, ans)
+        #self.clientsock.send(ans)
+        
         tmp = ''
         data = ''
         while len(tmp) < size:
@@ -89,11 +93,14 @@ class ClientHandlerRecognizer(Thread):
     def run(self):
         self.finish = False
         while not self.finish:
-            data = self.clientsock.recv(self.BUFSIZ)
-            if not data: break
-            print 'request:', data
-            request = json.loads(data)
-            if not data: break
+            #data = self.clientsock.recv(self.BUFSIZ)
+            #if not data: break
+            #print 'request:', data
+            #request = json.loads(data)
+            #if not data: break
+            request = ReceivJSON(self.clientsock)
+            if not request:break
+            print request
             if request['method'] == 'recimage':
                 img = self.RecievImage(request['args'])
                 cv2.imwrite('1.jpg', img)
