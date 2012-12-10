@@ -8,8 +8,6 @@ import cv2
 
 import os
 
-import sys
-
 import simplejson as json
 
 from time import time
@@ -19,23 +17,6 @@ from ImageConverter import *
 from SWT_lite import *
 
 from PyTesseract import RecFromFile
-
-import struct
-
-def ReceivJSON(sock):
-    psize = sock.recv(4)
-    size = struct.unpack('I', psize)[0]
-    data = sock.recv(size)
-    data = json.loads(data)
-    return data
-
-def SendJSON(sock, data):
-    data = str(data)
-    size = sys.getsizeof(data)
-    sizeinfo = struct.pack('I', size)
-    sock.send(sizeinfo)
-    sock.send(data)
-
 
 class ClientHandlerRecognizer(Thread):
     def __init__(self, clientsock, addr):
