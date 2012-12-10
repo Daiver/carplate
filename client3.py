@@ -66,6 +66,7 @@ if __name__ == '__main__':
     #ans = json.loads(cl.Receiv())
     ans = ReceivJSON(cl.clientsock)
     print ans
+    img = None
     img = cl.RecievImage(ans['args'])
     cv2.imshow('', img)
     cv2.waitKey()
