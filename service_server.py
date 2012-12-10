@@ -24,7 +24,7 @@ import struct
 
 def ReceivJSON(sock):
     psize = sock.recv(4)
-    size = struct.unpack('I', psize)[0]
+    size = struct.unpack('!i', psize)[0]
     print 'sizes', psize, size
     data = sock.recv(size)
     data = json.loads(data)
@@ -33,7 +33,7 @@ def ReceivJSON(sock):
 def SendJSON(sock, data):
     data = str(data)
     size = sys.getsizeof(data)
-    sizeinfo = struct.pack('I', size)
+    sizeinfo = struct.pack('!i', size)
     sock.send(sizeinfo)
     sock.send(data)
 
