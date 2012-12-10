@@ -89,7 +89,7 @@ if __name__ == '__main__':
         print '\nusage:\npython client.py <image>\n'
         exit()
     HOST = '91.219.160.217'
-    PORT = 21577
+    PORT = 21580
     ADDR = (HOST, PORT)
 
     cl = Client(ADDR)

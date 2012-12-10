@@ -32,7 +32,8 @@ def ReceivJSON(sock):
 
 def SendJSON(sock, data):
     data = str(data)
-    size = sys.getsizeof(data)
+    #size = sys.getsizeof(data)
+    size = len(data)
     sizeinfo = struct.pack('!i', size)
     sock.send(sizeinfo)
     sock.send(data)
@@ -67,9 +68,9 @@ class ClientHandlerRecognizer(Thread):
         jreq = json.dumps(request)
         #self.Send(jreq)
         SendJSON(self.clientsock, jreq)
-        ans = ReceivJSON(self.clientsock)#self.Receiv()
-        if not ans:raise Exception('Conection is down')
-        if ans['ans'] != 'ready': raise Exception('Sending refused')
+        #ans = ReceivJSON(self.clientsock)#self.Receiv()
+        #if not ans:raise Exception('Conection is down')
+        #if ans['ans'] != 'ready': raise Exception('Sending refused')
         #print len(tmp)
         self.Send(tmp)
 
@@ -78,7 +79,7 @@ class ClientHandlerRecognizer(Thread):
         size = arg['size']
         ans = json.dumps({'ans' : 'ready'})
         
-        SendJSON(self.clientsock, ans)
+        #SendJSON(self.clientsock, ans)
         #self.clientsock.send(ans)
         
         tmp = ''

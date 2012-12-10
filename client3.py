@@ -25,40 +25,6 @@ class Client(ClientHandlerRecognizer):
 
     def Connect(self):
         self.clientsock.connect(self.addr)
-    '''
-    def SendImage(self, img):
-        tmp = imgToStr(img)
-        request = {
-                    'method' : 'recimage',
-                    'args':{
-                            'shape' : img.shape,
-                            'size' : len(tmp)
-                        }
-                }
-        jreq = json.dumps(request)
-        self.Send(jreq)
-        ans = self.Receiv()
-        if not ans:raise Exception('Conection is down')
-        ans = json.loads(ans)
-        if ans['ans'] != 'ready': raise Exception('Sending refused')
-        #print len(tmp)
-        self.Send(tmp)
-
-    def RecievImage(self, arg):
-        shape = arg['shape']
-        size = arg['size']
-        ans = json.dumps({'ans' : 'ready'})
-        self.Send(ans)
-        tmp = ''
-        data = ''
-        while len(tmp) < size:
-            data = self.Receiv()
-            if not data: raise Exception('failed to reciev image')
-            tmp += data              
-        #print tmp
-        image = imgFromStr(tmp, shape)
-        return image
-    '''     
 
     def Send(self, data):
         self.clientsock.send(data)
@@ -89,13 +55,14 @@ if __name__ == '__main__':
         print '\nusage:\npython client.py <image>\n'
         exit()
     HOST = '91.219.160.217'
-    PORT = 21577
+    PORT = 21582
     ADDR = (HOST, PORT)
 
     img = cv2.imread(sys.argv[1])
     cl = Client(ADDR)
     cl.Connect()
     cl.SendImage(img)
+    print 'receiving...'
     #ans = json.loads(cl.Receiv())
     ans = ReceivJSON(cl.clientsock)
     print ans
