@@ -25,7 +25,7 @@ import struct
 def ReceivJSON(sock):
     psize = sock.recv(4)
     size = struct.unpack('!i', psize)[0]
-    print 'sizes', psize, size
+    #print 'sizes', psize, size
     data = sock.recv(size)
     data = json.loads(data)
     return data
@@ -150,8 +150,11 @@ class Server:
 
 if __name__=='__main__': 
     #HOST = 'localhost'
-    HOST = '91.219.160.217'
-    PORT = 21577
+    if len(sys.argv) < 2 :
+        print 'USAGE <port> [<addr>]'
+        exit()
+    HOST = sys.argv[2] if len(sys.argv) else 'localhost'#'91.219.160.217'
+    PORT = int(sys.argv[1])#21577
     ADDR = (HOST, PORT)
     server = Server(ADDR, ClientHandlerRecognizer)
     server.run()
