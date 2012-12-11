@@ -18,7 +18,7 @@ from ImageConverter import *
 
 from SWT_lite import *
 
-from PyTesseract import RecFromFile
+#from PyTesseract import RecFromFile
 
 import struct
 
