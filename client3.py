@@ -54,7 +54,7 @@ if __name__ == '__main__':
     if len(sys.argv) < 2:
         print '\nusage:\npython client.py <image>\n'
         exit()
-    HOST = '91.219.160.217'
+    HOST = '91.219.161.8'#'91.219.160.217'
     PORT = 21582
     ADDR = (HOST, PORT)
 

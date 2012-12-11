@@ -104,9 +104,10 @@ class ClientHandlerRecognizer(Thread):
             print request
             if request['method'] == 'recimage':
                 img = self.RecievImage(request['args'])
-                cv2.imwrite('1.jpg', img)
+                #cv2.imwrite('1.jpg', img)
                 #cv2.imread(1)
-                cv2.rectangle(img, (20, 30), (300, 300), (255, 0, 255))
+                img = MarkLetters(img)
+                #cv2.rectangle(img, (20, 30), (300, 300), (255, 0, 255))
                 self.SendImage(img)
             ans = []
             if request['method'] == 'load_image':

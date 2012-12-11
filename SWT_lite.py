@@ -538,6 +538,15 @@ def FindLetters(image, stage=work_stages['no'], oldser=None, dump_stages=False, 
 
     return lettercandidats
 
+def MarkLetters(img):
+    try:
+        lettercandidats = FindLetters(img)
+        for l in lettercandidats:
+            cv2.rectangle(img, (l['Y'], l['X']), (l['Y2'], l['X2']), (0, 20, 200))
+    finally:
+        return img
+
+
 def GetLetters(img):
     lettercandidats = FindLetters(img)
     return [CutRect(img, (c['X'], c['Y']), (c['X2'], c['Y2']), 2) for c in lettercandidats]
