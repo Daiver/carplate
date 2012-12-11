@@ -109,18 +109,21 @@ class ClientHandlerRecognizer(Thread):
                 img = MarkLetters(img)
                 #cv2.rectangle(img, (20, 30), (300, 300), (255, 0, 255))
                 self.SendImage(img)
-            ans = []
-            if request['method'] == 'load_image':
+
+            elif request['method'] == 'load_image':
                 data = request['path']
                 if os.path.exists(data):
                     img = cv2.imread(data)#self.RecievImage(request['args'])p
-                    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-                    letters = GetLetters(gray)
+                    #gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                    letterscan = FindLetters(img)#GetLetters(gray)
+                    letters = CutAllLetters(img, letterscan)
+                    img = MarkIt(img, letterscan)
                     for l in letters:
                         tmp_name = str(time()) + '.tif'
                         cv2.imwrite('lettersstorage/' + tmp_name, l)
-                        ans.append(RecFromFile(tmp_name))
-                    self.clientsock.send(str(ans))
+                        #ans.append(RecFromFile(tmp_name))
+                    cv2.imwrite(data[:data.rfind('.')] + '.rec.jpg', img)
+                    self.clientsock.send('ok')
                 else:
                     self.clientsock.send('bad_path')
             else:
