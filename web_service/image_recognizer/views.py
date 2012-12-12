@@ -21,6 +21,8 @@ import os
 
 import struct
 
+import datetime
+
 def ReceivJSON(sock):
     psize = sock.recv(4)
     size = struct.unpack('!i', psize)[0]
@@ -52,24 +54,29 @@ class RecInitializer:
 
 def handle_uploaded_file(f):
     tmp_name = str(time()) + '.jpg'
+    name_for_db = '/media/saved/' + tmp_name
     tmp_name = 'web_service/media/saved/' + tmp_name
     destination = open(tmp_name, 'wb+')
     for chunk in f.chunks():
         destination.write(chunk)
     destination.close()
+    newrec = img2rec(path=name_for_db, download_data=datetime.date.today())
+    newrec.save()
     ADDR = (settings.REC_SERVER_PARAMS['HOST'], settings.REC_SERVER_PARAMS['PORT'])
     cl = RecInitializer(ADDR)
-    cl.Connect()
-    req = json.dumps({'method' : 'load_image', 'path' : os.path.abspath(tmp_name)})
-    SendJSON(cl.clientsock, req)
+    try:
+        cl.Connect()
+        req = json.dumps({'method' : 'load_image', 'path' : os.path.abspath(tmp_name)})
+        SendJSON(cl.clientsock, req)
     #ans = cl.clientsock.recv(cl.BUFSIZ)
-    cl.Close()
+    finally:
+        cl.Close()
 
 
 @csrf_protect
 def gallery(request):
     form = AddImageForm(request.POST or None, request.FILES)
-    li = img2rec.objects.all().order_by('path')#.order_by('download_data')
+    li = img2rec.objects.all().order_by('-path')#.order_by('download_data')
     #print request
     if request.method == 'POST':# and form.is_valid():
         form = AddImageForm(request.POST or None, request.FILES)
