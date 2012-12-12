@@ -5,5 +5,5 @@ from django import forms
 from models import *
 
 class AddImageForm(forms.Form):
-	img = forms.ImageField()
+	img = forms.FileField()
 	

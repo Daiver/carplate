@@ -7,9 +7,23 @@ from django.views.generic.simple import direct_to_template
 from django.views.decorators.csrf import csrf_protect
 from django.core.context_processors import csrf
 
+def handle_uploaded_file(f):
+    destination = open('web_service/media/saved/1.jpg', 'wb+')
+    for chunk in f.chunks():
+        destination.write(chunk)
+    destination.close()
+
 @csrf_protect
 def gallery(request):
-	form = AddImageForm(request.POST or None, request.FILES)
-	#if request.method == 'POST' and form.is_valid():
-	list = img2rec.objects.all()
-	return direct_to_template(request,'gallery.html',{'list':list, 'form':form})
+    form = AddImageForm(request.POST or None, request.FILES)
+    list = img2rec.objects.all()
+    #print request
+    if request.method == 'POST':# and form.is_valid():
+        form = AddImageForm(request.POST or None, request.FILES)
+        print request.POST
+        if form.is_valid():
+            handle_uploaded_file(request.FILES['img'])
+        return HttpResponseRedirect('/')
+    else:
+        form = AddImageForm()
+    return direct_to_template(request,'gallery.html',{'list':list, 'form':form})
