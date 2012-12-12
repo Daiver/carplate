@@ -65,8 +65,8 @@ font-weight:bold;
     <div class="features">
       <ul>
         <li> Как это работает? 
-Нажмите "Выберите файл" после поиска изображения на вашем компьютере ,нажмите кнопку "ок". <br />
-          <span class="bannertxt"></span></li>
+<br />
+          <span class="bannertxt">Нажмите "Выберите файл" после поиска изображения на вашем компьютере ,нажмите кнопку "ок". </span></li>
         <li><form enctype="multipart/form-data" action="." method="POST">{% csrf_token %}
         <table>
         {{form}}
@@ -77,9 +77,10 @@ font-weight:bold;
         </tr>
         </table>
     </form>
- <li>Gallery: <br />
+ <li><h2>Gallery: </h2><br />
           {% for o in list%}
 	<p align=center>#{{o.id}}</br><img src = {{o.path}} height = "400"></img></p>
+	<p></p>
 {%endfor%}</li>
 <br />
       </ul>
@@ -88,7 +89,7 @@ font-weight:bold;
     <div class="clear"></div>
   <div id="footer">
     <ul>
-    Copyright (c) All rights reserved. Design by cs_vsu.
+    cs_vsu. 2012
     </ul>
   </div>
 </div>
