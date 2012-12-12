@@ -77,6 +77,12 @@ def handle_uploaded_file(f):
 def gallery(request):
     form = AddImageForm(request.POST or None, request.FILES)
     li = img2rec.objects.all().order_by('-path')#.order_by('download_data')
+    newli = []
+    for x in li:
+        tmp_path = x.path[:x.path.rfind('.')] + '.rec.jpg'
+        if os.path.exists('web_service/' + tmp_path):
+            x.path = tmp_path
+        newli.append(x)
     #print request
     if request.method == 'POST':# and form.is_valid():
         form = AddImageForm(request.POST or None, request.FILES)
@@ -85,4 +91,4 @@ def gallery(request):
         return HttpResponseRedirect('/')
     else:
         form = AddImageForm()
-    return direct_to_template(request,'gallery.html',{'list':li, 'form':form})
+    return direct_to_template(request,'gallery.html',{'list':newli, 'form':form})

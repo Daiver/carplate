@@ -17,16 +17,12 @@ Gx = np.array([
     )
 
 #Выделяет на картинке область с центром в точке center
-#Кривая, но мне хватало
 def SquareSelect(image, center):
     return image[center[0] - 1:center[0] + 2, center[1] - 1:center[1] + 2]
     
-#Свертка. По крайней мере я себе ее так представлял
 def convolution(A, kernel):
     return sum(sum(kernel * A))#/6#6 - coff norm
 
-#Дает нам угол наклона градиента к оси ОХ. Я мог накосячить с системой координат
-#Но что-то работает
 def gradient(image, anchor):
     A = SquareSelect(image, anchor)
     dx = convolution(A, Gx)
@@ -36,10 +32,6 @@ def gradient(image, anchor):
     #if not g: return None
     #angle = np.arccos(dx / g)
     #return np.arccos(dx / g)
-
-#Тут грустная но поучительная история: я не верно перевел (или неверно понял)
-#фразу в документе, и решил что надо нам ходить *по* контуру
-#Так родилась эта ф-ия
 
 #Ф-ия берет угол, и дает нам направление в котором надо идти
 #Может можно и проще, но на момент написания это показалось мне озарением

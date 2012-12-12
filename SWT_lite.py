@@ -45,12 +45,6 @@ def SWViz(image, ser):
     tmp[tmp == np.inf] = Barrier
     tmp[tmp > Barrier] = Barrier
     tmp *= 10
-    #res = np.zeros((image.shape[0], image.shape[1], 3), dtype=np.uint8)
-    #res[tmp > 10] = (200, 0, 0)
-    #res[tmp > 15] = (10, 50, 100)
-    #res[tmp > 30] = (0, 100, 100)
-    #res[tmp > 45] = (0, 0, 200)
-    #cv2.imwrite('swimageimprove1.jpg', tmp)
     cv2.imwrite(DIR_TO_DUMP + ser + '-swimage.jpg', tmp)
     cv2.imshow('swimage', tmp)
     cv2.waitKey(1000)
@@ -87,15 +81,6 @@ def ContourNear(contour, point):
     tmp1 = contour[point[0]-1:point[0]+2, point[1]:point[1]+1]
     tmp2 = contour[point[0]:point[0]+1, point[1]-1:point[1]+2]
     return np.sum(tmp2 + tmp1) > 0
-    '''for i in [-1, 0, 1]:
-        new_p = (point[0] + i, point[1])
-        if checkbound(new_p, contour) and contour[new_p[0], new_p[1]] != 0:
-            return True
-    for i in [-1, 1]:
-        new_p = (point[0], point[1] + i)
-        if checkbound(new_p, contour) and contour[new_p[0], new_p[1]] != 0:
-            return True
-    return False'''
 
 def CheckAngleNear(angles_img, point, border_angle, oldangle):
     for i in [-1, 0, 1]:
@@ -425,17 +410,6 @@ def PairFilter(components, contour=None):
                 ):
                 lettercandidats.append(c)
                 q = True
-                #print i, '1:', c['centerX'], c['centerY'], c['width'], c['height'], DistanceBetween(c, c2)
-                #print j, '2:', c2['centerX'], c2['centerY'], c2['width'], c2['height'], DistanceBetween(c, c2)
-                #tmp = np.zeros(contour.shape)
-                #tmp[:] = 255
-                #for p in c['points']:
-                #    tmp[p[0], p[1]] = 0
-                #for p in c2['points']:
-                #    tmp[p[0], p[1]] = 0
-                #VizComponent(contour, lettercandidats, 'pairs', '')
-                #cv2.imshow('', tmp)
-                #cv2.waitKey()
                 break
         if not q:
             marks[i] = False
