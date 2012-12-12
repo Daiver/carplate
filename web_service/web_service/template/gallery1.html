@@ -1,0 +1,17 @@
+<form enctype="multipart/form-data" action="." method="POST">{% csrf_token %}
+        <table>
+        {{form}}
+        <tr>
+        	<td colspan="2">
+        		<br><input type="submit" value="Ok"><br>
+        	</td>
+        </tr>
+        </table>
+    </form>
+
+<h3>
+    Gallery:
+</h3>
+{% for o in list%}
+	<p align=center>#{{o.id}}</br><img src = {{o.path}} height = "400"></img></p>
+{%endfor%}

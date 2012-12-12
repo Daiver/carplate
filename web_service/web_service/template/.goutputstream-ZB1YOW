@@ -64,33 +64,4 @@ font-weight:bold;
     <h1>RECOGNITION</h1>
     <div class="features">
       <ul>
-        <li> Как это работает? 
-<br />
-          <span class="bannertxt">Нажмите "Выберите файл" после поиска изображения на вашем компьютере ,нажмите кнопку "ок". </span></li>
-        <li><form enctype="multipart/form-data" action="." method="POST">{% csrf_token %}
-        <table>
-        {{form}}
-        <tr>
-        	<td colspan="2">
-        		<br><input type="submit" value="Ok"><br>
-        	</td>
-        </tr>
-        </table>
-    </form>
- <li>Gallery: <br />
-          {% for o in list%}
-	<p align=center>#{{o.id}}</br><img src = {{o.path}} height = "400"></img></p>
-{%endfor%}</li>
-<br />
-      </ul>
-    </div>
-  </div>
-    <div class="clear"></div>
-  <div id="footer">
-    <ul>
-    Copyright (c) All rights reserved. Design by cs_vsu.
-    </ul>
-  </div>
-</div>
-</body>
-</html>
+        <li> 
