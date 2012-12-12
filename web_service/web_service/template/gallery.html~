@@ -1,0 +1,5 @@
+
+
+{% for o in list%}
+	<img src = {{o.path}} height = "400"></img><br></br>
+{%endfor%}

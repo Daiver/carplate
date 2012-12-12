@@ -125,10 +125,10 @@ class ClientHandlerRecognizer(Thread):
                     letterscan = FindLetters(img)#GetLetters(gray)
                     letters = CutAllLetters(img, letterscan)
                     img = MarkIt(img, letterscan)
-                    for l in letters:
-                        tmp_name = str(time()) + '.tif'
-                        cv2.imwrite('lettersstorage/' + tmp_name, l)
-                        #ans.append(RecFromFile(tmp_name))
+                    #for l in letters:
+                    #    tmp_name = str(time()) + '.tif'
+                    #    #cv2.imwrite('lettersstorage/' + tmp_name, l)
+                    #    #ans.append(RecFromFile(tmp_name))
                     cv2.imwrite(data[:data.rfind('.')] + '.rec.jpg', img)
                     self.clientsock.send('ok')
                 else:
