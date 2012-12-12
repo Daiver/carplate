@@ -43,14 +43,14 @@ class Client(ClientHandlerRecognizer):
         return img
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print '\nusage:\npython client.py <image>\n'
+    if len(sys.argv) < 4:
+        print '\nusage:\npython client.py port addr <image>\n'
         exit()
-    HOST = '91.219.161.8'#'91.219.160.217'
-    PORT = 21583
+    HOST = sys.argv[2]#'91.219.161.8'#'91.219.160.217'
+    PORT = int(sys.argv[1])
     ADDR = (HOST, PORT)
 
-    img = cv2.imread(sys.argv[1])
+    img = cv2.imread(sys.argv[3])
     cl = Client(ADDR)
     cl.Connect()
     img = cl.RecImage(img)

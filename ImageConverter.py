@@ -1,5 +1,7 @@
 import numpy as np
 
+import cv2
+
 def imgFromStr(s, size):
     #print size
     if len(s) > 2 and s[-2:] == ', ':
@@ -14,3 +16,13 @@ def imgToStr(img):
     res = res[1:]
     res = res[:-1]    
     return res
+
+def PackImage(img, width):
+    nw = width
+    nh = img.shape[0] * width/img.shape[1]
+    return cv2.resize(img, (nw, nh))
+
+#img = cv2.imread('img/cars/1.jpg')
+#img = PackImage(img, 500)
+#cv2.imshow('', img)
+#cv2.waitKey()

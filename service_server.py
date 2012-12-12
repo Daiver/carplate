@@ -104,6 +104,8 @@ class ClientHandlerRecognizer(Thread):
             print request
             if request['method'] == 'recimage':
                 img = self.RecievImage(request['args'])
+                if img.shape[1] > 1000:
+                    img = PackImage(img, 1000)
                 #cv2.imwrite('1.jpg', img)
                 #cv2.imread(1)
                 img = MarkLetters(img)
@@ -114,6 +116,8 @@ class ClientHandlerRecognizer(Thread):
                 data = request['path']
                 if os.path.exists(data):
                     img = cv2.imread(data)#self.RecievImage(request['args'])p
+                    if img.shape[1] > 1000:
+                        img = PackImage(img, 1000)
                     #gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
                     letterscan = FindLetters(img)#GetLetters(gray)
                     letters = CutAllLetters(img, letterscan)
@@ -158,7 +162,7 @@ if __name__=='__main__':
     if len(sys.argv) < 2 :
         print 'USAGE <port> [<addr>]'
         exit()
-    HOST = sys.argv[2] if len(sys.argv) else 'localhost'#'91.219.160.217'
+    HOST = sys.argv[2] if len(sys.argv) > 2 else 'localhost'#'91.219.160.217'
     PORT = int(sys.argv[1])#21577
     ADDR = (HOST, PORT)
     server = Server(ADDR, ClientHandlerRecognizer)
