@@ -24,5 +24,5 @@ urlpatterns = patterns('',
 
 if settings.DEBUG:
     urlpatterns += patterns('',
-        (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root':settings.MEDIA_ROOT}),
-    )
+        (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root':settings.MEDIA_URL}),
+    ) #'/home/kirill/coding/MyPy/carplate/web_service/web_service/media/'

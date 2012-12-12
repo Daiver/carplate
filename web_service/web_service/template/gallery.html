@@ -1,1 +1,14 @@
-<img src = '/media/img/cars/1.jpg'></img>
+<form action="." method="POST">{% csrf_token %}
+        <table>
+        {{form}}
+        <tr>
+        	<td colspan="2">
+        		<br><input type="submit" value="Ok"><br>
+        	</td>
+        </tr>
+        </table>
+    </form>
+
+{% for o in list%}
+	<img src = {{o.path}} height = "400"></img><br></br>
+{%endfor%}
