@@ -7,8 +7,15 @@ from django.views.generic.simple import direct_to_template
 from django.views.decorators.csrf import csrf_protect
 from django.core.context_processors import csrf
 
+from django.conf import settings
+
+from image_recognizer.models import *
+
+from time import time
+
 def handle_uploaded_file(f):
-    destination = open('web_service/media/saved/1.jpg', 'wb+')
+    tmp_name = str(time()) + '.jpg'
+    destination = open('web_service/media/saved/' + tmp_name, 'wb+')
     for chunk in f.chunks():
         destination.write(chunk)
     destination.close()
