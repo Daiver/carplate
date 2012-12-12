@@ -133,7 +133,7 @@ INSTALLED_APPS = (
 )
 
 REC_SERVER_PARAMS = {
-    'ADDR' : 'localhost',
+    'HOST' : 'localhost',
     'PORT' : 20000,
 }
 

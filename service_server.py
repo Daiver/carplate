@@ -99,9 +99,10 @@ class ClientHandlerRecognizer(Thread):
             #print 'request:', data
             #request = json.loads(data)
             #if not data: break
+            print 'receiving....'
             request = ReceivJSON(self.clientsock)
             if not request:break
-            print request
+            print 'request', request
             if request['method'] == 'recimage':
                 img = self.RecievImage(request['args'])
                 if img.shape[1] > 1000:
@@ -112,8 +113,10 @@ class ClientHandlerRecognizer(Thread):
                 #cv2.rectangle(img, (20, 30), (300, 300), (255, 0, 255))
                 self.SendImage(img)
 
-            elif request['method'] == 'load_image':
+            if request['method'] == 'load_image':
+                print 'work with loaded image'
                 data = request['path']
+                print 'path:', data
                 if os.path.exists(data):
                     img = cv2.imread(data)#self.RecievImage(request['args'])p
                     if img.shape[1] > 1000:
