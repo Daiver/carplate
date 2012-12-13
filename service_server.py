@@ -100,7 +100,10 @@ class ClientHandlerRecognizer(Thread):
             #request = json.loads(data)
             #if not data: break
             print 'receiving....'
-            request = ReceivJSON(self.clientsock)
+            try:
+                request = ReceivJSON(self.clientsock)
+            except:
+                print 'closing connection from', self.addr
             if not request:break
             print 'request', request
             if request['method'] == 'recimage':
@@ -130,11 +133,19 @@ class ClientHandlerRecognizer(Thread):
                     #    #cv2.imwrite('lettersstorage/' + tmp_name, l)
                     #    #ans.append(RecFromFile(tmp_name))
                     cv2.imwrite(data[:data.rfind('.')] + '.rec.jpg', img)
-                    self.clientsock.send('ok')
+                    try:
+                        SendJSON(self.clientsock, json.dumps({'ans' : 'ok'}))
+                    except:
+                        self.Close()
+                        break
+                    #self.clientsock.send('ok')
                 else:
-                    self.clientsock.send('bad_path')
+                    ans = json.dumps({'ans' : 'bad_path'})
+                    SendJSON(self.clientsock, ans)
             else:
-                self.clientsock.send('bad_request')
+                ans = json.dumps({'ans' : 'bad_request'})
+                SendJSON(self.clientsock, ans)
+                #self.clientsock.send('bad_request')
         print 'close conn', self.addr
         self.clientsock.close()
 
