@@ -75,8 +75,10 @@ def handle_uploaded_file(f):
 
 @csrf_protect
 def gallery(request):
+    limit = 10
     form = AddImageForm(request.POST or None, request.FILES)
-    li = img2rec.objects.all().order_by('-path')#.order_by('download_data')
+    li = img2rec.objects.all().order_by('-path').reverse()[:limit].reverse()#.order_by('download_data')
+    #li = li[:]
     newli = []
     for x in li:
         tmp_path = x.path[:x.path.rfind('.')] + '.rec.jpg'
