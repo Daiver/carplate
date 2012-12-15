@@ -9,6 +9,7 @@ from django.conf.urls.static import static
 
 urlpatterns = patterns('',
     url(r'^$', gallery),
+    url(r'^auth/', include('regnauth.urls')),
     # Examples:
     # url(r'^$', 'web_service.views.home', name='home'),
     # url(r'^web_service/', include('web_service.foo.urls')),

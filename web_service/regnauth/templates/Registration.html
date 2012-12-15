@@ -1,0 +1,30 @@
+{% extends "index.html" %}
+
+{% load i18n %}
+
+{% block application %}
+
+
+
+<h3>{% trans "Registration" %}</h3>
+<form action="." method="POST">{% csrf_token %}
+
+
+{% if messages %}
+    <ul class="messages">
+    {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+            {{ message }}
+        </li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+
+{{ form }}
+</br>
+<input type="submit"/>
+</form>
+
+{% endblock %}
+

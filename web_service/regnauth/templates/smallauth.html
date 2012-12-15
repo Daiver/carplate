@@ -1,0 +1,36 @@
+{% load i18n %}
+
+<h3>{% trans "Auth" %}</h3>
+<form action="." method="POST">{% csrf_token %}
+
+{% if messages %}
+    <ul class="messages">
+    {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+            {{ message }}
+        </li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+
+{% if not user.is_authenticated %}
+{{ form }}
+</br>
+<input type="submit"/>
+</form>
+
+<h4>
+
+<a href={% url regnauth.RegPage  %}>{% trans "Registration" %}</a>
+<a href={% url regnauth.RestorePassRequestPage  %}>{% trans "Forgot your password" %}</a>
+
+</h4>
+
+{% else %}
+
+<h3>Hello {{user.username}}</h3>
+<h4><a href={% url regnauth.logout %}>logout</a></h4>
+
+{% endif %}
+

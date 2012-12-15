@@ -104,6 +104,9 @@ class ClientHandlerRecognizer(Thread):
                 request = ReceivJSON(self.clientsock)
             except:
                 print 'closing connection from', self.addr
+                self.Close()
+                break
+
             if not request:break
             print 'request', request
             if request['method'] == 'recimage':
@@ -145,7 +148,7 @@ class ClientHandlerRecognizer(Thread):
             else:
                 ans = json.dumps({'ans' : 'bad_request'})
                 SendJSON(self.clientsock, ans)
-                #self.clientsock.send('bad_request')
+
         print 'close conn', self.addr
         self.clientsock.close()
 
@@ -158,7 +161,6 @@ class Server:
 
     def Stop(self):
         self.finish = True
-        #TODO stop ALL clients
 
     def run(self):
         self.serversock.bind(self.addr)

@@ -1,68 +1,7 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<META http-equiv=Content-Type content="text/html; charset=windows-1251"><LINK 
-<meta name="Robots" content="index,follow" />
-<title>RECOGNITION</title>
-</head>
-<STYLE type="text/css">
- h1
-{margin:0px;
-padding:26px 0px 0px 47px;
-font-size:21px;
-color:#FFFF;
-font-family:Arial, Helvetica, sans-serif;
-}
+{% extends "index.html" %}
+{% block application %}
 
-
-body
-{font-family:Arial, Helvetica, sans-serif;
-font-size:11px;
-background:#EEEFF3 url(../images/bodybg.jpg) repeat-x;
-margin:0px;
-padding:0px;
-}
-*{margin:0; padding:0}
-#wrapper
-{margin:0 auto;
-width:904px;
-}
-.clear
-{clear:both;
-margin:0px;
-padding:0px;
-}
-
-.menuzone
-{
- height:35px;
-}
-
-.bannertxt {
-	color:#777373;
-	font-size:11px; 
-	font-weight:100;
-}
-#footer ul{width:904px; float:left; text-align:center; list-style:none; padding:20px 0 50px 0 }
-.features li
-{list-style-type:none;
-padding:10px 30px 12px 86px;
-font-size:12px;
-color:#356CE0;
-font-weight:bold;
-}
-  </STYLE>
-<body>
-<div id="wrapper">
-  <div class="menuzone">
-    <div class="clear"></div>
-  </div>
-  <div class="clear"></div>
-  <div id="header">
-  <div class="clear"></div>
-  <div id="banner">
-    <h1>RECOGNITION</h1>
-    <div class="features">
+   <div class="features">
       <ul>
         <li> Как это работает? 
 <br />
@@ -85,13 +24,5 @@ font-weight:bold;
 <br />
       </ul>
     </div>
-  </div>
-    <div class="clear"></div>
-  <div id="footer">
-    <ul>
-    cs_vsu. 2012
-    </ul>
-  </div>
-</div>
-</body>
-</html>
+{% endblock %}
+
