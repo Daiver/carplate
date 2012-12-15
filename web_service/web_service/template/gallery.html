@@ -3,6 +3,8 @@
 
    <div class="features">
       <ul>
+        {% if user.is_authenticated %}
+
         <li> Как это работает? 
 <br />
           <span class="bannertxt">Нажмите "Выберите файл" после поиска изображения на вашем компьютере ,нажмите кнопку "ок". </span></li>
@@ -16,6 +18,9 @@
         </tr>
         </table>
     </form>
+    {% else %}
+    <h3> Чтобы получить возможность добавлять свои фотографии - авторизуйтесь </h3>
+    {% endif %}
  <li><h2>Gallery: </h2><br />
           {% for o in list%}
 	<p align=center>#{{o.id}}</br><img src = {{o.path}} height = "400"></img></p>

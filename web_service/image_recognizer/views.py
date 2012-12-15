@@ -9,6 +9,8 @@ from django.core.context_processors import csrf
 
 from django.conf import settings
 
+from django.contrib.auth.decorators import permission_required
+
 from image_recognizer.models import *
 
 from time import time
@@ -75,10 +77,9 @@ def handle_uploaded_file(f):
 
 @csrf_protect
 def gallery(request):
-    limit = 10
+    limit = 20
     form = AddImageForm(request.POST or None, request.FILES)
     li = img2rec.objects.all().order_by('-path').reverse()[:limit].reverse()#.order_by('download_data')
-    #li = li[:]
     newli = []
     for x in li:
         tmp_path = x.path[:x.path.rfind('.')] + '.rec.jpg'
