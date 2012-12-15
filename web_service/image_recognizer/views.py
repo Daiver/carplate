@@ -89,7 +89,8 @@ def gallery(request):
     #print request
     if request.method == 'POST':# and form.is_valid():
         form = AddImageForm(request.POST or None, request.FILES)
-        if form.is_valid():
+        user = request.user
+        if form.is_valid() and user:
             handle_uploaded_file(request.FILES['img'])
         return HttpResponseRedirect('/')
     else:
