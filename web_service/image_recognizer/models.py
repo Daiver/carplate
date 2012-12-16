@@ -1,7 +1,7 @@
 from django.db import models
 
 class img2rec(models.Model):
-	download_data = models.DateField()
+	download_data = models.DateTimeField()
 	path = models.CharField(max_length = 4096)
 
 class letter(models.Model):

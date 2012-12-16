@@ -23,7 +23,7 @@
     {% endif %}
  <li><h2>Gallery: </h2><br />
           {% for o in list%}
-	<p align=center>#{{o.id}}</br><img src = {{o.path}} height = "400"></img></p>
+	<p align=center>#{{o.id}} {{o.isrec}}</br><img src = {{o.path}} height = "400"></img></p>
 	<p></p>
 {%endfor%}</li>
 <br />

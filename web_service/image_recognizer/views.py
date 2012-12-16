@@ -22,7 +22,9 @@ import os
 
 import struct
 
-import datetime
+#import datetime
+from datetime import datetime
+
 
 def ReceivJSON(sock):
     psize = sock.recv(4)
@@ -67,7 +69,7 @@ def handle_uploaded_file(f):
         cl.Connect()
         req = json.dumps({'method' : 'load_image', 'path' : os.path.abspath(tmp_name)})
         SendJSON(cl.clientsock, req)
-        newrec = img2rec(path=name_for_db, download_data=datetime.date.today())
+        newrec = img2rec(path=name_for_db, download_data=datetime.now())
         newrec.save()
     #ans = cl.clientsock.recv(cl.BUFSIZ)
     except:
@@ -90,8 +92,10 @@ def gallery(request, showlimit):
     newli = []
     for x in li:
         tmp_path = x.path[:x.path.rfind('.')] + '.rec.jpg'
+        x.isrec = 'not recognized'
         if os.path.exists('web_service/' + tmp_path):
             x.path = tmp_path
+            x.isrec = 'recognized'
         newli.append(x)
     #print request
     if request.method == 'POST':# and form.is_valid():
