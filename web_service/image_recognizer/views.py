@@ -1,4 +1,3 @@
-# Create your views here.
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from image_recognizer.models import *
@@ -62,22 +61,28 @@ def handle_uploaded_file(f):
     for chunk in f.chunks():
         destination.write(chunk)
     destination.close()
-    newrec = img2rec(path=name_for_db, download_data=datetime.date.today())
-    newrec.save()
     ADDR = (settings.REC_SERVER_PARAMS['HOST'], settings.REC_SERVER_PARAMS['PORT'])
     cl = RecInitializer(ADDR)
     try:
         cl.Connect()
         req = json.dumps({'method' : 'load_image', 'path' : os.path.abspath(tmp_name)})
         SendJSON(cl.clientsock, req)
+        newrec = img2rec(path=name_for_db, download_data=datetime.date.today())
+        newrec.save()
     #ans = cl.clientsock.recv(cl.BUFSIZ)
+    except:
+        pass
     finally:
         cl.Close()
 
 
 @csrf_protect
-def gallery(request):
-    limit = 20
+def gallerydefault(request):
+    return gallery(request, 5)
+
+@csrf_protect
+def gallery(request, showlimit):
+    limit = showlimit
     form = AddImageForm(request.POST or None, request.FILES)
     li = img2rec.objects.all().order_by('-path').reverse()[:limit].reverse()#.order_by('download_data')
     newli = []

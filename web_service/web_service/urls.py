@@ -8,7 +8,8 @@ from django.conf.urls.static import static
 # admin.autodiscover()
 
 urlpatterns = patterns('',
-    url(r'^$', gallery),
+    url(r'^$', gallerydefault),
+    url(r'^show/(?P<showlimit>\d+)/+$', gallery),
     url(r'^auth/', include('regnauth.urls')),
     # Examples:
     # url(r'^$', 'web_service.views.home', name='home'),
