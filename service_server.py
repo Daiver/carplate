@@ -25,14 +25,13 @@ import struct
 def ReceivJSON(sock):
     psize = sock.recv(4)
     size = struct.unpack('!i', psize)[0]
-    #print 'sizes', psize, size
+
     data = sock.recv(size)
     data = json.loads(data)
     return data
 
 def SendJSON(sock, data):
     data = str(data)
-    #size = sys.getsizeof(data)
     size = len(data)
     sizeinfo = struct.pack('!i', size)
     sock.send(sizeinfo)
@@ -66,21 +65,13 @@ class ClientHandlerRecognizer(Thread):
                         }
                 }
         jreq = json.dumps(request)
-        #self.Send(jreq)
         SendJSON(self.clientsock, jreq)
-        #ans = ReceivJSON(self.clientsock)#self.Receiv()
-        #if not ans:raise Exception('Conection is down')
-        #if ans['ans'] != 'ready': raise Exception('Sending refused')
-        #print len(tmp)
         self.Send(tmp)
 
     def RecievImage(self, arg):
         shape = arg['shape']
         size = arg['size']
         ans = json.dumps({'ans' : 'ready'})
-        
-        #SendJSON(self.clientsock, ans)
-        #self.clientsock.send(ans)
         
         tmp = ''
         data = ''
@@ -94,11 +85,6 @@ class ClientHandlerRecognizer(Thread):
     def run(self):
         self.finish = False
         while not self.finish:
-            #data = self.clientsock.recv(self.BUFSIZ)
-            #if not data: break
-            #print 'request:', data
-            #request = json.loads(data)
-            #if not data: break
             print 'receiving....'
             try:
                 request = ReceivJSON(self.clientsock)
@@ -113,10 +99,7 @@ class ClientHandlerRecognizer(Thread):
                 img = self.RecievImage(request['args'])
                 if img.shape[1] > 1000:
                     img = PackImage(img, 1000)
-                #cv2.imwrite('1.jpg', img)
-                #cv2.imread(1)
                 img = MarkLetters(img)
-                #cv2.rectangle(img, (20, 30), (300, 300), (255, 0, 255))
                 self.SendImage(img)
 
             if request['method'] == 'load_image':
@@ -127,14 +110,9 @@ class ClientHandlerRecognizer(Thread):
                     img = cv2.imread(data)#self.RecievImage(request['args'])p
                     if img.shape[1] > 1000:
                         img = PackImage(img, 1000)
-                    #gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
                     letterscan = FindLetters(img)#GetLetters(gray)
                     letters = CutAllLetters(img, letterscan)
                     img = MarkIt(img, letterscan)
-                    #for l in letters:
-                    #    tmp_name = str(time()) + '.tif'
-                    #    #cv2.imwrite('lettersstorage/' + tmp_name, l)
-                    #    #ans.append(RecFromFile(tmp_name))
                     cv2.imwrite(data[:data.rfind('.')] + '.rec.jpg', img)
                     try:
                         SendJSON(self.clientsock, json.dumps({'ans' : 'ok'}))
