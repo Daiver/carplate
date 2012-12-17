@@ -8,14 +8,12 @@ import datetime
 
 from random import random
 
-from django.shortcuts import render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 
 from django.template.loader import get_template
 from django.template import RequestContext
 
 from django.core.urlresolvers import reverse
-from django.shortcuts import get_object_or_404
 
 from django.contrib import auth
 from django.contrib.auth.models import User 
@@ -25,8 +23,6 @@ from django.contrib import messages
 from django.utils.translation import ugettext as _
 
 from forms import AuthForm, RegForm, RestorePassForm
-
-from models import RestorePassRequest
 
 def AuthPage(request, message=''):
     application_name = _("Auth")

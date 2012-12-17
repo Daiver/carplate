@@ -20,6 +20,7 @@
     </form>
     {% else %}
     <h3> Чтобы получить возможность добавлять свои фотографии - авторизуйтесь </h3>
+    <a href="{% url regnauth.AuthPage %}">Auth</a>
     {% endif %}
  <li><h2>Gallery: </h2><br />
           {% for o in list%}

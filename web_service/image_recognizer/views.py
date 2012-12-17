@@ -107,3 +107,6 @@ def gallery(request, showlimit):
     else:
         form = AddImageForm()
     return direct_to_template(request,'gallery.html',{'list':newli, 'form':form})
+
+def aboutUs(request) :
+    return direct_to_template(request, 'aboutUs.html')
