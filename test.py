@@ -2,7 +2,7 @@ import unittest
 
 from SWT_lite import *
 from SWT_Support import *
-import djset 
+from djset  import *
 
 import numpy as np
 
@@ -32,7 +32,6 @@ class Test_TwoPass(unittest.TestCase):
                 [1, 0, 0, 1, 1, 0, 1, 1],
             ], dtype=np.float
             )
-        data *= 100
         data [data == 0] = np.inf 
         res = TwoPass(data)
         testres = []
@@ -40,6 +39,51 @@ class Test_TwoPass(unittest.TestCase):
             testres.append(x.points)
 
         self.assertEqual(testres, testeq)
+    
+    def test_2(self):
+        testeq = [ [(0, 3), (1, 3), (1, 4), (2, 4), (3, 3), (3, 4)],
+                    [(2, 0), (3, 0)],
+                ]
+
+
+        data = np.array(
+            [
+                [0, 0, 0, 1, 0],
+                [0, 0, 0, 1, 1],
+                [1, 0, 0, 0, 1],
+                [1, 0, 0, 1, 1],
+            ], dtype=np.float
+            )
+        data [data == 0] = np.inf 
+        res = TwoPass(data)
+        testres = []
+        for x in res:
+            testres.append(x.points)
+        self.assertEqual(testres, testeq)
+
+    def test_3(self):
+        testeq = [ [(0, 0), (0, 1)],
+                    [(0, 3), (1, 3), (1, 4), (2, 4), (3, 3), (3, 4)],
+                    [(2, 0), (3, 0)],
+                ]
+
+
+        data = np.array(
+            [
+                [1, 1, 0, 1, 0],
+                [0, 0, 0, 1, 1],
+                [1, 0, 0, 0, 1],
+                [1, 0, 0, 1, 1],
+            ], dtype=np.float
+            )
+        data [data == 0] = np.inf 
+        res = TwoPass(data)
+        testres = []
+        for x in res:
+            testres.append(x.points)
+        self.assertEqual(testres, testeq)
+
+
 '''
 '''
 class Test_DistanceBetween(unittest.TestCase):
