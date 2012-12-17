@@ -2,9 +2,46 @@ import unittest
 
 from SWT_lite import *
 from SWT_Support import *
+import djset 
 
 import numpy as np
 
+import math
+
+from random import random
+
+
+class Test_TwoPass(unittest.TestCase):
+    def test_1(self):
+        testeq = [ [(0, 3), (1, 3), (1, 4), (2, 2), (2, 3), (3, 3), (3, 4)],
+                    [(0, 6), (0, 7)],
+                    [(5, 0), (6, 0)],
+                    [(5, 4), (6, 3), (6, 4)],
+                    [(5, 6), (6, 6), (6, 7)],
+                ]
+
+
+        data = np.array(
+            [
+                [0, 0, 0, 1, 0, 0, 1, 1],
+                [0, 0, 0, 1, 1, 0, 0, 0],
+                [0, 0, 1, 1, 0, 0, 0, 0],
+                [0, 0, 0, 1, 1, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0],
+                [1, 0, 0, 0, 1, 0, 1, 0],
+                [1, 0, 0, 1, 1, 0, 1, 1],
+            ], dtype=np.float
+            )
+        data *= 100
+        data [data == 0] = np.inf 
+        res = TwoPass(data)
+        testres = []
+        for x in res:
+            testres.append(x.points)
+
+        self.assertEqual(testres, testeq)
+'''
+'''
 class Test_DistanceBetween(unittest.TestCase):
     def test_1(self):
         c1 = {'centerX': 0, 'centerY' : 0}
@@ -30,6 +67,17 @@ class Test_DistanceBetween(unittest.TestCase):
         c1 = {'centerX': 3, 'centerY' : 4}
         c2 = {'centerX': 6, 'centerY' : 0}
         self.assertEqual(DistanceBetween(c1, c2), 5.)
+
+    def test_rand(self):
+        c1 = {'centerX': random()*100, 'centerY' : random()*100}
+        c2 = {'centerX': random()*100, 'centerY' : random()*100}
+        self.assertEqual(DistanceBetween(c1, c2), math.sqrt((c1['centerX']-c2['centerX'])**2 + (c1['centerY']-c2['centerY'])**2))
+
+    def test_full(self):
+        for i in xrange(1000):
+            c1 = {'centerX': random()*100, 'centerY' : random()*100}
+            c2 = {'centerX': random()*100, 'centerY' : random()*100}
+            self.assertEqual(DistanceBetween(c1, c2), math.sqrt((c1['centerX']-c2['centerX'])**2 + (c1['centerY']-c2['centerY'])**2))
 
 class Test_anglediff(unittest.TestCase):
     def test_1(self):

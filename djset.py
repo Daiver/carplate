@@ -62,7 +62,7 @@ def TwoPass(data):
             labels[i, j] = linked[labels[i, j]].label
             linked[labels[i, j]].points.append((i, j))
     #print labels
-    print 'inner', time() - st
+    #print 'inner', time() - st
     res = []
     #for x in linked:
     #    if x.parent == x:res.append(x)
@@ -73,8 +73,7 @@ def TwoPass(data):
     for x in tmp: res.append(linked[x])
     return res
 
-
-if __name__ == '__main__':
+def testtwopass():
     from random import random
     from time import time
     for j in xrange(1):
@@ -93,12 +92,18 @@ if __name__ == '__main__':
         data *= 100
         data [data == 0] = np.inf 
         #data = np.array([int(random() * 15) for i in xrange(1200000)]).reshape(1000, 1200)
-        print data
-        st = time()
+        #print data
         res = TwoPass(data)
+        testres = []
         for x in res:
-            print x.points
-        print 't', time() - st
+            testres.append(x.points)
+            #print x.points
+        #print 't', time() - st
+
+
+if __name__ == '__main__':
+    testtwopass()
+
 '''
 algorithm TwoPass(data)
    linked = []
