@@ -5,11 +5,7 @@ from SWT_lite import *
 
 from socket import socket, AF_INET, SOCK_STREAM
 
-import simplejson as json
-
 from SocketWorker import *
-
-from ImageConverter import *
 
 #from letterselect import CutLetters
 
