@@ -14,10 +14,11 @@
     </div>
     <div class="subheader">
         <div class="subheader_right">
+            <a href="/">Главная</a><a href="/show/0/">Показать всё</a><a href="/aboutUs/">Контакты</a>
             {% if user.is_authenticated %}
-            <a href="/">Главная</a><a href="/show/0/">Показать всё</a><a href="/aboutUs/">Контакты</a><a href="{% url regnauth.logout %}">Выйти, {{ user.username }}</a>
+            <a href="{% url regnauth.logout %}">Выйти, {{ user.username }}</a>
             {% else %}
-            <a href="#">Главная</a><a href="#">Контакты</a>
+            <a href="/auth/">Авторизоваться</a>
             {% endif%}
         </div>
         <div class="subheader_left">
