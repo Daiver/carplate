@@ -7,7 +7,7 @@ from socket import socket, AF_INET, SOCK_STREAM
 
 import simplejson as json
 
-from service_server import *
+from SocketWorker import *
 
 from ImageConverter import *
 
@@ -15,7 +15,7 @@ from ImageConverter import *
 
 BUFSIZ = 1000000000
 
-class Client(ClientHandlerRecognizer):
+class Client(SocketWorker):
     def __init__(self, addr):
         self.addr = addr
         self.clientsock = socket(AF_INET, SOCK_STREAM)
@@ -23,12 +23,6 @@ class Client(ClientHandlerRecognizer):
 
     def Connect(self):
         self.clientsock.connect(self.addr)
-
-    def Send(self, data):
-        self.clientsock.send(data)
-
-    def Receiv(self):
-        return self.clientsock.recv(BUFSIZ)
 
     def Close(self):
         self.clientsock.close()
