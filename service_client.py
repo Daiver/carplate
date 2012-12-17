@@ -6,7 +6,6 @@ from SWT_lite import *
 from socket import socket, AF_INET, SOCK_STREAM
 
 import cv2
-#import numpy as np
 import simplejson as json
 
 from service_server import *
@@ -28,9 +27,6 @@ if __name__ == '__main__':
     cl.Connect()
     req = json.dumps({'method' : 'load_image', 'path' : sys.argv[1]})
     SendJSON(cl.clientsock, req)
-    #cl.SendImage(img)
-    #ans = json.loads(cl.Receiv())
-    #ans = ReceivJSON(cl.clientsock)
     ans = cl.Receiv()
     data = sys.argv[1]
     img = cv2.imread(data[:data.rfind('.')] + '.rec.jpg')

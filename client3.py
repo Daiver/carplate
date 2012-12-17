@@ -11,8 +11,6 @@ from service_server import *
 
 from ImageConverter import *
 
-#from letterselect import CutLetters
-
 BUFSIZ = 1000000000
 
 class Client(ClientHandlerRecognizer):
