@@ -3,15 +3,12 @@ import sys, os, cv2
 import numpy as np
 import simplejson as json
 
-if __name__ == '__main__':
-    img_path = 'img/cars/2.jpg'
+def show_n_write_components(img_path):
     if not os.path.exists(img_path):
-        print 'Cannot find image'
-        exit()
+        print 'Cannot find image', img_path
+        return
     
     image = cv2.imread(img_path)
-    #gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
     letters = FindLetters(image, 
             debug_flags=DEFAULT_DEBUG_FLAGS
         )
@@ -26,3 +23,11 @@ if __name__ == '__main__':
     cv2.imwrite('result/' + img_path.replace('/', '-'), image)
     #cv2.imshow('after all ...', image)
     #cv2.waitKey(10000)
+
+
+if __name__ == '__main__':
+    img_path = 'img/cars/2.jpg'
+    show_n_write_components(img_path)
+
+#{'std': 1.3543538616436788, 'X2': 50, 'height': 62, 'width': 48, 'centerX': 26.0, 'centerY': 33.0, 'Y': 2, 'X': 2, 'Y2': 64, 'mean': 2.9627906976744187}
+
