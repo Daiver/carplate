@@ -55,7 +55,7 @@ if __name__ == '__main__':
     dirs, files = getsubs(dir_path)
     files = filter(lambda x: x[-4:] == '.jpg', files)
     print('Finding %s durs, %s files' % (str(len(dirs)), str(len(files))))
-    border_index = 2
+    border_index = 33
     for i, i_name in enumerate(files[border_index:]):
         i += border_index
         print('Number %s', str(i))
