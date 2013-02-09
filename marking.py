@@ -19,14 +19,22 @@ def show_n_write_components(img_path):
         for l in letters:
             del l['points']
             del l['swvalues']
+            back_img = image.copy()
             cv2.rectangle(image, (l['Y'], l['X']), (l['Y2'], l['X2']), (0, 20, 200))
             l['path'] = img_path
             cv2.imshow('after all ...', image)
             key = cv2.waitKey() % 0x100
-            print(key)
+            #print(key)
+            if key != 82:
+                l['is_symbol'] = True
+                print('Marking as symbol')
+            else:
+                l['is_symbol'] = False
+                print('Marking as NOT symbol')
             newltr = json.dumps(l)
             print(newltr)
             f.write(newltr + '\n')
+            image = back_img
 
 def getsubs(dir):
     dirs = []
@@ -45,8 +53,11 @@ if __name__ == '__main__':
     dir_path = '/home/kirill/fromavtochmo'
     print('Scaning dir %s....' % dir_path)
     dirs, files = getsubs(dir_path)
+    files = filter(lambda x: x[-4:] == '.jpg', files)
     print('Finding %s durs, %s files' % (str(len(dirs)), str(len(files))))
-    show_n_write_components(img_path)
+    for i, i_name in enumerate(files):
+        print('Number %s', str(i))
+        show_n_write_components(i_name)
 
 #{'std': 1.3543538616436788, 'X2': 50, 'height': 62, 'width': 48, 'centerX': 26.0, 'centerY': 33.0, 'Y': 2, 'X': 2, 'Y2': 64, 'mean': 2.9627906976744187}
 
