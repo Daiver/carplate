@@ -23,7 +23,7 @@ if __name__ == '__main__':
     border_index = 0
     for i, i_name in enumerate(files[border_index:]):
         i += border_index
-        print('Number %s', str(i))
+        print('Number %s' % str(i))
         su.call('python marking.py %s' % i_name, shell=True)
         #show_n_write_components(i_name)
 
