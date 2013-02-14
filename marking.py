@@ -14,7 +14,7 @@ def show_n_write_components(img_path):
         )
 
     #print json.loads(newltr)
-    new_path = 'dumps/' + img_path.replace('/', '-')
+    new_path = 'dumps/' + img_path.replace('/', '\\')
     with open(new_path, 'w') as f:
         for l in letters:
             del l['points']
@@ -36,30 +36,12 @@ def show_n_write_components(img_path):
             f.write(newltr + '\n')
             image = back_img
 
-def getsubs(dir):
-    dirs = []
-    files = []
-    for dirname, dirnames, filenames in os.walk(dir):
-        dirs.append(dirname)
-        for subdirname in dirnames:
-            dirs.append(os.path.join(dirname, subdirname))
-        for filename in filenames:
-            files.append(os.path.join(dirname, filename))
-    return dirs, files
-
-
 if __name__ == '__main__':
-    img_path = 'img/cars/2.jpg'
-    dir_path = '/home/kirill/fromavtochmo'
-    print('Scaning dir %s....' % dir_path)
-    dirs, files = getsubs(dir_path)
-    files = filter(lambda x: x[-4:] == '.jpg', files)
-    print('Finding %s durs, %s files' % (str(len(dirs)), str(len(files))))
-    border_index = 33
-    for i, i_name in enumerate(files[border_index:]):
-        i += border_index
-        print('Number %s', str(i))
-        show_n_write_components(i_name)
+    try:
+        show_n_write_components(sys.argv[1])
+    except Exception as ex:
+        print(ex)
+        print('Error in %s' % sys.argv[1])
 
 #{'std': 1.3543538616436788, 'X2': 50, 'height': 62, 'width': 48, 'centerX': 26.0, 'centerY': 33.0, 'Y': 2, 'X': 2, 'Y2': 64, 'mean': 2.9627906976744187}
 
