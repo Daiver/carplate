@@ -22,15 +22,15 @@ def show_n_write_components(img_path):
             back_img = image.copy()
             cv2.rectangle(image, (l['Y'], l['X']), (l['Y2'], l['X2']), (0, 20, 200))
             l['path'] = img_path
-            cv2.imshow('after all ...', image)
-            key = cv2.waitKey() % 0x100
+            #cv2.imshow('after all ...', image)
+            #key = cv2.waitKey() % 0x100
             #print(key)
-            if key != 82:
-                l['is_symbol'] = True
-                print('Marking as symbol')
-            else:
-                l['is_symbol'] = False
-                print('Marking as NOT symbol')
+            #if key != 82:
+            #    l['is_symbol'] = True
+            #    print('Marking as symbol')
+            #else:
+            #    l['is_symbol'] = False
+            #    print('Marking as NOT symbol')
             newltr = json.dumps(l)
             print(newltr)
             f.write(newltr + '\n')
