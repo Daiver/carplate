@@ -39,7 +39,7 @@ def ds_from_raw_data(source_dir):
     return ds
 
 def train_it(ds):
-    net = buildNetwork(NN_in_size, 12, 1, bias=True)
+    net = buildNetwork(NN_in_size, 36, 1, bias=True)
     st = time()
     trainer = rprop.RPropMinusTrainer(net, learningrate = 0.01, momentum = 0.99, verbose=True)
     trainer.trainOnDataset(ds, 100)
@@ -49,3 +49,5 @@ def train_it(ds):
 
 if __name__ == '__main__':
     net = train_it(ds_from_raw_data('training_examples'))
+    with open('Saved_NN', 'w') as f:
+        pickle.dump(net, f)
