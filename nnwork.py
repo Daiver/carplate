@@ -7,6 +7,7 @@ import numpy as np
 from time import time
 import simplejson as json
 import os
+import random
 
 NN_in_size = 6
 
@@ -26,21 +27,25 @@ def ds_from_raw_data(source_dir):
         with open(os.path.join(source_dir, source_file)) as f:
             for line in f:
                 res.append(json.loads(line))
-    print(len(res))
+    print('Num of samples: %s' % len(res))
+    pos = filter(lambda x:x['issymbol'], res)
+    neg = filter(lambda x: not x['issymbol'], res)
+    neg = [neg[int(random.random()*len(neg))] for x in pos]
+    print(len(pos), len(neg))
     ds = SupervisedDataSet(NN_in_size, 1)
+    map(lambda x:ds.addSample(features_from_component(x), (1, )), pos)
+    map(lambda x:ds.addSample(features_from_component(x), (0, )), neg)
+    print(ds)
     return ds
 
-def train_it():
+def train_it(ds):
     net = buildNetwork(NN_in_size, 12, 1, bias=True)
-    for i in xrange(1, 5):
-        ds.addSample(np.array([1, 0.1 * i]), (1, ))
-    for i in xrange(1, 50):
-        ds.addSample(np.array([0, 0.1 * i]), (0, ))
     st = time()
-    trainer = BackpropTrainer(net, learningrate = 0.01, momentum = 0.99)
+    trainer = rprop.rprop(net, learningrate = 0.01, momentum = 0.99)
     trainer.trainOnDataset(ds, 10)
     trainer.testOnData()
     print 'Learning time:', time() - st
+    return net
 
 if __name__ == '__main__':
-    ds_from_raw_data('training_examples')
+    net = train_it(ds_from_raw_data('training_examples'))
