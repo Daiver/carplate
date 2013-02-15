@@ -347,14 +347,15 @@ def Association(gray, contour, swimage, debug_components=False, ser=''):
     if debug_components: VizComponent(contour, components, 'Association', ser)
     return components
 
-ANN = None
+
 features_from_component = None
 
-def NN_filter(component):
-    print('!')
+def NN_filter(component, ANN, features_from_component):
+    print('ANN', features_from_component)
+    print(ANN.activate(features_from_component(component)))
     return True
 
-def ComponentFiltering(components, contour, gray, debug_components_after=False, ser='', use_ann=False):
+def ComponentFiltering(components, contour, gray, debug_components_after=False, ser='', use_ann=False, ANN=None, ffcf=None):
     final_components = []
     for res in components:
         if (
@@ -372,7 +373,7 @@ def ComponentFiltering(components, contour, gray, debug_components_after=False, 
                 res['std'] = np.std(res['swvalues'])
                 if ((res['std']/res['mean'] <= 1)
                     and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 1200)
-                    and ((use_ann==False) or NN_filter(res))
+                    and ((use_ann==False) or NN_filter(res, ANN, ffcf))
                 ):
                     #if True:#res['variance'] < 40:
                     res['centerX'] = res['X'] + res['width']/2.
@@ -493,12 +494,16 @@ def FindLetters(image, stage=work_stages['no'], oldser=None, dump_stages=False, 
     
     if stage < work_stages['components']:
         print 'Component Filtering...'
+        ANN = None
+        features_from_component = None
         if debug_flags['use_ann_component_filter']:
             with open('Saved_NN') as f:
                 ANN = pickle.load(f)
                 import nnwork
                 features_from_component = nnwork.features_from_component
-        components = ComponentFiltering(components, contour, gray, debug_components_after=debug_flags['debug_components_after'], ser=curser, use_ann=debug_flags['use_ann_component_filter'])
+                print features_from_component
+        print ANN
+        components = ComponentFiltering(components, contour, gray, debug_components_after=debug_flags['debug_components_after'], ser=curser, use_ann=debug_flags['use_ann_component_filter'], ANN=ANN, ffcf=features_from_component)
         if dump_stages:
             dumpobj(components, 'components', curser)
     else:
