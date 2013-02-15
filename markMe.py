@@ -21,7 +21,8 @@ def main():
                     cv2.rectangle(img, (component['Y'], component['X']), (component['Y2'], component['X2']), (0, 20, 200))
                     cv2.imshow('Watch!...', img)
                     key = cv2.waitKey() % 0x100
-                    if key != 82:
+                    print(key)
+                    if key == 82:
                         print('Marking component as NOT symbol')
                         component['issymbol'] = False
                     else:
