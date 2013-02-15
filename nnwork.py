@@ -41,8 +41,8 @@ def ds_from_raw_data(source_dir):
 def train_it(ds):
     net = buildNetwork(NN_in_size, 12, 1, bias=True)
     st = time()
-    trainer = rprop.rprop(net, learningrate = 0.01, momentum = 0.99)
-    trainer.trainOnDataset(ds, 10)
+    trainer = rprop.RPropMinusTrainer(net, learningrate = 0.01, momentum = 0.99, verbose=True)
+    trainer.trainOnDataset(ds, 100)
     trainer.testOnData()
     print 'Learning time:', time() - st
     return net
