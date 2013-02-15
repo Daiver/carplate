@@ -14,7 +14,7 @@ CUR_DEBUG_FLAGS = {
         'debug_components' : False,
         'debug_components_after' : False,
         'debug_pairs' : True,
-        'use_ann_component_filter' : True,
+        'use_ann_component_filter' : False,
     }
 
 if __name__ == '__main__':
