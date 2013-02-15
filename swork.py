@@ -10,9 +10,9 @@ import numpy as np
 
 CUR_DEBUG_FLAGS = {
         'debug_rays' : False,
-        'debug_swimage' : True,
-        'debug_components' : True,
-        'debug_components_after' : True,
+        'debug_swimage' : False,
+        'debug_components' : False,
+        'debug_components_after' : False,
         'debug_pairs' : True,
         'use_ann_component_filter' : True,
     }
@@ -67,5 +67,5 @@ if __name__ == '__main__':
         cv2.rectangle(image, (l['Y'], l['X']), (l['Y2'], l['X2']), (0, 20, 200))
     #writing final result
     cv2.imwrite('result/' + sys.argv[1].replace('/', '-'), image)
-    #cv2.imshow('after all ...', image)
-    #cv2.waitKey(10000)
+    cv2.imshow('after all ...', image)
+    cv2.waitKey(10000)

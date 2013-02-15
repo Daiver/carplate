@@ -348,9 +348,10 @@ def Association(gray, contour, swimage, debug_components=False, ser=''):
     return components
 
 ANN = None
+features_from_component = None
 
 def NN_filter(component):
-    print('in ann filter!')
+    print('!')
     return True
 
 def ComponentFiltering(components, contour, gray, debug_components_after=False, ser='', use_ann=False):
@@ -492,6 +493,11 @@ def FindLetters(image, stage=work_stages['no'], oldser=None, dump_stages=False, 
     
     if stage < work_stages['components']:
         print 'Component Filtering...'
+        if debug_flags['use_ann_component_filter']:
+            with open('Saved_NN') as f:
+                ANN = pickle.load(f)
+                import nnwork
+                features_from_component = nnwork.features_from_component
         components = ComponentFiltering(components, contour, gray, debug_components_after=debug_flags['debug_components_after'], ser=curser, use_ann=debug_flags['use_ann_component_filter'])
         if dump_stages:
             dumpobj(components, 'components', curser)
