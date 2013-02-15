@@ -2,26 +2,16 @@
 #import cython
 
 import cv2
-
 import numpy as np
 import numpy#madness 
-
 from Queue import Queue
-
 import SWT_Support# import *
-
 import Bresenham #import Selector
-
 from multiprocessing.pool import ThreadPool
-
 from time import time
-
 import cProfile
-
 import pickle
-
 from djset import *
-
 import pp
 
 makestep = lambda point, step: (point[0] + step[0], point[1] + step[1])
@@ -357,6 +347,11 @@ def Association(gray, contour, swimage, debug_components=False, ser=''):
     if debug_components: VizComponent(contour, components, 'Association', ser)
     return components
 
+ANN = None
+
+def NN_filter(component):
+    return True
+
 def ComponentFiltering(components, contour, gray, debug_components_after=False, ser=''):
     final_components = []
     for res in components:
@@ -375,6 +370,7 @@ def ComponentFiltering(components, contour, gray, debug_components_after=False, 
                 res['std'] = np.std(res['swvalues'])
                 if ((res['std']/res['mean'] <= 1)
                     and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 1200)
+                    and (NN_filter(res))
                 ):
                     #if True:#res['variance'] < 40:
                     res['centerX'] = res['X'] + res['width']/2.
@@ -432,6 +428,7 @@ DEFAULT_DEBUG_FLAGS = {
         'debug_components' : False,
         'debug_components_after' : False,
         'debug_pairs' : False,
+        'use_ann_component_filter' : False,
     }
 
 def FindLetters(image, stage=work_stages['no'], oldser=None, dump_stages=False, new_ser='', debug_flags=None):
