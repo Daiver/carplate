@@ -6,9 +6,21 @@ import pickle
 import numpy as np
 from time import time
 
-if __name__ == '__main__':
-    ds = SupervisedDataSet(2, 1)
-    net = buildNetwork(2, 4, 1, bias=True)
+NN_in_size = 6
+
+def features_from_component(component):
+    return np.array([
+            float(component['width'])/component['height'],
+            float(component['std'])/component['mean'],
+            float(component['width']),
+            float(component['height']),
+            float(component['std']),
+            float(component['mean']),
+        ])
+
+def train_it():
+    ds = SupervisedDataSet(NN_in_size, 1)
+    net = buildNetwork(NN_in_size, 12, 1, bias=True)
     for i in xrange(1, 5):
         ds.addSample(np.array([1, 0.1 * i]), (1, ))
     for i in xrange(1, 50):
