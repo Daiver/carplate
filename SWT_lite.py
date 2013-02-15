@@ -349,7 +349,7 @@ def Association(gray, contour, swimage, debug_components=False, ser=''):
 
 
 def NN_filter(component, ANN, features_from_component):
-    return ANN.activate(features_from_component(component)) > 0.45
+    return ANN.activate(features_from_component(component)) > 0.35
     return True
 
 def ComponentFiltering(components, contour, gray, debug_components_after=False, ser='', use_ann=False, ANN=None, ffcf=None):
