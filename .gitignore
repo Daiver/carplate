@@ -2,5 +2,6 @@
 *.*~
 result/*
 dumps/*
+training_examples/*
 lettersstorage/*
 web_service/web_service/media/saved/

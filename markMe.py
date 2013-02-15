@@ -10,15 +10,16 @@ def main():
         lambda x: x not in os.listdir(target_dir), 
         os.listdir(source_dir)):
         with open(os.path.join(source_dir, source_file)) as f:
-            with open(os.path.join(target_dir, source_file)) as output:
+            with open(os.path.join(target_dir, source_file), 'w') as output:
                 print('Works with %s' % source_file)
                 img = None
                 for string in f:
                     component = json.loads(string)
-                    if not img:img = cv2.imread(component['path'])
+                    print(component)
+                    if img == None:img = cv2.imread(component['path'])
                     oldimg = img.copy()
-                    cv2.rectangle(image, (component['Y'], component['X']), (component['Y2'], component['X2']), (0, 20, 200))
-                    cv2.imshow('Watch!...')
+                    cv2.rectangle(img, (component['Y'], component['X']), (component['Y2'], component['X2']), (0, 20, 200))
+                    cv2.imshow('Watch!...', img)
                     key = cv2.waitKey() % 0x100
                     if key != 82:
                         print('Marking component as NOT symbol')
