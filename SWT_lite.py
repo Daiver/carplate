@@ -350,9 +350,10 @@ def Association(gray, contour, swimage, debug_components=False, ser=''):
 ANN = None
 
 def NN_filter(component):
+    print('in ann filter!')
     return True
 
-def ComponentFiltering(components, contour, gray, debug_components_after=False, ser=''):
+def ComponentFiltering(components, contour, gray, debug_components_after=False, ser='', use_ann=False):
     final_components = []
     for res in components:
         if (
@@ -370,7 +371,7 @@ def ComponentFiltering(components, contour, gray, debug_components_after=False, 
                 res['std'] = np.std(res['swvalues'])
                 if ((res['std']/res['mean'] <= 1)
                     and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 1200)
-                    and (NN_filter(res))
+                    and ((use_ann==False) or NN_filter(res))
                 ):
                     #if True:#res['variance'] < 40:
                     res['centerX'] = res['X'] + res['width']/2.
@@ -491,7 +492,7 @@ def FindLetters(image, stage=work_stages['no'], oldser=None, dump_stages=False, 
     
     if stage < work_stages['components']:
         print 'Component Filtering...'
-        components = ComponentFiltering(components, contour, gray, debug_components_after=debug_flags['debug_components_after'], ser=curser)
+        components = ComponentFiltering(components, contour, gray, debug_components_after=debug_flags['debug_components_after'], ser=curser, use_ann=debug_flags['use_ann_component_filter'])
         if dump_stages:
             dumpobj(components, 'components', curser)
     else:
