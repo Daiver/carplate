@@ -9,11 +9,12 @@ import simplejson as json
 import os
 import random
 
-NN_in_size = 6
+NN_in_size = 7
 
 def features_from_component(component):
     return np.array([
             float(component['width'])/component['height'],
+            float(component['width'])*component['height'],
             float(component['std'])/component['mean'],
             float(component['width']),
             float(component['height']),
@@ -39,10 +40,10 @@ def ds_from_raw_data(source_dir):
     return ds
 
 def train_it(ds):
-    net = buildNetwork(NN_in_size, 54, 1, bias=True)
+    net = buildNetwork(NN_in_size, 50, 1, bias=True)
     st = time()
     trainer = rprop.RPropMinusTrainer(net, learningrate = 0.01, momentum = 0.99, verbose=True)
-    trainer.trainOnDataset(ds, 200)
+    trainer.trainOnDataset(ds, 5000)
     trainer.testOnData()
     print 'Learning time:', time() - st
     return net
