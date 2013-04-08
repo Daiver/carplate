@@ -242,6 +242,7 @@ def Ray_Tracing(contour, angles_img, debug_rays=False, dx=None, dy=None):#return
     rng = 4 
     block_len = len(li)/rng
     li2 = [li[block_len*(i-1) : block_len*i]  for i in xrange(1, int(rng)+1)]    
+    '''
     job_server = pp.Server(2, ppservers=())
 
     jobs = [(points, job_server.submit(worker3, (n_contour, angles_img, points, dx, dy), (Stroke, CheckAngleNear, checkbound, makestep, checkbound_sq), ("math", 'numpy', 'Bresenham', 'SWT_Support'))) for points in li2]
@@ -249,16 +250,16 @@ def Ray_Tracing(contour, angles_img, debug_rays=False, dx=None, dy=None):#return
         tmp = job()
         if tmp:rays.extend(tmp)
     '''
+    '''
     st = time()
     print 'start tracking'
     p.map(worker, li2)
     print 'rt t', time() - st
     '''
-    '''
     tmp = map(worker2, li)
     for t in tmp:
         if t:rays.append(t)
-    '''
+
     if debug_rays:
         for res in rays:
             tmp = contour.copy()
@@ -350,7 +351,6 @@ def Association(gray, contour, swimage, debug_components=False, ser=''):
 
 def NN_filter(component, ANN, features_from_component):
     return ANN.activate(features_from_component(component)) > 0.5
-    return True
 
 def ComponentFiltering(components, contour, gray, debug_components_after=False, ser='', use_ann=False, ANN=None, ffcf=None):
     final_components = []
@@ -370,7 +370,7 @@ def ComponentFiltering(components, contour, gray, debug_components_after=False, 
                 res['std'] = np.std(res['swvalues'])
                 if ((res['std']/res['mean'] <= 1)
                     and (VarianceFromRect((res['X'], res['Y']), (res['X2'], res['Y2']), gray) > 1200)
-                    and ((use_ann==False) or NN_filter(res, ANN, ffcf))
+                    #and ((use_ann==False) or NN_filter(res, ANN, ffcf))
                 ):
                     #if True:#res['variance'] < 40:
                     res['centerX'] = res['X'] + res['width']/2.
